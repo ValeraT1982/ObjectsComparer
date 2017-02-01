@@ -8,6 +8,8 @@ namespace ObjectsComparer.Tests.TestClasses
 {
     class CollectionOfB: IProgress<string>, ICollection<B>
     {
+        public string Property1 { get; set; }
+
         public int Count => _collection.Count;
         public bool IsReadOnly => false;
 

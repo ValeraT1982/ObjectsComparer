@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace ObjectsComparer
 {
-    public class CollectionsComparer<T> : IComparer
+    public class CollectionsComparer<T> : ICollectionsComparer
     {
         private readonly IObjectDataComparer _comparer;
 
@@ -14,32 +14,32 @@ namespace ObjectsComparer
             _comparer = elementComparer ?? new ObjectsDataComparer<T>();
         }
 
-        public IEnumerable<ComparisonFailure> Compare(object expected, object actual)
+        public IEnumerable<Difference> Compare(object obj1, object obj2)
         {
-            expected = expected ?? new Collection<T>();
-            actual = actual ?? new Collection<T>();
+            obj1 = obj1 ?? new Collection<T>();
+            obj2 = obj2 ?? new Collection<T>();
 
-            if (expected.GetType().IsAssignableFrom(typeof(ICollection<T>)))
+            if (obj1.GetType().IsAssignableFrom(typeof(ICollection<T>)))
             {
-                throw new ArgumentException(nameof(expected));
+                throw new ArgumentException(nameof(obj1));
             }
 
-            if (actual.GetType().IsAssignableFrom(typeof(ICollection<T>)))
+            if (obj2.GetType().IsAssignableFrom(typeof(ICollection<T>)))
             {
-                throw new ArgumentException(nameof(actual));
+                throw new ArgumentException(nameof(obj2));
             }
 
-            var expectedList = ((ICollection<T>)expected).ToList();
-            var actualList = ((ICollection<T>)actual).ToList();
+            var expectedList = ((ICollection<T>)obj1).ToList();
+            var actualList = ((ICollection<T>)obj2).ToList();
 
             if (expectedList.Count != actualList.Count)
             {
-                yield return new ComparisonFailure("[]", expectedList.Count.ToString(), actualList.Count.ToString());
+                yield return new Difference("[]", expectedList.Count.ToString(), actualList.Count.ToString());
 
                 yield break;
             }
 
-            for (int i = 0; i < actualList.Count - 1; i++)
+            for (int i = 0; i < actualList.Count; i++)
             {
                 foreach (var failure in _comparer.Compare(expectedList[i], actualList[i]))
                 {

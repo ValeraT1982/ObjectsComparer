@@ -6,13 +6,21 @@ namespace ObjectsComparer.Tests.TestClasses
 {
     class A
     {
-        public int Field1;
+        public int Field;
 
-        protected int Field2;
+        protected int ProtectedField;
 
-        public int Property1 { get; set; }
+        public readonly string ReadOnlyField;
 
-        internal double Property2 { get; }
+        public int Property { get; set; }
+
+        public double ReadOnlyProperty { get; }
+
+        protected bool ProtectedProperty { get; }
+
+        public B ClassB { get; set; }
+
+        public int[] IntArray { get; set; }
 
         public B[] ArrayOfB { get; set; }
 
@@ -23,6 +31,12 @@ namespace ObjectsComparer.Tests.TestClasses
         public List<B> ListOf { get; set; }
 
         public CollectionOfB ClassImplementsCollectionOfB { get; set; }
+
+        public ITestInterface IntefaceProperty { get; set; }
+
+        public TestStruct StructProperty { get; set; }
+
+        public TestEnum EnumProperty { get; set; }
 
         public int Property3
         {
@@ -37,13 +51,27 @@ namespace ObjectsComparer.Tests.TestClasses
 
         public A()
         {
-            Property2 = 3.14;
+            ReadOnlyProperty = 3.14;
         }
 
-        public A(double property2, int field2)
+        public A(double readOnlyProperty)
         {
-            Property2 = property2;
-            Field2 = field2;
+            ReadOnlyProperty = readOnlyProperty;
+        }
+
+        public A(int protectedField)
+        {
+            ProtectedField = protectedField;
+        }
+
+        public A(string readOnlyField)
+        {
+            ReadOnlyField = readOnlyField;
+        }
+
+        public A(bool protectedProperty)
+        {
+            ProtectedProperty = protectedProperty;
         }
     }
 }

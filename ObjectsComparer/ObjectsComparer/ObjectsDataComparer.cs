@@ -10,7 +10,6 @@ namespace ObjectsComparer
 {
     public class ObjectsDataComparer<T> : IObjectDataComparer
     {
-        public bool SkipDefaultValues { get; set; }
         public bool RecursiveComparison { get; set; }
 
         private readonly Dictionary<MemberInfo, IValueComparer> _memberComparerOverrides = new Dictionary<MemberInfo, IValueComparer>();
@@ -18,7 +17,9 @@ namespace ObjectsComparer
         private readonly List<MemberInfo> _members;
         private IValueComparer _defaultValueComparer;
 
-        public ObjectsDataComparer()
+        public ObjectsDataComparer() : this(true) { }
+
+        public ObjectsDataComparer(bool recursiveComparison)
         {
             var properties = typeof(T).GetProperties().Where(p =>
                 p.CanRead
@@ -31,8 +32,7 @@ namespace ObjectsComparer
 
             _members = properties.Union(fields.Cast<MemberInfo>()).ToList();
 
-            SkipDefaultValues = true;
-            RecursiveComparison = true;
+            RecursiveComparison = recursiveComparison;
             _defaultValueComparer = new DefaultValueComparer();
             AddComparerOverride(typeof(string), new NulableStringsValueComparer());
         }
@@ -63,23 +63,33 @@ namespace ObjectsComparer
             _defaultValueComparer = valueComparer;
         }
 
-        public IEnumerable<ComparisonFailure> Compare(object expectedObject, object actualObject)
+        public IEnumerable<Difference> Compare(object obj1, object obj2)
         {
-            return Compare((T)expectedObject, (T)actualObject);
+            return Compare((T)obj1, (T)obj2);
         }
 
-        public IEnumerable<ComparisonFailure> Compare(T expectedObject, T actualObject)
+        public IEnumerable<Difference> Compare(T obj1, T obj2)
         {
+            if ((typeof(T)).IsComparable() || _typeComparerOverrides.ContainsKey(typeof(T)))
+            {
+                var comparer = _defaultValueComparer;
+
+                if (_typeComparerOverrides.ContainsKey(typeof(T)))
+                {
+                    comparer = _typeComparerOverrides[typeof(T)];
+                }
+
+                if (!comparer.Compare(obj1, obj2))
+                {
+                    yield return new Difference(string.Empty, comparer.ToString(obj1), comparer.ToString(obj2));
+                }
+            }
+
             foreach (var member in _members)
             {
-                var expectedValue = member.GetMemberValue(expectedObject);
-                var actualValue = member.GetMemberValue(actualObject);
+                var value1 = member.GetMemberValue(obj1);
+                var value2 = member.GetMemberValue(obj2);
                 var type = member.GetMemberType();
-
-                if (SkipDefaultValues && expectedValue.IsDefaultValue())
-                {
-                    continue;
-                }
 
                 var comparer = _defaultValueComparer;
                 var hasCustomComparer = false;
@@ -97,13 +107,10 @@ namespace ObjectsComparer
 
                 if (RecursiveComparison
                     && !hasCustomComparer
-                    && expectedValue != null
-                    && actualValue != null
-                    && type.IsClass
-                    && type != typeof(string)
-                    && !type.IsAssignableFrom(typeof(IComparable))
-                    && !type.IsAssignableFrom(typeof(IComparable<>))
-                    && type.IsAssignableFrom(typeof(ICollection<>)))
+                    && value1 != null
+                    && value2 != null
+                    && !type.IsComparable()
+                    && type.InheritsFrom(typeof(ICollection<>)))
                 {
                     var elementType = type.GetInterfaces()
                         .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICollection<>))
@@ -114,22 +121,18 @@ namespace ObjectsComparer
                     var elementComparer = (IObjectDataComparer)Activator.CreateInstance(elementComparerType);
                     ConfigureChildComparer(elementComparer, _defaultValueComparer, _memberComparerOverrides, _typeComparerOverrides);
                     var collectionComparerType = typeof(CollectionsComparer<>).MakeGenericType(elementType);
-                    var collectionComparer = (IObjectDataComparer)Activator.CreateInstance(collectionComparerType, elementComparer);
-                    
-                    foreach (var failure in collectionComparer.Compare(expectedValue, actualValue))
-                    {
-                        yield return failure.InsertPath(member.Name);
-                    }
+                    var collectionComparer = (ICollectionsComparer)Activator.CreateInstance(collectionComparerType, elementComparer);
 
-                    continue;
+                    foreach (var difference in collectionComparer.Compare(value1, value2))
+                    {
+                        yield return difference.InsertPath(member.Name);
+                    }
                 }
 
                 if (RecursiveComparison
                     && !hasCustomComparer
-                    && expectedValue != null
-                    && actualValue != null
-                    && type.IsClass
-                    && type != typeof(string)
+                    && value1 != null
+                    && value2 != null
                     && type.IsArray)
                 {
                     var elementType = type.GetElementType();
@@ -137,14 +140,14 @@ namespace ObjectsComparer
                     var elementComparer = (IObjectDataComparer)Activator.CreateInstance(elementComparerType);
                     ConfigureChildComparer(elementComparer, _defaultValueComparer, _memberComparerOverrides, _typeComparerOverrides);
                     var collectionType = typeof(Collection<>).MakeGenericType(elementType);
-                    var expectedCollection = Activator.CreateInstance(collectionType, expectedValue);
-                    var actualCollection = Activator.CreateInstance(collectionType, actualValue);
+                    var expectedCollection = Activator.CreateInstance(collectionType, value1);
+                    var actualCollection = Activator.CreateInstance(collectionType, value2);
                     var collectionComparerType = typeof(CollectionsComparer<>).MakeGenericType(elementType);
-                    var collectionComparer = (IComparer)Activator.CreateInstance(collectionComparerType, elementComparer);
+                    var collectionComparer = (ICollectionsComparer)Activator.CreateInstance(collectionComparerType, elementComparer);
 
-                    foreach (var failure in collectionComparer.Compare(expectedCollection, actualCollection))
+                    foreach (var difference in collectionComparer.Compare(expectedCollection, actualCollection))
                     {
-                        yield return failure.InsertPath(member.Name);
+                        yield return difference.InsertPath(member.Name);
                     }
 
                     continue;
@@ -152,19 +155,14 @@ namespace ObjectsComparer
 
                 if (RecursiveComparison
                     && !hasCustomComparer
-                    && expectedValue != null
-                    && actualValue != null
-                    && type.IsClass
-                    && type != typeof(string)
-                    && !type.IsAssignableFrom(typeof(IComparable))
-                    && !type.IsAssignableFrom(typeof(IComparable<>)))
+                    && value1 != null
+                    && value2 != null
+                    && !type.IsComparable())
                 {
                     var objectDataComparerType = typeof(ObjectsDataComparer<>).MakeGenericType(type);
                     var objectDataComparer = (IObjectDataComparer)Activator.CreateInstance(objectDataComparerType);
                     ConfigureChildComparer(objectDataComparer, _defaultValueComparer, _memberComparerOverrides, _typeComparerOverrides);
 
-                    objectDataComparer.SkipDefaultValues = SkipDefaultValues;
-                    objectDataComparer.RecursiveComparison = true;
                     objectDataComparer.SetDefaultComparer(_defaultValueComparer);
                     foreach (var typeComparerOverride in _typeComparerOverrides)
                     {
@@ -176,7 +174,7 @@ namespace ObjectsComparer
                         objectDataComparer.AddComparerOverride(memberComparerOverride.Key, memberComparerOverride.Value);
                     }
 
-                    foreach (var failure in objectDataComparer.Compare(expectedValue, actualValue))
+                    foreach (var failure in objectDataComparer.Compare(value1, value2))
                     {
                         yield return failure.InsertPath(member.Name);
                     }
@@ -184,17 +182,23 @@ namespace ObjectsComparer
                     continue;
                 }
 
-                if (!comparer.Compare(expectedValue, actualValue))
+                if (!RecursiveComparison &&
+                    !type.IsComparable())
                 {
-                    yield return new ComparisonFailure(member.Name, comparer.ToString(expectedValue), comparer.ToString(actualValue));
+                    continue;
+                }
+
+                if (!comparer.Compare(value1, value2))
+                {
+                    yield return new Difference(member.Name, comparer.ToString(value1), comparer.ToString(value2));
                 }
             }
         }
 
         private void ConfigureChildComparer(
-            IObjectDataComparer comparer, 
-            IValueComparer defaultValueComparer, 
-            Dictionary<MemberInfo, IValueComparer> memberComparerOverrides, 
+            IObjectDataComparer comparer,
+            IValueComparer defaultValueComparer,
+            Dictionary<MemberInfo, IValueComparer> memberComparerOverrides,
             Dictionary<Type, IValueComparer> typeComparerOverrides)
         {
             comparer.SetDefaultComparer(defaultValueComparer);
