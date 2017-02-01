@@ -1,6 +1,6 @@
 ﻿namespace ObjectsComparer
 {
-    public class NulableStringsComparer: IComparer
+    public class NulableStringsValueComparer: IValueComparer
     {
         public bool Compare(object expected, object actual)
         {

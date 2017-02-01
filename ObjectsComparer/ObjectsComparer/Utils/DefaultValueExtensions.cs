@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace ObjectsComparer
+namespace ObjectsComparer.Utils
 {
     public static class DefaultValueExtensions
     {
@@ -28,7 +28,6 @@ namespace ObjectsComparer
         ///     object Default = someType.GetDefault();
         /// </code>
         /// </example>
-        /// <seealso cref="GetDefault&lt;T&gt;"/>
         public static List<object> GetDefaults(this Type type)
         {
             // If no Type was supplied, if the Type was a reference type, or if the Type was a System.Void, return null
@@ -47,7 +46,7 @@ namespace ObjectsComparer
             if (type.ContainsGenericParameters)
             {
                 throw new ArgumentException(
-                    "{" + MethodInfo.GetCurrentMethod() + "} Error:\n\nThe supplied value type <" + type +
+                    "{" + MethodBase.GetCurrentMethod() + "} Error:\n\nThe supplied value type <" + type +
                     "> contains generic parameters, so the default value cannot be retrieved");
             }
 
@@ -57,19 +56,19 @@ namespace ObjectsComparer
             {
                 try
                 {
-                    return new List<object>(new object[] { Activator.CreateInstance(type) });
+                    return new List<object>(new[] { Activator.CreateInstance(type) });
                 }
                 catch (Exception e)
                 {
                     throw new ArgumentException(
-                        "{" + MethodInfo.GetCurrentMethod() + "} Error:\n\nThe Activator.CreateInstance method could not " +
+                        "{" + MethodBase.GetCurrentMethod() + "} Error:\n\nThe Activator.CreateInstance method could not " +
                         "create a default instance of the supplied value type <" + type +
                         "> (Inner Exception message: \"" + e.Message + "\")", e);
                 }
             }
 
             // Fail with exception
-            throw new ArgumentException("{" + MethodInfo.GetCurrentMethod() + "} Error:\n\nThe supplied value type <" + type +
+            throw new ArgumentException("{" + MethodBase.GetCurrentMethod() + "} Error:\n\nThe supplied value type <" + type +
                 "> is not a publicly-visible type, so the default value cannot be retrieved");
         }
 

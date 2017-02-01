@@ -1,6 +1,6 @@
 ﻿namespace ObjectsComparer
 {
-    public class DefaultComparer: IComparer
+    public class DefaultValueComparer: IValueComparer
     {
         public bool Compare(object expected, object actual)
         {

@@ -5,14 +5,13 @@ using System.Reflection;
 
 namespace ObjectsComparer
 {
-    public interface IObjectDataComparer
+    public interface IObjectDataComparer: IComparer
     {
         bool SkipDefaultValues { get; set; }
         bool RecursiveComparison { get; set; }
-        void AddComparerOverride<TProp>(Expression<Func<TProp>> propertyLambda, IComparer propertyComparer);
-        void AddComparerOverride(PropertyInfo propertyInfo, IComparer propertyComparer);
-        void AddComparerOverride(Type type, IComparer typeComparer);
-        void SetDefaultComparer(IComparer comparer);
-        IEnumerable<ComparisonFailure> Compare(object expectedObject, object actualObject);
+        void AddComparerOverride<TProp>(Expression<Func<TProp>> memberLambda, IValueComparer memberValueComparer);
+        void AddComparerOverride(MemberInfo memberInfo, IValueComparer memberValueComparer);
+        void AddComparerOverride(Type type, IValueComparer typeValueComparer);
+        void SetDefaultComparer(IValueComparer valueComparer);
     }
 }

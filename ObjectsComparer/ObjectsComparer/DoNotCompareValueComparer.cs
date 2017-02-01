@@ -1,19 +1,21 @@
-﻿namespace ObjectsComparer
+﻿using System;
+
+namespace ObjectsComparer
 {
-    public class DoNotCompareComparer : IComparer
+    public class DoNotCompareValueComparer : IValueComparer
     {
-        private static volatile IComparer _instance;
-        public static IComparer Instance
+        private static volatile IValueComparer _instance;
+        public static IValueComparer Instance
         {
             get
             {
                 if (_instance == null)
                 {
-                    lock (SyncRoot)
+                    lock (syncRoot)
                     {
                         if (_instance == null)
                         {
-                            _instance = new DoNotCompareComparer();
+                            _instance = new DoNotCompareValueComparer();
                         }
                     }
                 }
@@ -22,9 +24,9 @@
             }
         }
 
-        private static readonly object SyncRoot = new object();
+        private static object syncRoot = new Object();
 
-        private DoNotCompareComparer() { }
+        private DoNotCompareValueComparer() { }
 
         public bool Compare(object expected, object actual)
         {

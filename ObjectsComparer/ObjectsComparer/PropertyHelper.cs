@@ -20,30 +20,41 @@ namespace ObjectsComparer
 
         public static PropertyInfo GetPropertyInfo<T>(Expression<Func<T>> propertyLambda)
         {
+            return GetMemberInfo(propertyLambda) as PropertyInfo;
+        }
+
+        public static FieldInfo GetFieldInfo<T>(Expression<Func<T>> fieldLambda)
+        {
+            return GetMemberInfo(fieldLambda) as FieldInfo;
+        }
+
+        public static MemberInfo GetMemberInfo<T>(Expression<Func<T>> memberLambda)
+        {
             MemberExpression exp;
 
             //this line is necessary, because sometimes the expression comes in as Convert(originalexpression)
-            var body = propertyLambda.Body as UnaryExpression;
+            var body = memberLambda.Body as UnaryExpression;
             if (body != null)
             {
                 var unExp = body;
-                if (unExp.Operand is MemberExpression)
+                var operand = unExp.Operand as MemberExpression;
+                if (operand != null)
                 {
-                    exp = (MemberExpression)unExp.Operand;
+                    exp = operand;
                 }
                 else
                     throw new ArgumentException();
             }
-            else if (propertyLambda.Body is MemberExpression)
+            else if (memberLambda.Body is MemberExpression)
             {
-                exp = (MemberExpression)propertyLambda.Body;
+                exp = (MemberExpression)memberLambda.Body;
             }
             else
             {
                 throw new ArgumentException();
             }
 
-            return (PropertyInfo)exp.Member;
+            return exp.Member;
         }
     }
 }

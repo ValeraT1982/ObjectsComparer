@@ -1,9 +1,9 @@
-﻿namespace ObjectsComparer
+using System.Collections.Generic;
+
+namespace ObjectsComparer
 {
     public interface IComparer
     {
-        bool Compare(object expected, object actual);
-
-        string ToString(object value);
+        IEnumerable<ComparisonFailure> Compare(object expected, object actual);
     }
 }

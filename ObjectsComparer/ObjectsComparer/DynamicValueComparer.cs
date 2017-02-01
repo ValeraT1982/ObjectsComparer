@@ -2,12 +2,12 @@
 
 namespace ObjectsComparer
 {
-    public class DynamicComparer<T>: IComparer
+    public class DynamicValueComparer<T>: IValueComparer
     {
         private readonly Func<T, T, bool> _compareFunction;
         private readonly Func<T, string> _toStringFunction;
 
-        public DynamicComparer(Func<T, T, bool> compareFunction, Func<T, string> toStringFunction)
+        public DynamicValueComparer(Func<T, T, bool> compareFunction, Func<T, string> toStringFunction)
         {
             if (compareFunction == null)
             {
