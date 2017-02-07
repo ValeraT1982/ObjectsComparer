@@ -14,6 +14,10 @@ namespace ObjectsComparer.Tests.TestClasses
 
         public int Property { get; set; }
 
+        public string TestProperty1 { get; set; }
+
+        public string TestProperty2 { get; set; }
+
         public double ReadOnlyProperty { get; }
 
         protected bool ProtectedProperty { get; }

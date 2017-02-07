@@ -31,8 +31,8 @@ namespace ObjectsComparer.Utils
         {
             if (type.IsPrimitive ||
                 type.IsEnum ||
-                type.IsAssignableFrom(typeof(IComparable)) ||
-                type.IsAssignableFrom(typeof(IComparable<>)))
+                type.InheritsFrom(typeof(IComparable)) ||
+                type.InheritsFrom(typeof(IComparable<>)))
             {
                 return true;
             }

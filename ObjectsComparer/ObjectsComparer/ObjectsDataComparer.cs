@@ -34,13 +34,19 @@ namespace ObjectsComparer
 
             RecursiveComparison = recursiveComparison;
             _defaultValueComparer = new DefaultValueComparer();
-            AddComparerOverride(typeof(string), new NulableStringsValueComparer());
+            //AddComparerOverride(typeof(string), new NulableStringsValueComparer());
         }
 
+        public static IObjectDataComparer CreateComparer(Type type)
+        {
+            var elementComparerType = typeof(ObjectsDataComparer<>).MakeGenericType(type);
+
+            return (IObjectDataComparer)Activator.CreateInstance(elementComparerType);
+        }
 
         public void AddComparerOverride<TProp>(Expression<Func<TProp>> memberLambda, IValueComparer memberValueComparer)
         {
-            _memberComparerOverrides[PropertyHelper.GetFieldInfo(memberLambda)] = memberValueComparer;
+            _memberComparerOverrides[PropertyHelper.GetMemberInfo(memberLambda)] = memberValueComparer;
         }
 
         public void AddComparerOverride(MemberInfo memberInfo, IValueComparer memberValueComparer)
@@ -117,8 +123,7 @@ namespace ObjectsComparer
                         .Select(i => i.GetGenericArguments()[0])
                         .First();
 
-                    var elementComparerType = typeof(ObjectsDataComparer<>).MakeGenericType(elementType);
-                    var elementComparer = (IObjectDataComparer)Activator.CreateInstance(elementComparerType);
+                    var elementComparer = CreateComparer(elementType);
                     ConfigureChildComparer(elementComparer, _defaultValueComparer, _memberComparerOverrides, _typeComparerOverrides);
                     var collectionComparerType = typeof(CollectionsComparer<>).MakeGenericType(elementType);
                     var collectionComparer = (ICollectionsComparer)Activator.CreateInstance(collectionComparerType, elementComparer);
@@ -136,8 +141,7 @@ namespace ObjectsComparer
                     && type.IsArray)
                 {
                     var elementType = type.GetElementType();
-                    var elementComparerType = typeof(ObjectsDataComparer<>).MakeGenericType(elementType);
-                    var elementComparer = (IObjectDataComparer)Activator.CreateInstance(elementComparerType);
+                    var elementComparer = CreateComparer(elementType);
                     ConfigureChildComparer(elementComparer, _defaultValueComparer, _memberComparerOverrides, _typeComparerOverrides);
                     var collectionType = typeof(Collection<>).MakeGenericType(elementType);
                     var expectedCollection = Activator.CreateInstance(collectionType, value1);
@@ -159,8 +163,7 @@ namespace ObjectsComparer
                     && value2 != null
                     && !type.IsComparable())
                 {
-                    var objectDataComparerType = typeof(ObjectsDataComparer<>).MakeGenericType(type);
-                    var objectDataComparer = (IObjectDataComparer)Activator.CreateInstance(objectDataComparerType);
+                    var objectDataComparer = CreateComparer(type);
                     ConfigureChildComparer(objectDataComparer, _defaultValueComparer, _memberComparerOverrides, _typeComparerOverrides);
 
                     objectDataComparer.SetDefaultComparer(_defaultValueComparer);

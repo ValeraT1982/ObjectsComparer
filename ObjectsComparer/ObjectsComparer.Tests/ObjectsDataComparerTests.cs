@@ -1,5 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
+using NSubstitute;
 using NUnit.Framework;
 using ObjectsComparer.Tests.TestClasses;
 
@@ -486,6 +488,120 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual("EnumProperty", differences.First().MemberPath);
             Assert.AreEqual("Value1", differences.First().Value1);
             Assert.AreEqual("Value2", differences.First().Value2);
+        }
+
+        [Test]
+        public void OverrideStringComparisonEqual()
+        {
+            var a1 = new A { TestProperty1 = "ABC", TestProperty2 = "ABC", ClassB = new B { Property1 = "Str1" } };
+            var a2 = new A { TestProperty1 = "BCD", TestProperty2 = "ABC", ClassB = new B { Property1 = "Str2" } };
+            var comparer = new ObjectsDataComparer<A>();
+            var stringComparer = Substitute.For<IValueComparer>();
+            stringComparer.Compare(Arg.Any<object>(), Arg.Any<object>()).Returns(true);
+            comparer.AddComparerOverride(typeof(string), stringComparer);
+
+            var differences = comparer.Compare(a1, a2);
+
+            CollectionAssert.IsEmpty(differences);
+            stringComparer.Received().Compare(Arg.Any<object>(), Arg.Any<object>());
+        }
+
+        [Test]
+        public void OverrideStringComparisonNotEqual()
+        {
+            var a1 = new A { TestProperty1 = "ABC", TestProperty2 = "ABC", ClassB = new B { Property1 = "Str1" } };
+            var a2 = new A { TestProperty1 = "BCD", TestProperty2 = "ABC", ClassB = new B { Property1 = "Str1" } };
+            var comparer = new ObjectsDataComparer<A>();
+            var stringComparer = Substitute.For<IValueComparer>();
+            stringComparer.Compare(Arg.Any<object>(), Arg.Any<object>()).Returns(false);
+            stringComparer.ToString(Arg.Any<object>()).Returns(info => (info.Arg<object>() ?? string.Empty).ToString());
+            comparer.AddComparerOverride(typeof(string), stringComparer);
+
+            var differences = comparer.Compare(a1, a2).ToList();
+
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.IsTrue(differences.Any(d => d.MemberPath == "TestProperty1" && d.Value1 == "ABC" && d.Value2 == "BCD"));
+            Assert.IsTrue(differences.Any(d => d.MemberPath == "TestProperty2" && d.Value1 == "ABC" && d.Value2 == "ABC"));
+            Assert.IsTrue(differences.Any(d => d.MemberPath == "ClassB.Property1" && d.Value1 == "Str1" && d.Value2 == "Str1"));
+            stringComparer.Received().Compare(Arg.Any<object>(), Arg.Any<object>());
+            stringComparer.Received().ToString(Arg.Any<object>());
+        }
+
+        [Test]
+        public void OverrideIntComparisonNotEqual()
+        {
+            var a1 = new A { IntArray = new[] { 1, 2 } };
+            var a2 = new A { IntArray = new[] { 1, 3 } };
+            var comparer = new ObjectsDataComparer<A>();
+            var stringComparer = Substitute.For<IValueComparer>();
+            stringComparer.Compare(Arg.Any<object>(), Arg.Any<object>()).Returns(false);
+            stringComparer.ToString(Arg.Any<object>()).Returns(info => (info.Arg<object>() ?? string.Empty).ToString());
+            comparer.AddComparerOverride(typeof(int), stringComparer);
+
+            var differences = comparer.Compare(a1, a2).ToList();
+
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.IsTrue(differences.Any(d => d.MemberPath == "IntArray[0]" && d.Value1 == "1" && d.Value2 == "1"));
+            Assert.IsTrue(differences.Any(d => d.MemberPath == "IntArray[1]" && d.Value1 == "2" && d.Value2 == "3"));
+            stringComparer.Received().Compare(Arg.Any<object>(), Arg.Any<object>());
+            stringComparer.Received().ToString(Arg.Any<object>());
+        }
+
+        [Test]
+        public void OverrideIntComparisonEqual()
+        {
+            var a1 = new A { IntArray = new[] { 1, 2 } };
+            var a2 = new A { IntArray = new[] { 1, 3 } };
+            var comparer = new ObjectsDataComparer<A>();
+            var stringComparer = Substitute.For<IValueComparer>();
+            stringComparer.Compare(Arg.Any<object>(), Arg.Any<object>()).Returns(true);
+            stringComparer.ToString(Arg.Any<object>()).Returns(info => (info.Arg<object>() ?? string.Empty).ToString());
+            comparer.AddComparerOverride(typeof(int), stringComparer);
+
+            var differences = comparer.Compare(a1, a2);
+
+            CollectionAssert.IsEmpty(differences);
+            stringComparer.Received().Compare(Arg.Any<object>(), Arg.Any<object>());
+        }
+
+        [Test]
+        public void OverridePropertyComparisonEqual()
+        {
+            var a1 = new A { TestProperty1 = "ABC" };
+            var a2 = new A { TestProperty1 = "BCD" };
+            var comparer = new ObjectsDataComparer<A>();
+            var valueComparer = Substitute.For<IValueComparer>();
+            valueComparer.Compare(Arg.Any<object>(), Arg.Any<object>()).Returns(true);
+            comparer.AddComparerOverride(() => a1.TestProperty1, valueComparer);
+
+            var differences = comparer.Compare(a1, a2);
+
+            CollectionAssert.IsEmpty(differences);
+            valueComparer.Received(1).Compare(Arg.Any<object>(), Arg.Any<object>());
+        }
+
+        [Test]
+        public void SetDefaultComparer()
+        {
+            var a1 = new A { TestProperty1 = "ABC", Field = 5 };
+            var a2 = new A { TestProperty1 = "BCD", Field = 6 };
+            var comparer = new ObjectsDataComparer<A>();
+            var valueComparer = Substitute.For<IValueComparer>();
+            valueComparer.Compare(Arg.Any<object>(), Arg.Any<object>()).Returns(true);
+            comparer.SetDefaultComparer(valueComparer);
+
+            var differences = comparer.Compare(a1, a2);
+
+            CollectionAssert.IsEmpty(differences);
+            valueComparer.Received().Compare(Arg.Any<object>(), Arg.Any<object>());
+        }
+
+        [Test]
+        public void SetDefaultComparerNullException()
+        {
+            var comparer = new ObjectsDataComparer<A>();
+
+            Assert.Throws<ArgumentNullException>(() => comparer.SetDefaultComparer(null));
         }
     }
 }
