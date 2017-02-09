@@ -40,17 +40,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CollectionsComparer.cs" />
+    <Compile Include="EnumerablesComparer.cs" />
+    <Compile Include="EnumerablesComparer~1.cs" />
     <Compile Include="Difference.cs" />
     <Compile Include="DefaultValueComparer.cs" />
-    <Compile Include="ICollectionsComparer.cs" />
-    <Compile Include="Utils\DefaultValueExtensions.cs" />
+    <Compile Include="IEnumerablesComparer.cs" />
     <Compile Include="DoNotCompareValueComparer.cs" />
     <Compile Include="DynamicValueComparer.cs" />
-    <Compile Include="IObjectDataComparer.cs" />
+    <Compile Include="IObjectsDataComparer.cs" />
     <Compile Include="IValueComparer.cs" />
     <Compile Include="Utils\MemberInfoExtensions.cs" />
-    <Compile Include="ObjectsDataComparer.cs" />
+    <Compile Include="ObjectsesDataComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyHelper.cs" />
     <Compile Include="StringComparer.cs" />

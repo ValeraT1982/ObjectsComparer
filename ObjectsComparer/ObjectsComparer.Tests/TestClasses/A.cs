@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 
@@ -30,7 +31,8 @@ namespace ObjectsComparer.Tests.TestClasses
 
         public Collection<B> CollectionOfB { get; set; }
 
-        public ICollection<B> ICollectionOf { get; set; }
+        // ReSharper disable once InconsistentNaming
+        public IEnumerable<B> ICollectionOfB { get; set; }
 
         public List<B> ListOf { get; set; }
 
@@ -41,6 +43,10 @@ namespace ObjectsComparer.Tests.TestClasses
         public TestStruct StructProperty { get; set; }
 
         public TestEnum EnumProperty { get; set; }
+
+        public IEnumerable NonGenericEnumerable { get; set; }
+
+        public EnumerableImplementation NonGenericEnumerableImplementation { get; set; }
 
         public int Property3
         {

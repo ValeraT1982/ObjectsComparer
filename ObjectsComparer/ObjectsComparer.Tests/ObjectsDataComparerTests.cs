@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.ObjectModel;
 using System.Linq;
 using NSubstitute;
@@ -15,7 +16,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { Property = 10, Property3 = 5 };
             var a2 = new A { Property = 10, Property3 = 8 };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2);
 
@@ -27,7 +28,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { Property = 10 };
             var a2 = new A { Property = 8 };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2).ToList();
 
@@ -42,7 +43,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A(1.99);
             var a2 = new A(1.99);
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2);
 
@@ -54,7 +55,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A(1.99);
             var a2 = new A(0.89);
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2).ToList();
 
@@ -69,7 +70,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A(true);
             var a2 = new A(false);
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2);
 
@@ -81,7 +82,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { Field = 9 };
             var a2 = new A { Field = 9 };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2);
 
@@ -93,7 +94,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { Field = 10 };
             var a2 = new A { Field = 8 };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2).ToList();
 
@@ -108,7 +109,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A("Str1");
             var a2 = new A("Str1");
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2);
 
@@ -120,7 +121,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A("Str1");
             var a2 = new A("Str2");
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2).ToList();
 
@@ -135,7 +136,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A(5);
             var a2 = new A(6);
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2);
 
@@ -147,7 +148,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { ClassB = new B { Property1 = "Str1" } };
             var a2 = new A { ClassB = new B { Property1 = "Str1" } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2);
 
@@ -159,7 +160,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { ClassB = new B { Property1 = "Str1" } };
             var a2 = new A { ClassB = new B { Property1 = "Str2" } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2).ToList();
 
@@ -174,7 +175,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A();
             var a2 = new A { ClassB = new B { Property1 = "Str2" } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2).ToList();
 
@@ -189,7 +190,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { ClassB = new B { Property1 = "Str2" } };
             var a2 = new A();
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2).ToList();
 
@@ -204,7 +205,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { ClassB = new B { Property1 = "Str1" } };
             var a2 = new A { ClassB = new B { Property1 = "Str2" } };
-            var comparer = new ObjectsDataComparer<A>(false);
+            var comparer = new ObjectsesDataComparer<A>(false);
 
             var differences = comparer.Compare(a1, a2).ToList();
 
@@ -216,7 +217,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { IntArray = new[] { 1, 2 } };
             var a2 = new A { IntArray = new[] { 1, 2 } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2);
 
@@ -228,7 +229,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { IntArray = new[] { 1, 2 } };
             var a2 = new A { IntArray = new[] { 1, 2, 3 } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2).ToList();
 
@@ -243,7 +244,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { IntArray = new[] { 1, 2 } };
             var a2 = new A { IntArray = new[] { 1, 3 } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2).ToList();
 
@@ -258,7 +259,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A();
             var a2 = new A { IntArray = new int[0] };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2).ToList();
 
@@ -273,7 +274,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { IntArray = new int[0] };
             var a2 = new A();
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2).ToList();
 
@@ -288,7 +289,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { ArrayOfB = new[] { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
             var a2 = new A { ArrayOfB = new[] { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2);
 
@@ -300,7 +301,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { ArrayOfB = new[] { new B { Property1 = "Str1" } } };
             var a2 = new A { ArrayOfB = new[] { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2).ToList();
 
@@ -315,7 +316,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { ArrayOfB = new[] { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
             var a2 = new A { ArrayOfB = new[] { new B { Property1 = "Str1" }, new B { Property1 = "Str3" } } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2).ToList();
 
@@ -330,7 +331,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
             var a2 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2);
 
@@ -342,7 +343,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
             var a2 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1" } } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2).ToList();
 
@@ -357,7 +358,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
             var a2 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1" }, new B { Property1 = "Str3" } } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2).ToList();
 
@@ -372,7 +373,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
             var a2 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2);
 
@@ -384,7 +385,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
             var a2 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str1" } } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2).ToList();
 
@@ -399,7 +400,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
             var a2 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str1" }, new B { Property1 = "Str3" } } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2).ToList();
 
@@ -414,7 +415,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { IntefaceProperty = new TestInterfaceImplementation1 { Property = "Str1" } };
             var a2 = new A { IntefaceProperty = new TestInterfaceImplementation2 { Property = "Str1", AnotherProperty = 50 } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2);
 
@@ -426,7 +427,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { IntefaceProperty = new TestInterfaceImplementation1 { Property = "Str1" } };
             var a2 = new A { IntefaceProperty = new TestInterfaceImplementation2 { Property = "Str2", AnotherProperty = 50 } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2).ToList();
 
@@ -441,7 +442,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { StructProperty = new TestStruct { FieldA = "FA", FieldB = "FB" } };
             var a2 = new A { StructProperty = new TestStruct { FieldA = "FA", FieldB = "FB" } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2);
 
@@ -453,7 +454,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { StructProperty = new TestStruct { FieldA = "FA", FieldB = "FB" } };
             var a2 = new A { StructProperty = new TestStruct { FieldA = "FA", FieldB = "FBB" } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2).ToList();
 
@@ -468,7 +469,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { EnumProperty = TestEnum.Value1 };
             var a2 = new A { EnumProperty = TestEnum.Value1 };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2);
 
@@ -480,7 +481,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { EnumProperty = TestEnum.Value1 };
             var a2 = new A { EnumProperty = TestEnum.Value2 };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2).ToList();
 
@@ -495,7 +496,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { TestProperty1 = "ABC", TestProperty2 = "ABC", ClassB = new B { Property1 = "Str1" } };
             var a2 = new A { TestProperty1 = "BCD", TestProperty2 = "ABC", ClassB = new B { Property1 = "Str2" } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
             var stringComparer = Substitute.For<IValueComparer>();
             stringComparer.Compare(Arg.Any<object>(), Arg.Any<object>()).Returns(true);
             comparer.AddComparerOverride(typeof(string), stringComparer);
@@ -511,7 +512,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { TestProperty1 = "ABC", TestProperty2 = "ABC", ClassB = new B { Property1 = "Str1" } };
             var a2 = new A { TestProperty1 = "BCD", TestProperty2 = "ABC", ClassB = new B { Property1 = "Str1" } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
             var stringComparer = Substitute.For<IValueComparer>();
             stringComparer.Compare(Arg.Any<object>(), Arg.Any<object>()).Returns(false);
             stringComparer.ToString(Arg.Any<object>()).Returns(info => (info.Arg<object>() ?? string.Empty).ToString());
@@ -532,7 +533,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { IntArray = new[] { 1, 2 } };
             var a2 = new A { IntArray = new[] { 1, 3 } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
             var stringComparer = Substitute.For<IValueComparer>();
             stringComparer.Compare(Arg.Any<object>(), Arg.Any<object>()).Returns(false);
             stringComparer.ToString(Arg.Any<object>()).Returns(info => (info.Arg<object>() ?? string.Empty).ToString());
@@ -552,7 +553,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { IntArray = new[] { 1, 2 } };
             var a2 = new A { IntArray = new[] { 1, 3 } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
             var stringComparer = Substitute.For<IValueComparer>();
             stringComparer.Compare(Arg.Any<object>(), Arg.Any<object>()).Returns(true);
             stringComparer.ToString(Arg.Any<object>()).Returns(info => (info.Arg<object>() ?? string.Empty).ToString());
@@ -569,7 +570,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { TestProperty1 = "ABC" };
             var a2 = new A { TestProperty1 = "BCD" };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
             var valueComparer = Substitute.For<IValueComparer>();
             valueComparer.Compare(Arg.Any<object>(), Arg.Any<object>()).Returns(true);
             comparer.AddComparerOverride(() => a1.TestProperty1, valueComparer);
@@ -585,7 +586,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { TestProperty1 = "ABC", Field = 5 };
             var a2 = new A { TestProperty1 = "BCD", Field = 6 };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
             var valueComparer = Substitute.For<IValueComparer>();
             valueComparer.Compare(Arg.Any<object>(), Arg.Any<object>()).Returns(true);
             comparer.SetDefaultComparer(valueComparer);
@@ -599,9 +600,95 @@ namespace ObjectsComparer.Tests
         [Test]
         public void SetDefaultComparerNullException()
         {
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new ObjectsesDataComparer<A>();
 
             Assert.Throws<ArgumentNullException>(() => comparer.SetDefaultComparer(null));
         }
+
+
+        [Test]
+        public void NonGenericEnumerableEquality()
+        {
+            var a1 = new A { NonGenericEnumerable = new ArrayList { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
+            var a2 = new A { NonGenericEnumerable = new ArrayList { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
+            var comparer = new ObjectsesDataComparer<A>();
+
+            var differences = comparer.Compare(a1, a2);
+
+            CollectionAssert.IsEmpty(differences);
+        }
+
+        [Test]
+        public void NonGenericEnumerableInequalityCount()
+        {
+            var a1 = new A { NonGenericEnumerable = new ArrayList { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
+            var a2 = new A { NonGenericEnumerable = new ArrayList { new B { Property1 = "Str1" } } };
+            var comparer = new ObjectsesDataComparer<A>();
+
+            var differences = comparer.Compare(a1, a2).ToList();
+
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual("NonGenericEnumerable[]", differences.First().MemberPath);
+            Assert.AreEqual("2", differences.First().Value1);
+            Assert.AreEqual("1", differences.First().Value2);
+        }
+
+        [Test]
+        public void NonGenericEnumerableInequalityProperty()
+        {
+            var a1 = new A { NonGenericEnumerable = new ArrayList { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
+            var a2 = new A { NonGenericEnumerable = new ArrayList { new B { Property1 = "Str1" }, new B { Property1 = "Str3" } } };
+            var comparer = new ObjectsesDataComparer<A>();
+
+            var differences = comparer.Compare(a1, a2).ToList();
+
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual("NonGenericEnumerable[1].Property1", differences.First().MemberPath);
+            Assert.AreEqual("Str2", differences.First().Value1);
+            Assert.AreEqual("Str3", differences.First().Value2);
+        }
+
+        [Test]
+        public void NonGenericEnumerableInequalityType()
+        {
+            var a1 = new A { NonGenericEnumerable = new ArrayList { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
+            var a2 = new A { NonGenericEnumerable = new ArrayList { new B { Property1 = "Str1" }, "Str3" } };
+            var comparer = new ObjectsesDataComparer<A>();
+
+            var differences = comparer.Compare(a1, a2).ToList();
+
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual("NonGenericEnumerable[1]", differences.First().MemberPath);
+            Assert.AreEqual("ObjectsComparer.Tests.TestClasses.B", differences.First().Value1);
+            Assert.AreEqual("Str3", differences.First().Value2);
+        }
+
+        [Test]
+        public void NonGenericEnumerableImplementationEquality()
+        {
+            var a1 = new A { NonGenericEnumerableImplementation = new EnumerableImplementation(new ArrayList { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } }) };
+            var a2 = new A { NonGenericEnumerableImplementation = new EnumerableImplementation(new ArrayList { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } }) };
+            var comparer = new ObjectsesDataComparer<A>();
+
+            var differences = comparer.Compare(a1, a2);
+
+            CollectionAssert.IsEmpty(differences);
+        }
+
+        [Test]
+        public void NonGenericEnumerableImplementationInequalityProperty()
+        {
+            var a1 = new A { NonGenericEnumerableImplementation = new EnumerableImplementation(new ArrayList { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } }) { Property1 = "Str3" } };
+            var a2 = new A { NonGenericEnumerableImplementation = new EnumerableImplementation(new ArrayList { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } }) { Property1 = "Str4" } };
+            var comparer = new ObjectsesDataComparer<A>();
+
+            var differences = comparer.Compare(a1, a2).ToList();
+
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual("NonGenericEnumerableImplementation.Property1", differences.First().MemberPath);
+            Assert.AreEqual("Str3", differences.First().Value1);
+            Assert.AreEqual("Str4", differences.First().Value2);
+        }
+
     }
 }

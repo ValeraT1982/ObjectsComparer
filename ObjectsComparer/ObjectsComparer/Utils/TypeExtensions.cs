@@ -12,9 +12,10 @@ namespace ObjectsComparer.Utils
                 return false;
             }
 
-            if (null != t1.BaseType &&
+            if (t1 == t2 ||
+                (t1.BaseType != null &&
                 t1.BaseType.IsGenericType &&
-                t1.BaseType.GetGenericTypeDefinition() == t2)
+                t1.BaseType.GetGenericTypeDefinition() == t2))
             {
                 return true;
             }

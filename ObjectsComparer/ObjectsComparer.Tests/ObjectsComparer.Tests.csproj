@@ -47,6 +47,7 @@
     <Compile Include="TestClasses\A.cs" />
     <Compile Include="TestClasses\B.cs" />
     <Compile Include="TestClasses\CollectionOfB.cs" />
+    <Compile Include="TestClasses\EnumerableImplementation.cs" />
     <Compile Include="TestClasses\ITestInterface.cs" />
     <Compile Include="TestClasses\TestEnum.cs" />
     <Compile Include="TestClasses\TestInterfaceImplementation2.cs" />

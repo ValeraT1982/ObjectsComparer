@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace ObjectsComparer
 {
-    public interface IObjectDataComparer
+    public interface IObjectsDataComparer
     {
         bool RecursiveComparison { get; set; }
 
@@ -18,5 +18,6 @@ namespace ObjectsComparer
         void SetDefaultComparer(IValueComparer valueComparer);
         
         IEnumerable<Difference> Compare(object obj1, object obj2);
+        void ConfigureChildComparer(IObjectsDataComparer comparer);
     }
 }

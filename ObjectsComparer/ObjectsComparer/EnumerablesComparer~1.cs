@@ -1,36 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace ObjectsComparer
 {
-    public class CollectionsComparer<T> : ICollectionsComparer
+    public class EnumerablesComparer<T> : IEnumerablesComparer
     {
-        private readonly IObjectDataComparer _comparer;
+        private readonly IObjectsDataComparer _comparer;
 
-        public CollectionsComparer(IObjectDataComparer elementComparer = null)
+        public EnumerablesComparer(IObjectsDataComparer elementComparer = null)
         {
-            _comparer = elementComparer ?? new ObjectsDataComparer<T>();
+            _comparer = elementComparer ?? new ObjectsesDataComparer<T>();
         }
 
         public IEnumerable<Difference> Compare(object obj1, object obj2)
         {
-            obj1 = obj1 ?? new Collection<T>();
-            obj2 = obj2 ?? new Collection<T>();
+            obj1 = obj1 ?? Enumerable.Empty<T>();
+            obj2 = obj2 ?? Enumerable.Empty<T>();
 
-            if (obj1.GetType().IsAssignableFrom(typeof(ICollection<T>)))
+            if (obj1.GetType().IsAssignableFrom(typeof(IEnumerable<T>)))
             {
                 throw new ArgumentException(nameof(obj1));
             }
 
-            if (obj2.GetType().IsAssignableFrom(typeof(ICollection<T>)))
+            if (obj2.GetType().IsAssignableFrom(typeof(IEnumerable<T>)))
             {
                 throw new ArgumentException(nameof(obj2));
             }
 
-            var expectedList = ((ICollection<T>)obj1).ToList();
-            var actualList = ((ICollection<T>)obj2).ToList();
+            var expectedList = ((IEnumerable<T>)obj1).ToList();
+            var actualList = ((IEnumerable<T>)obj2).ToList();
 
             if (expectedList.Count != actualList.Count)
             {
