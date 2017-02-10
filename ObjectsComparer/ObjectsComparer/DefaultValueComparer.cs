@@ -2,14 +2,14 @@
 {
     public class DefaultValueComparer: IValueComparer
     {
-        public bool Compare(object expected, object actual)
+        public bool Compare(object obj1, object obj2)
         {
-            if (expected == null || actual == null)
+            if (obj1 == null || obj2 == null)
             {
-                return expected == actual;
+                return obj1 == obj2;
             }
 
-            return expected.Equals(actual);
+            return obj1.Equals(obj2);
         }
 
         public string ToString(object value)

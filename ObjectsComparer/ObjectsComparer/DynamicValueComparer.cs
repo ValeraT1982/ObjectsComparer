@@ -23,34 +23,28 @@ namespace ObjectsComparer
             _toStringFunction = toStringFunction;
         }
 
-        public bool Compare(object expected, object actual)
+        public bool Compare(object obj1, object obj2)
         {
-            if (expected.GetType() != typeof(T))
-            {
-                throw new ArgumentException("expected");
-            }
+            IsArgumentException(obj1, nameof(obj1));
+            IsArgumentException(obj2, nameof(obj2));
 
-            if (actual.GetType() != typeof(T))
-            {
-                throw new ArgumentException("actual");
-            }
-
-            return _compareFunction((T)expected, (T)actual);
+            return _compareFunction((T)obj1, (T)obj2);
         }
 
         public string ToString(object value)
         {
-            if (value == null)
-            {
-                return string.Empty;
-            }
-
-            if (value.GetType() != typeof(T))
-            {
-                throw new ArgumentException("value");
-            }
+            IsArgumentException(value, nameof(value));
 
             return _toStringFunction((T)value);
+        }
+
+        // ReSharper disable once UnusedParameter.Local
+        private void IsArgumentException(object obj, string argumentName)
+        {
+            if (!(obj is T) && !(typeof(T).IsClass && obj == null))
+            {
+                throw new ArgumentException(argumentName);
+            }
         }
     }
 }

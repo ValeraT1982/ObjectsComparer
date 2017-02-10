@@ -6,28 +6,6 @@ namespace ObjectsComparer
 {
     public class PropertyHelper
     {
-        public static string GetPropertyName<T>(Expression<Func<T>> propertyLambda)
-        {
-            var me = propertyLambda.Body as MemberExpression;
-
-            if (me == null)
-            {
-                throw new ArgumentException("You must pass a lambda of the form: '() => Class.Property' or '() => object.Property'");
-            }
-
-            return me.Member.Name;
-        }
-
-        public static PropertyInfo GetPropertyInfo<T>(Expression<Func<T>> propertyLambda)
-        {
-            return GetMemberInfo(propertyLambda) as PropertyInfo;
-        }
-
-        public static FieldInfo GetFieldInfo<T>(Expression<Func<T>> fieldLambda)
-        {
-            return GetMemberInfo(fieldLambda) as FieldInfo;
-        }
-
         public static MemberInfo GetMemberInfo<T>(Expression<Func<T>> memberLambda)
         {
             MemberExpression exp;
@@ -43,7 +21,9 @@ namespace ObjectsComparer
                     exp = operand;
                 }
                 else
+                {
                     throw new ArgumentException();
+                }
             }
             else if (memberLambda.Body is MemberExpression)
             {

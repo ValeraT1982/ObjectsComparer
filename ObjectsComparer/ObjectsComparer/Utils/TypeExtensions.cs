@@ -12,20 +12,28 @@ namespace ObjectsComparer.Utils
                 return false;
             }
 
-            if (t1 == t2 ||
-                (t1.BaseType != null &&
-                t1.BaseType.IsGenericType &&
-                t1.BaseType.GetGenericTypeDefinition() == t2))
+            if (t1 == t2)
             {
                 return true;
             }
 
-            if (InheritsFrom(t1.BaseType, t2))
+            if (t1.IsGenericType && t1.GetGenericTypeDefinition() == t2)
             {
                 return true;
             }
 
-            return t2.IsAssignableFrom(t1) && t1 != t2 || t1.GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == t2);
+            if (t1.GetInterfaces().Any(i => (i.IsGenericType && i.GetGenericTypeDefinition() == t2) || i == t2))
+            {
+                return true;
+            }
+
+            if (t1.BaseType != null &&
+                InheritsFrom(t1.BaseType, t2))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public static bool IsComparable(this Type type)

@@ -42,6 +42,11 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DoNotCompareValueComparerTests.cs" />
+    <Compile Include="DynamicValueComparerTests.cs" />
+    <Compile Include="EnumerablesComparerTests.cs" />
+    <Compile Include="EnumerablesComparerGenericTests.cs" />
+    <Compile Include="NulableStringsValueComparerTests.cs" />
     <Compile Include="ObjectsDataComparerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestClasses\A.cs" />
@@ -53,6 +58,7 @@
     <Compile Include="TestClasses\TestInterfaceImplementation2.cs" />
     <Compile Include="TestClasses\TestInterfaceImplementation1.cs" />
     <Compile Include="TestClasses\TestStruct.cs" />
+    <Compile Include="Utils\TypeExtensionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

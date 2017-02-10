@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
@@ -19,12 +20,12 @@ namespace ObjectsComparer
             obj1 = obj1 ?? Enumerable.Empty<object>();
             obj2 = obj2 ?? Enumerable.Empty<object>();
 
-            if (obj1.GetType().IsAssignableFrom(typeof(IEnumerable)))
+            if (!obj1.GetType().InheritsFrom(typeof(IEnumerable)))
             {
                 throw new ArgumentException(nameof(obj1));
             }
 
-            if (obj2.GetType().IsAssignableFrom(typeof(IEnumerable)))
+            if (!obj2.GetType().InheritsFrom(typeof(IEnumerable)))
             {
                 throw new ArgumentException(nameof(obj2));
             }

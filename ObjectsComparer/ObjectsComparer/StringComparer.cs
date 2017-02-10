@@ -2,19 +2,19 @@
 {
     public class NulableStringsValueComparer: IValueComparer
     {
-        public bool Compare(object expected, object actual)
+        public bool Compare(object obj1, object obj2)
         {
-            if (expected == null)
+            if (obj1 == null)
             {
-                expected = string.Empty;
+                obj1 = string.Empty;
             }
 
-            if (actual == null)
+            if (obj2 == null)
             {
-                actual = string.Empty;
+                obj2 = string.Empty;
             }
 
-            return expected.Equals(actual);
+            return obj1.Equals(obj2);
         }
 
         public string ToString(object value)

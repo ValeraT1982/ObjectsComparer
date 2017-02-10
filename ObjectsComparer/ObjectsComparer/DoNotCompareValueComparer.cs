@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ObjectsComparer
+﻿namespace ObjectsComparer
 {
     public class DoNotCompareValueComparer : IValueComparer
     {
@@ -11,7 +9,7 @@ namespace ObjectsComparer
             {
                 if (_instance == null)
                 {
-                    lock (syncRoot)
+                    lock (SyncRoot)
                     {
                         if (_instance == null)
                         {
@@ -24,11 +22,11 @@ namespace ObjectsComparer
             }
         }
 
-        private static object syncRoot = new Object();
+        private static readonly object SyncRoot = new object();
 
         private DoNotCompareValueComparer() { }
 
-        public bool Compare(object expected, object actual)
+        public bool Compare(object obj1, object obj2)
         {
             return true;
         }
