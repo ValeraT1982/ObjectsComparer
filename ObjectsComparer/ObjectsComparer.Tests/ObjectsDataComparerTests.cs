@@ -14,8 +14,8 @@ namespace ObjectsComparer.Tests
         [Test]
         public void PropertyEquality()
         {
-            var a1 = new A { Property = 10, Property3 = 5 };
-            var a2 = new A { Property = 10, Property3 = 8 };
+            var a1 = new A { IntProperty = 10, DateTimeProperty = new DateTime(2017, 1, 1), Property3 = 5 };
+            var a2 = new A { IntProperty = 10, DateTimeProperty = new DateTime(2017, 1, 1), Property3 = 8 };
             var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2);
@@ -26,16 +26,23 @@ namespace ObjectsComparer.Tests
         [Test]
         public void PropertyInequality()
         {
-            var a1 = new A { Property = 10 };
-            var a2 = new A { Property = 8 };
+            var date1 = new DateTime(2017, 1, 1);
+            var date2 = new DateTime(2017, 1, 2);
+            var a1 = new A { IntProperty = 10, DateTimeProperty = date1 };
+            var a2 = new A { IntProperty = 8, DateTimeProperty = date2 };
             var comparer = new ObjectsesDataComparer<A>();
 
             var differences = comparer.Compare(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
-            Assert.AreEqual("Property", differences.First().MemberPath);
-            Assert.AreEqual("10", differences.First().Value1);
-            Assert.AreEqual("8", differences.First().Value2);
+            Assert.AreEqual("IntProperty", differences[0].MemberPath);
+            Assert.AreEqual("10", differences[0].Value1);
+            Assert.AreEqual("8", differences[0].Value2);
+            Assert.AreEqual("DateTimeProperty", differences[1].MemberPath);
+            // ReSharper disable once SpecifyACultureInStringConversionExplicitly
+            Assert.AreEqual(date1.ToString(), differences[1].Value1);
+            // ReSharper disable once SpecifyACultureInStringConversionExplicitly
+            Assert.AreEqual(date2.ToString(), differences[1].Value2);
         }
 
         [Test]

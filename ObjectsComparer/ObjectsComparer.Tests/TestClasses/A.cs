@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -13,11 +14,13 @@ namespace ObjectsComparer.Tests.TestClasses
 
         public readonly string ReadOnlyField;
 
-        public int Property { get; set; }
+        public int IntProperty { get; set; }
 
         public string TestProperty1 { get; set; }
 
         public string TestProperty2 { get; set; }
+
+        public DateTime DateTimeProperty { get; set; }
 
         public double ReadOnlyProperty { get; }
 

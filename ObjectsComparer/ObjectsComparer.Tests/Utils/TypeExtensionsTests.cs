@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
-using ObjectsComparer.Tests.TestClasses;
 using ObjectsComparer.Utils;
 
 namespace ObjectsComparer.Tests.Utils
