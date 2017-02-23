@@ -42,6 +42,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DifferenceTests.cs" />
     <Compile Include="DoNotCompareValueComparerTests.cs" />
     <Compile Include="DynamicValueComparerTests.cs" />
     <Compile Include="EnumerablesComparerTests.cs" />

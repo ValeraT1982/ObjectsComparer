@@ -8,15 +8,24 @@ namespace ObjectsComparer
 {
     public class EnumerablesComparer : IEnumerablesComparer
     {
+        private readonly ComparisonSettings _settings;
         private readonly IObjectsDataComparer _parentComparer;
 
-        public EnumerablesComparer(IObjectsDataComparer parentComparer = null)
+        public EnumerablesComparer(ComparisonSettings settings, IObjectsDataComparer parentComparer = null)
         {
+            _settings = settings;
             _parentComparer = parentComparer;
         }
 
         public IEnumerable<Difference> Compare(object obj1, object obj2)
         {
+            if (!_settings.EmptyAndNullEnumerablesEqual &&
+                (obj1 == null || obj2 == null) && obj1 != obj2)
+            {
+                yield return new Difference("[]", obj1?.ToString() ?? string.Empty, obj2?.ToString() ?? string.Empty);
+                yield break;
+            }
+
             obj1 = obj1 ?? Enumerable.Empty<object>();
             obj2 = obj2 ?? Enumerable.Empty<object>();
 
@@ -47,7 +56,7 @@ namespace ObjectsComparer
                     continue;
                 }
 
-                var comparer = ObjectsesDataComparer<object>.CreateComparer(array1[i].GetType());
+                var comparer = ObjectsesDataComparer<object>.CreateComparer(array1[i].GetType(), _settings);
                 _parentComparer.ConfigureChildComparer(comparer);
 
                 foreach (var failure in comparer.Compare(array1[i], array2[i]))

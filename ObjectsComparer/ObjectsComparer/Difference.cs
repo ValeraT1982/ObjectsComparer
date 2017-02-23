@@ -22,9 +22,14 @@
                 : path + "." + MemberPath;
 
             return new Difference(
-                newPath, 
-                Value1, 
+                newPath,
+                Value1,
                 Value2);
+        }
+
+        public override string ToString()
+        {
+            return $"ComparisonFailure. MemberPath='{MemberPath}'. Value1='{Value1}'. Value2='{Value2}'";
         }
     }
 }

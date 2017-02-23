@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ComparisonSettings.cs" />
     <Compile Include="EnumerablesComparer.cs" />
     <Compile Include="EnumerablesComparer~1.cs" />
     <Compile Include="Difference.cs" />

@@ -7,8 +7,6 @@ namespace ObjectsComparer
 {
     public interface IObjectsDataComparer
     {
-        bool RecursiveComparison { get; set; }
-
         void AddComparerOverride<TProp>(Expression<Func<TProp>> memberLambda, IValueComparer memberValueComparer);
 
         void AddComparerOverride(MemberInfo memberInfo, IValueComparer memberValueComparer);
@@ -18,6 +16,7 @@ namespace ObjectsComparer
         void SetDefaultComparer(IValueComparer valueComparer);
         
         IEnumerable<Difference> Compare(object obj1, object obj2);
+
         void ConfigureChildComparer(IObjectsDataComparer comparer);
     }
 }

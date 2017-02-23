@@ -5,6 +5,7 @@ using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
 using ObjectsComparer.Tests.TestClasses;
+using System.Collections.Generic;
 
 namespace ObjectsComparer.Tests
 {
@@ -212,7 +213,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { ClassB = new B { Property1 = "Str1" } };
             var a2 = new A { ClassB = new B { Property1 = "Str2" } };
-            var comparer = new ObjectsesDataComparer<A>(false);
+            var comparer = new ObjectsesDataComparer<A>(new ComparisonSettings { RecursiveComparison = false });
 
             var differences = comparer.Compare(a1, a2).ToList();
 
@@ -271,7 +272,7 @@ namespace ObjectsComparer.Tests
             var differences = comparer.Compare(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
-            Assert.AreEqual("IntArray", differences.First().MemberPath);
+            Assert.AreEqual("IntArray[]", differences.First().MemberPath);
             Assert.AreEqual(string.Empty, differences.First().Value1);
             Assert.AreEqual(a2.IntArray.ToString(), differences.First().Value2);
         }
@@ -286,7 +287,7 @@ namespace ObjectsComparer.Tests
             var differences = comparer.Compare(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
-            Assert.AreEqual("IntArray", differences.First().MemberPath);
+            Assert.AreEqual("IntArray[]", differences.First().MemberPath);
             Assert.AreEqual(a1.IntArray.ToString(), differences.First().Value1);
             Assert.AreEqual(string.Empty, differences.First().Value2);
         }
@@ -697,5 +698,58 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual("Str4", differences.First().Value2);
         }
 
+        [Test]
+        public void NullAndEmptyComparisonNonGenericInequalityTest()
+        {
+            var a1 = new A { NonGenericEnumerable = new ArrayList() };
+            var a2 = new A();
+            var comparer = new ObjectsesDataComparer<A>();
+
+            var differences = comparer.Compare(a1, a2).ToList();
+
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual("NonGenericEnumerable[]", differences.First().MemberPath);
+            Assert.AreEqual("System.Collections.ArrayList", differences.First().Value1);
+            Assert.AreEqual(string.Empty, differences.First().Value2);
+        }
+
+        [Test]
+        public void NullAndEmptyComparisonNonGenericEqualityTest()
+        {
+            var a1 = new A { NonGenericEnumerable = new ArrayList() };
+            var a2 = new A();
+            var comparer = new ObjectsesDataComparer<A>(new ComparisonSettings {EmptyAndNullEnumerablesEqual = true});
+
+            var differences = comparer.Compare(a1, a2).ToList();
+
+            CollectionAssert.IsEmpty(differences);
+        }
+
+        [Test]
+        public void NullAndEmptyComparisonGenericInequalityTest()
+        {
+            var a1 = new A { ListOf = new List<B>() };
+            var a2 = new A();
+            var comparer = new ObjectsesDataComparer<A>();
+
+            var differences = comparer.Compare(a1, a2).ToList();
+
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual("ListOf[]", differences.First().MemberPath);
+            Assert.AreEqual("System.Collections.Generic.List`1[ObjectsComparer.Tests.TestClasses.B]", differences.First().Value1);
+            Assert.AreEqual(string.Empty, differences.First().Value2);
+        }
+
+        [Test]
+        public void NullAndEmptyComparisonGenericEqualityTest()
+        {
+            var a1 = new A { ListOf = new List<B>() };
+            var a2 = new A();
+            var comparer = new ObjectsesDataComparer<A>(new ComparisonSettings { EmptyAndNullEnumerablesEqual = true });
+
+            var differences = comparer.Compare(a1, a2).ToList();
+
+            CollectionAssert.IsEmpty(differences);
+        }
     }
 }

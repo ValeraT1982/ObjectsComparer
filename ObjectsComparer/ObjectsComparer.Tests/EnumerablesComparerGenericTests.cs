@@ -12,7 +12,7 @@ namespace ObjectsComparer.Tests
         [Test]
         public void FirstParameterNotEnumerable()
         {
-            var comparer = new EnumerablesComparer<string>();
+            var comparer = new EnumerablesComparer<string>(new ComparisonSettings());
             var obj1 = new List<int>();
             var obj2 = new List<string>();
 
@@ -24,7 +24,7 @@ namespace ObjectsComparer.Tests
         [Test]
         public void SecondParameterNotEnumerable()
         {
-            var comparer = new EnumerablesComparer<string>();
+            var comparer = new EnumerablesComparer<string>(new ComparisonSettings());
             var obj1 = new List<string>();
             var obj2 = new A();
 

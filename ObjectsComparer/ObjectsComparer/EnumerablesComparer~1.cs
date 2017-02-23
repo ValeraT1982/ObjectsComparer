@@ -7,15 +7,24 @@ namespace ObjectsComparer
 {
     public class EnumerablesComparer<T> : IEnumerablesComparer
     {
+        private readonly ComparisonSettings _settings;
         private readonly IObjectsDataComparer _comparer;
 
-        public EnumerablesComparer(IObjectsDataComparer elementComparer = null)
+        public EnumerablesComparer(ComparisonSettings settings, IObjectsDataComparer elementComparer = null)
         {
+            _settings = settings;
             _comparer = elementComparer ?? new ObjectsesDataComparer<T>();
         }
 
         public IEnumerable<Difference> Compare(object obj1, object obj2)
         {
+            if (!_settings.EmptyAndNullEnumerablesEqual &&
+                (obj1 == null || obj2 == null) && obj1 != obj2)
+            {
+                yield return new Difference("[]", obj1?.ToString() ?? string.Empty, obj2?.ToString() ?? string.Empty);
+                yield break;
+            }
+
             obj1 = obj1 ?? Enumerable.Empty<T>();
             obj2 = obj2 ?? Enumerable.Empty<T>();
 
