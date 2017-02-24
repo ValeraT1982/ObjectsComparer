@@ -22,13 +22,13 @@ namespace ObjectsComparer
         public ObjectsesDataComparer(ComparisonSettings settings)
         {
             Settings = settings;
-            var properties = typeof(T).GetProperties().Where(p =>
+            var properties = typeof(T).GetTypeInfo().GetProperties().Where(p =>
                 p.CanRead
                 && p.GetGetMethod(true).IsPublic
                 && p.GetGetMethod(true).GetParameters().Length == 0
                 && !p.GetGetMethod(true).IsStatic).ToList();
 
-            var fields = typeof(T).GetFields().Where(f =>
+            var fields = typeof(T).GetTypeInfo().GetFields().Where(f =>
                 f.IsPublic && !f.IsStatic).ToList();
 
             _members = properties.Union(fields.Cast<MemberInfo>()).ToList();
@@ -97,15 +97,15 @@ namespace ObjectsComparer
             {
                 Type elementType;
 
-                if (typeof(T).IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                if (typeof(T).GetTypeInfo().IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(IEnumerable<>))
                 {
-                    elementType = typeof(T).GetGenericArguments()[0];
+                    elementType = typeof(T).GetTypeInfo().GetGenericArguments()[0];
                 }
                 else
                 {
-                    elementType = typeof(T).GetInterfaces()
-                        .Where(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>))
-                        .Select(i => i.GetGenericArguments()[0])
+                    elementType = typeof(T).GetTypeInfo().GetInterfaces()
+                        .Where(i => i.GetTypeInfo().IsGenericType && i.GetTypeInfo().GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                        .Select(i => i.GetTypeInfo().GetGenericArguments()[0])
                         .First();
                 }
                 

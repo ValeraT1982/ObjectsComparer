@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace ObjectsComparer
 {
@@ -41,7 +42,7 @@ namespace ObjectsComparer
         // ReSharper disable once UnusedParameter.Local
         private void IsArgumentException(object obj, string argumentName)
         {
-            if (!(obj is T) && !(typeof(T).IsClass && obj == null))
+            if (!(obj is T) && !(typeof(T).GetTypeInfo().IsClass && obj == null))
             {
                 throw new ArgumentException(argumentName);
             }

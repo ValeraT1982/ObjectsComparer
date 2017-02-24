@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 
 namespace ObjectsComparer.Utils
 {
@@ -17,18 +18,18 @@ namespace ObjectsComparer.Utils
                 return true;
             }
 
-            if (t1.IsGenericType && t1.GetGenericTypeDefinition() == t2)
+            if (t1.GetTypeInfo().IsGenericType && t1.GetTypeInfo().GetGenericTypeDefinition() == t2)
             {
                 return true;
             }
 
-            if (t1.GetInterfaces().Any(i => (i.IsGenericType && i.GetGenericTypeDefinition() == t2) || i == t2))
+            if (t1.GetTypeInfo().GetInterfaces().Any(i => (i.GetTypeInfo().IsGenericType && i.GetGenericTypeDefinition() == t2) || i == t2))
             {
                 return true;
             }
 
-            if (t1.BaseType != null &&
-                InheritsFrom(t1.BaseType, t2))
+            if (t1.GetTypeInfo().BaseType != null &&
+                InheritsFrom(t1.GetTypeInfo().BaseType, t2))
             {
                 return true;
             }
@@ -38,8 +39,8 @@ namespace ObjectsComparer.Utils
 
         public static bool IsComparable(this Type type)
         {
-            if (type.IsPrimitive ||
-                type.IsEnum ||
+            if (type.GetTypeInfo().IsPrimitive ||
+                type.GetTypeInfo().IsEnum ||
                 type.InheritsFrom(typeof(IComparable)) ||
                 type.InheritsFrom(typeof(IComparable<>)))
             {
