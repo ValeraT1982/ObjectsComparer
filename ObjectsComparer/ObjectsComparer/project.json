@@ -1,5 +1,18 @@
-{
-  "version": "1.0.0-*",
+﻿{
+  "copyright": "Copyright © Valerii Tereshchenko 2017",
+  "title": "Objects Data Comparer",
+  "version": "0.1.0",
+  "authors": [ "Valerii Tereshchenko" ],
+  "description": "Framework provides mechanism to compare classes, allows override comparison rules for specific properties and types.",
+  "packOptions": {
+    "copyright": "Copyright Valerii Tereshchenko",
+    "owners": [ "Valerii Tereshchenko" ],
+    "licenseUrl": "https://github.com/ValeraT1982/ObjectsComparer/blob/master/LICENSE",
+    "projectUrl": "https://github.com/ValeraT1982/ObjectsComparer",
+    "iconUrl": "https://github.com/ValeraT1982/ObjectsComparer/blob/master/ObjectsDataComparer.png",
+    "requireLicenseAcceptance": false,
+    "summary": "Objects data comparer"
+  },
 
   "dependencies": {
     "NETStandard.Library": "1.6.0"
@@ -10,5 +23,9 @@
     "netstandard1.5": {
       "imports": "dnxcore50"
     }
+  },
+
+  "scripts": {
+    "postcompile": [ "dotnet pack --no-build --version-suffix %project:Version% project.json" ]
   }
 }
