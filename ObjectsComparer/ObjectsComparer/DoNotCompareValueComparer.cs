@@ -26,7 +26,7 @@
 
         private DoNotCompareValueComparer() { }
 
-        public bool Compare(object obj1, object obj2)
+        public bool Compare(object obj1, object obj2, ComparisonSettings settings)
         {
             return true;
         }

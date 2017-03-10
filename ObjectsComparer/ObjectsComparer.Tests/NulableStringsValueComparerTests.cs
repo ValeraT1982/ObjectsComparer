@@ -17,7 +17,7 @@ namespace ObjectsComparer.Tests
         {
             var comparer = new NulableStringsValueComparer();
 
-            var result = comparer.Compare(s1, s2);
+            var result = comparer.Compare(s1, s2, new ComparisonSettings());
 
             Assert.AreEqual(expectedResult, result);
         }

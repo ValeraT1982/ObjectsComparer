@@ -2,7 +2,7 @@
 {
     public class DefaultValueComparer: IValueComparer
     {
-        public bool Compare(object obj1, object obj2)
+        public bool Compare(object obj1, object obj2, ComparisonSettings settings)
         {
             if (obj1 == null || obj2 == null)
             {

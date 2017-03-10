@@ -56,8 +56,7 @@ namespace ObjectsComparer
                     continue;
                 }
 
-                var comparer = ObjectsesDataComparer<object>.CreateComparer(array1[i].GetType(), _settings);
-                _parentComparer.ConfigureChildComparer(comparer);
+                var comparer = ObjectsDataComparer<object>.CreateComparer(array1[i].GetType(), _settings, _parentComparer);
 
                 foreach (var failure in comparer.Compare(array1[i], array2[i]))
                 {

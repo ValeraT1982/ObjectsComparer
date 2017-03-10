@@ -14,7 +14,7 @@ namespace ObjectsComparer.Tests
         [Test]
         public void CompareTest()
         {
-            var result = DoNotCompareValueComparer.Instance.Compare(25, "String");
+            var result = DoNotCompareValueComparer.Instance.Compare(25, "String", new ComparisonSettings());
 
             Assert.IsTrue(result);
         }

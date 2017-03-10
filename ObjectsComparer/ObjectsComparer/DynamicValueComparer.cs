@@ -5,10 +5,10 @@ namespace ObjectsComparer
 {
     public class DynamicValueComparer<T>: IValueComparer
     {
-        private readonly Func<T, T, bool> _compareFunction;
+        private readonly Func<T, T, ComparisonSettings, bool> _compareFunction;
         private readonly Func<T, string> _toStringFunction;
 
-        public DynamicValueComparer(Func<T, T, bool> compareFunction, Func<T, string> toStringFunction)
+        public DynamicValueComparer(Func<T, T, ComparisonSettings, bool> compareFunction, Func<T, string> toStringFunction)
         {
             if (compareFunction == null)
             {
@@ -24,12 +24,12 @@ namespace ObjectsComparer
             _toStringFunction = toStringFunction;
         }
 
-        public bool Compare(object obj1, object obj2)
+        public bool Compare(object obj1, object obj2, ComparisonSettings settings)
         {
             IsArgumentException(obj1, nameof(obj1));
             IsArgumentException(obj2, nameof(obj2));
 
-            return _compareFunction((T)obj1, (T)obj2);
+            return _compareFunction((T)obj1, (T)obj2, settings);
         }
 
         public string ToString(object value)

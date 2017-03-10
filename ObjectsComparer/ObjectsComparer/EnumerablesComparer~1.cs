@@ -13,7 +13,7 @@ namespace ObjectsComparer
         public EnumerablesComparer(ComparisonSettings settings, IObjectsDataComparer elementComparer = null)
         {
             _settings = settings;
-            _comparer = elementComparer ?? new ObjectsesDataComparer<T>();
+            _comparer = elementComparer ?? new ObjectsDataComparer<T>();
         }
 
         public IEnumerable<Difference> Compare(object obj1, object obj2)
