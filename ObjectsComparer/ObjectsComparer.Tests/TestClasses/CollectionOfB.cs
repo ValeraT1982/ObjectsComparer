@@ -20,7 +20,7 @@ namespace ObjectsComparer.Tests.TestClasses
             _collection = new Collection<B>();
         }
 
-        public void Report(string value) => Debug.Print(value);
+        public void Report(string value) => Debug.WriteLine(value);
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

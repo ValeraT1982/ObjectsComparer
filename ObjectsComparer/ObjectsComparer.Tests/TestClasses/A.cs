@@ -57,7 +57,7 @@ namespace ObjectsComparer.Tests.TestClasses
             {
                 if (value > 3)
                 {
-                    Debug.Print("value > 3");
+                    Debug.WriteLine("value > 3");
                 }
             }
         }

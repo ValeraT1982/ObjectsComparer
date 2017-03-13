@@ -2,7 +2,7 @@
 
 namespace ObjectsComparer.Examples.Example2
 {
-    public class Customer
+    public class Person
     {
         public Guid CustomerId { get; set; }
 
@@ -13,5 +13,10 @@ namespace ObjectsComparer.Examples.Example2
         public string MiddleName { get; set; }
 
         public string PhoneNumber { get; set; }
+
+        public override string ToString()
+        {
+            return $"{FirstName} {MiddleName} {LastName} ({PhoneNumber})";
+        }
     }
 }

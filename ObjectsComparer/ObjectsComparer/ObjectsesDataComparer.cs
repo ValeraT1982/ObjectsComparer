@@ -26,7 +26,7 @@ namespace ObjectsComparer
 
         public ObjectsDataComparer(ComparisonSettings settings, IObjectsDataComparer parentComparer = null)
         {
-            Settings = settings;
+            Settings = settings ?? new ComparisonSettings();
             var properties = typeof(T).GetTypeInfo().GetProperties().Where(p =>
                 p.CanRead
                 && p.GetGetMethod(true).IsPublic
