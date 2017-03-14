@@ -58,7 +58,7 @@ namespace ObjectsComparer
 
                 var comparer = ObjectsDataComparer<object>.CreateComparer(array1[i].GetType(), _settings, _parentComparer);
 
-                foreach (var failure in comparer.Compare(array1[i], array2[i]))
+                foreach (var failure in comparer.CalculateDifferences(array1[i], array2[i]))
                 {
                     yield return failure.InsertPath($"[{i}]");
                 }

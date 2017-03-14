@@ -88,12 +88,29 @@ namespace ObjectsComparer
             DefaultValueComparer = valueComparer;
         }
 
-        public IEnumerable<Difference> Compare(object obj1, object obj2)
+        public bool Compare(object obj1, object obj2, out IEnumerable<Difference> differences)
         {
-            return Compare((T)obj1, (T)obj2);
+            return Compare((T) obj1, (T) obj2, out differences);
         }
 
-        public IEnumerable<Difference> Compare(T obj1, T obj2)
+        public bool Compare(T obj1, T obj2, out IEnumerable<Difference> differences)
+        {
+            differences = CalculateDifferences(obj1, obj2);
+
+            return !differences.Any();
+        }
+
+        public bool Compare(object obj1, object obj2)
+        {
+            return !CalculateDifferences((T)obj1, (T)obj2).Any();
+        }
+
+        public bool Compare(T obj1, T obj2)
+        {
+            return !CalculateDifferences(obj1, obj2).Any();
+        }
+
+        public IEnumerable<Difference> CalculateDifferences(object obj1, object obj2)
         {
             if (typeof(T).IsComparable() ||
                 _typeComparerOverrides.ContainsKey(typeof(T)))
@@ -145,7 +162,7 @@ namespace ObjectsComparer
                 }
             }
             else if (!typeof(T).IsComparable()
-                && typeof(T).InheritsFrom(typeof(IEnumerable)))
+                     && typeof(T).InheritsFrom(typeof(IEnumerable)))
             {
                 var enumerablesComparer = new EnumerablesComparer(Settings, this);
                 foreach (var difference in enumerablesComparer.Compare(obj1, obj2))
@@ -199,7 +216,7 @@ namespace ObjectsComparer
                 {
                     var objectDataComparer = CreateComparer(type, Settings, this);
 
-                    foreach (var failure in objectDataComparer.Compare(value1, value2))
+                    foreach (var failure in objectDataComparer.CalculateDifferences(value1, value2))
                     {
                         yield return failure.InsertPath(member.Name);
                     }
@@ -212,20 +229,6 @@ namespace ObjectsComparer
                     yield return new Difference(member.Name, comparer.ToString(value1), comparer.ToString(value2));
                 }
             }
-        }
-
-        public bool Compare(object obj1, object obj2, out IEnumerable<Difference> differences)
-        {
-            differences = Compare(obj1, obj2);
-
-            return !differences.Any();
-        }
-
-        public bool Compare(T obj1, T obj2, out IEnumerable<Difference> differences)
-        {
-            differences = Compare(obj1, obj2);
-
-            return !differences.Any();
         }
     }
 }

@@ -18,9 +18,9 @@ namespace ObjectsComparer.Tests
             stringComparer.Compare(Arg.Any<object>(), Arg.Any<object>(), Arg.Any<ComparisonSettings>()).Returns(true);
             comparer.AddComparerOverride<string>(stringComparer);
 
-            var differences = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
             stringComparer.Received().Compare(Arg.Any<object>(), Arg.Any<object>(), Arg.Any<ComparisonSettings>());
         }
 
@@ -35,7 +35,7 @@ namespace ObjectsComparer.Tests
             stringComparer.ToString(Arg.Any<object>()).Returns(info => (info.Arg<object>() ?? string.Empty).ToString());
             comparer.AddComparerOverride(typeof(string), stringComparer);
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.IsTrue(differences.Any(d => d.MemberPath == "TestProperty1" && d.Value1 == "ABC" && d.Value2 == "BCD"));
@@ -56,7 +56,7 @@ namespace ObjectsComparer.Tests
             stringComparer.ToString(Arg.Any<object>()).Returns(info => (info.Arg<object>() ?? string.Empty).ToString());
             comparer.AddComparerOverride<int>(stringComparer);
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.IsTrue(differences.Any(d => d.MemberPath == "IntArray[0]" && d.Value1 == "1" && d.Value2 == "1"));
@@ -76,9 +76,9 @@ namespace ObjectsComparer.Tests
             intComparer.ToString(Arg.Any<object>()).Returns(info => (info.Arg<object>() ?? string.Empty).ToString());
             comparer.AddComparerOverride(typeof(int), intComparer);
 
-            var differences = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
             intComparer.Received().Compare(Arg.Any<object>(), Arg.Any<object>(), Arg.Any<ComparisonSettings>());
         }
 
@@ -92,9 +92,9 @@ namespace ObjectsComparer.Tests
             valueComparer.Compare(Arg.Any<object>(), Arg.Any<object>(), Arg.Any<ComparisonSettings>()).Returns(true);
             comparer.AddComparerOverride(() => a1.TestProperty1, valueComparer);
 
-            var differences = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
             valueComparer.Received(1).Compare(Arg.Any<object>(), Arg.Any<object>(), Arg.Any<ComparisonSettings>());
         }
 
@@ -107,9 +107,9 @@ namespace ObjectsComparer.Tests
             var comparer = new ObjectsDataComparer<A>();
             comparer.AddComparerOverride<B>(valueComparer);
 
-            var differences = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
         }
 
         [Test]
@@ -121,7 +121,7 @@ namespace ObjectsComparer.Tests
             var comparer = new ObjectsDataComparer<A>();
             comparer.AddComparerOverride<B>(valueComparer);
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("ClassB", differences[0].MemberPath);
@@ -138,9 +138,9 @@ namespace ObjectsComparer.Tests
             var comparer = new ObjectsDataComparer<A>();
             comparer.AddComparerOverride(() => new B().Property1, valueComparer);
 
-            var differences = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
         }
 
         [Test]
@@ -152,7 +152,7 @@ namespace ObjectsComparer.Tests
             var comparer = new ObjectsDataComparer<A>();
             comparer.AddComparerOverride(() => new B().Property1, valueComparer);
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("ClassB.Property1", differences[0].MemberPath);

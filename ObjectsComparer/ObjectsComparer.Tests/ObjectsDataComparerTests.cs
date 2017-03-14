@@ -19,9 +19,9 @@ namespace ObjectsComparer.Tests
             var a2 = new A { IntProperty = 10, DateTimeProperty = new DateTime(2017, 1, 1), Property3 = 8 };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
         }
 
         [Test]
@@ -33,7 +33,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { IntProperty = 8, DateTimeProperty = date2 };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("IntProperty", differences[0].MemberPath);
@@ -53,9 +53,9 @@ namespace ObjectsComparer.Tests
             var a2 = new A(1.99);
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
         }
 
         [Test]
@@ -65,7 +65,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A(0.89);
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("ReadOnlyProperty", differences.First().MemberPath);
@@ -80,9 +80,9 @@ namespace ObjectsComparer.Tests
             var a2 = new A(false);
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
         }
 
         [Test]
@@ -92,9 +92,9 @@ namespace ObjectsComparer.Tests
             var a2 = new A { Field = 9 };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
         }
 
         [Test]
@@ -104,7 +104,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { Field = 8 };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("Field", differences.First().MemberPath);
@@ -119,9 +119,9 @@ namespace ObjectsComparer.Tests
             var a2 = new A("Str1");
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
         }
 
         [Test]
@@ -131,7 +131,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A("Str2");
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("ReadOnlyField", differences.First().MemberPath);
@@ -146,9 +146,9 @@ namespace ObjectsComparer.Tests
             var a2 = new A(6);
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
         }
 
         [Test]
@@ -158,9 +158,9 @@ namespace ObjectsComparer.Tests
             var a2 = new A { ClassB = new B { Property1 = "Str1" } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
         }
 
         [Test]
@@ -170,7 +170,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { ClassB = new B { Property1 = "Str2" } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("ClassB.Property1", differences.First().MemberPath);
@@ -185,7 +185,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { ClassB = new B { Property1 = "Str2" } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("ClassB", differences.First().MemberPath);
@@ -200,7 +200,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A();
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("ClassB", differences.First().MemberPath);
@@ -215,9 +215,9 @@ namespace ObjectsComparer.Tests
             var a2 = new A { ClassB = new B { Property1 = "Str2" } };
             var comparer = new ObjectsDataComparer<A>(new ComparisonSettings { RecursiveComparison = false });
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
         }
 
         [Test]
@@ -227,9 +227,9 @@ namespace ObjectsComparer.Tests
             var a2 = new A { IntArray = new[] { 1, 2 } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
         }
 
         [Test]
@@ -239,7 +239,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { IntArray = new[] { 1, 2, 3 } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("IntArray[]", differences.First().MemberPath);
@@ -254,7 +254,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { IntArray = new[] { 1, 3 } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("IntArray[1]", differences.First().MemberPath);
@@ -269,7 +269,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { IntArray = new int[0] };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("IntArray[]", differences.First().MemberPath);
@@ -284,7 +284,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A();
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("IntArray[]", differences.First().MemberPath);
@@ -299,9 +299,9 @@ namespace ObjectsComparer.Tests
             var a2 = new A { ArrayOfB = new[] { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
         }
 
         [Test]
@@ -311,7 +311,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { ArrayOfB = new[] { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("ArrayOfB[]", differences.First().MemberPath);
@@ -326,7 +326,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { ArrayOfB = new[] { new B { Property1 = "Str1" }, new B { Property1 = "Str3" } } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("ArrayOfB[1].Property1", differences.First().MemberPath);
@@ -341,9 +341,9 @@ namespace ObjectsComparer.Tests
             var a2 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
         }
 
         [Test]
@@ -353,7 +353,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1" } } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("CollectionOfB[]", differences.First().MemberPath);
@@ -368,7 +368,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1" }, new B { Property1 = "Str3" } } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("CollectionOfB[1].Property1", differences.First().MemberPath);
@@ -383,9 +383,9 @@ namespace ObjectsComparer.Tests
             var a2 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
         }
 
         [Test]
@@ -395,7 +395,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str1" } } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("ClassImplementsCollectionOfB[]", differences.First().MemberPath);
@@ -410,7 +410,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str1" }, new B { Property1 = "Str3" } } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("ClassImplementsCollectionOfB[1].Property1", differences.First().MemberPath);
@@ -425,9 +425,9 @@ namespace ObjectsComparer.Tests
             var a2 = new A { IntefaceProperty = new TestInterfaceImplementation2 { Property = "Str1", AnotherProperty = 50 } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
         }
 
         [Test]
@@ -437,7 +437,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { IntefaceProperty = new TestInterfaceImplementation2 { Property = "Str2", AnotherProperty = 50 } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("IntefaceProperty.Property", differences.First().MemberPath);
@@ -452,9 +452,9 @@ namespace ObjectsComparer.Tests
             var a2 = new A { StructProperty = new TestStruct { FieldA = "FA", FieldB = "FB" } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
         }
 
         [Test]
@@ -464,7 +464,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { StructProperty = new TestStruct { FieldA = "FA", FieldB = "FBB" } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("StructProperty.FieldB", differences.First().MemberPath);
@@ -479,9 +479,9 @@ namespace ObjectsComparer.Tests
             var a2 = new A { EnumProperty = TestEnum.Value1 };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
         }
 
         [Test]
@@ -491,7 +491,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { EnumProperty = TestEnum.Value2 };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("EnumProperty", differences.First().MemberPath);
@@ -509,9 +509,9 @@ namespace ObjectsComparer.Tests
             valueComparer.Compare(Arg.Any<object>(), Arg.Any<object>(), Arg.Any<ComparisonSettings>()).Returns(true);
             comparer.SetDefaultComparer(valueComparer);
 
-            var differences = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
             valueComparer.Received().Compare(Arg.Any<object>(), Arg.Any<object>(), Arg.Any<ComparisonSettings>());
         }
 
@@ -531,9 +531,9 @@ namespace ObjectsComparer.Tests
             var a2 = new A { NonGenericEnumerable = new ArrayList { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
         }
 
         [Test]
@@ -543,7 +543,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { NonGenericEnumerable = new ArrayList { new B { Property1 = "Str1" } } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("NonGenericEnumerable[]", differences.First().MemberPath);
@@ -558,7 +558,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { NonGenericEnumerable = new ArrayList { new B { Property1 = "Str1" }, new B { Property1 = "Str3" } } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("NonGenericEnumerable[1].Property1", differences.First().MemberPath);
@@ -573,7 +573,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { NonGenericEnumerable = new ArrayList { new B { Property1 = "Str1" }, "Str3" } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("NonGenericEnumerable[1]", differences.First().MemberPath);
@@ -588,9 +588,9 @@ namespace ObjectsComparer.Tests
             var a2 = new A { NonGenericEnumerableImplementation = new EnumerableImplementation(new ArrayList { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } }) };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
         }
 
         [Test]
@@ -600,7 +600,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { NonGenericEnumerableImplementation = new EnumerableImplementation(new ArrayList { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } }) { Property1 = "Str4" } };
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("NonGenericEnumerableImplementation.Property1", differences.First().MemberPath);
@@ -615,7 +615,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A();
             var comparer = new ObjectsDataComparer<A>();
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("NonGenericEnumerable[]", differences.First().MemberPath);
@@ -630,9 +630,9 @@ namespace ObjectsComparer.Tests
             var a2 = new A();
             var comparer = new ObjectsDataComparer<A>(new ComparisonSettings {EmptyAndNullEnumerablesEqual = true});
 
-            var differences = comparer.Compare(a1, a2).ToList();
+            var isEqual = comparer.Compare(a1, a2);
 
-            CollectionAssert.IsEmpty(differences);
+            Assert.IsTrue(isEqual);
         }
 
         [Test]

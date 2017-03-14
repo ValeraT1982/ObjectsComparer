@@ -50,7 +50,7 @@ namespace ObjectsComparer
 
             for (int i = 0; i < actualList.Count; i++)
             {
-                foreach (var failure in _comparer.Compare(expectedList[i], actualList[i]))
+                foreach (var failure in _comparer.CalculateDifferences(expectedList[i], actualList[i]))
                 {
                     yield return failure.InsertPath($"[{i}]");
                 }

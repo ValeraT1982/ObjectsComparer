@@ -10,7 +10,7 @@ namespace ObjectsComparer
         IEnumerable<KeyValuePair<MemberInfo, IValueComparer>> MemberComparerOverrides { get; }
 
         IEnumerable<KeyValuePair<Type, IValueComparer>> TypeComparerOverrides { get; }
-        
+
         IValueComparer DefaultValueComparer { get; }
 
         ComparisonSettings Settings { get; }
@@ -25,8 +25,10 @@ namespace ObjectsComparer
 
         void SetDefaultComparer(IValueComparer valueComparer);
 
-        IEnumerable<Difference> Compare(object obj1, object obj2);
-
         bool Compare(object obj1, object obj2, out IEnumerable<Difference> differences);
+
+        bool Compare(object obj1, object obj2);
+
+        IEnumerable<Difference> CalculateDifferences(object obj1, object obj2);
     }
 }
