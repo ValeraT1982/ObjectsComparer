@@ -1,7 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using ObjectsComparer.Tests.TestClasses;
 
 namespace ObjectsComparer.Tests
@@ -12,25 +11,21 @@ namespace ObjectsComparer.Tests
         [Test]
         public void FirstParameterNotEnumerable()
         {
-            var comparer = new EnumerablesComparer(new ComparisonSettings());
+            var comparer = new EnumerablesComparer(new ComparisonSettings(), null, null);
             var obj1 = 25;
             var obj2 = new List<string>();
 
-
-            // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
-            Assert.Throws<ArgumentException>(() => comparer.Compare(obj1, obj2).ToList());
+            Assert.Throws<ArgumentException>(() => comparer.Compare(obj1, obj2));
         }
 
         [Test]
         public void SecondParameterNotEnumerable()
         {
-            var comparer = new EnumerablesComparer(new ComparisonSettings());
+            var comparer = new EnumerablesComparer(new ComparisonSettings(), null, null);
             var obj1 = new List<string>();
             var obj2 = new A();
 
-
-            // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
-            Assert.Throws<ArgumentException>(() => comparer.Compare(obj1, obj2).ToList());
+            Assert.Throws<ArgumentException>(() => comparer.Compare(obj1, obj2));
         }
     }
 }

@@ -6,20 +6,16 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    public class EnumerablesComparer : IEnumerablesComparer
+    public class EnumerablesComparer : AbstractObjectsDataComparer<IEnumerable>, IObjectsDataComparerWithCondition
     {
-        private readonly ComparisonSettings _settings;
-        private readonly IObjectsDataComparer _parentComparer;
-
-        public EnumerablesComparer(ComparisonSettings settings, IObjectsDataComparer parentComparer = null)
+        public EnumerablesComparer(ComparisonSettings settings, IObjectsDataComparer parentComparer, IObjectsComparersFactory factory)
+            : base(settings, parentComparer, factory)
         {
-            _settings = settings;
-            _parentComparer = parentComparer;
         }
 
-        public IEnumerable<Difference> Compare(object obj1, object obj2)
+        public override IEnumerable<Difference> CalculateDifferences(object obj1, object obj2)
         {
-            if (!_settings.EmptyAndNullEnumerablesEqual &&
+            if (!Settings.EmptyAndNullEnumerablesEqual &&
                 (obj1 == null || obj2 == null) && obj1 != obj2)
             {
                 yield return new Difference("[]", obj1?.ToString() ?? string.Empty, obj2?.ToString() ?? string.Empty);
@@ -56,13 +52,28 @@ namespace ObjectsComparer
                     continue;
                 }
 
-                var comparer = ObjectsDataComparer<object>.CreateComparer(array1[i].GetType(), _settings, _parentComparer);
+                var comparer = Factory.GetObjectsComparer(array1[i].GetType(), Settings, this);
 
                 foreach (var failure in comparer.CalculateDifferences(array1[i], array2[i]))
                 {
                     yield return failure.InsertPath($"[{i}]");
                 }
             }
+        }
+
+        public bool IsMatch(Type type)
+        {
+            return type.InheritsFrom(typeof(IEnumerable));
+        }
+
+        public bool IsStopComparison(object obj1, object obj2)
+        {
+            if (Settings.EmptyAndNullEnumerablesEqual && obj1 == null || obj2 == null)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

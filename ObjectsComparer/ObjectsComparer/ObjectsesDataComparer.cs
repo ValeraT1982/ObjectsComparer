@@ -2,31 +2,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    public class ObjectsDataComparer<T> : IObjectsDataComparer<T>
+    public class ObjectsDataComparer<T> : AbstractObjectsDataComparer<T>
     {
-        public ComparisonSettings Settings { get; }
-
-        public IEnumerable<KeyValuePair<MemberInfo, IValueComparer>> MemberComparerOverrides => _memberComparerOverrides.Select(o => o);
-
-        public IEnumerable<KeyValuePair<Type, IValueComparer>> TypeComparerOverrides => _typeComparerOverrides.Select(o => o);
-
-        public IValueComparer DefaultValueComparer { get; private set; }
-
-        private readonly Dictionary<MemberInfo, IValueComparer> _memberComparerOverrides = new Dictionary<MemberInfo, IValueComparer>();
-        private readonly Dictionary<Type, IValueComparer> _typeComparerOverrides = new Dictionary<Type, IValueComparer>();
         private readonly List<MemberInfo> _members;
-        
-        public ObjectsDataComparer(IObjectsDataComparer parentComparer = null) : this(new ComparisonSettings(), parentComparer) { }
+        private readonly List<IObjectsDataComparerWithCondition> _conditionalComparers;
 
-        public ObjectsDataComparer(ComparisonSettings settings, IObjectsDataComparer parentComparer = null)
+        public ObjectsDataComparer(ComparisonSettings settings = null, IObjectsDataComparer parentComparer = null, IObjectsComparersFactory factory = null) 
+            : base(settings, parentComparer, factory)
         {
-            Settings = settings ?? new ComparisonSettings();
             var properties = typeof(T).GetTypeInfo().GetProperties().Where(p =>
                 p.CanRead
                 && p.GetGetMethod(true).IsPublic
@@ -35,90 +23,21 @@ namespace ObjectsComparer
             var fields = typeof(T).GetTypeInfo().GetFields().Where(f =>
                 f.IsPublic && !f.IsStatic).ToList();
             _members = properties.Union(fields.Cast<MemberInfo>()).ToList();
-            DefaultValueComparer = new DefaultValueComparer();
-            if (parentComparer != null)
+            _conditionalComparers = new List<IObjectsDataComparerWithCondition>
             {
-                DefaultValueComparer = parentComparer.DefaultValueComparer;
-                foreach (var memberComparerOverride in parentComparer.MemberComparerOverrides)
-                {
-                    AddComparerOverride(memberComparerOverride.Key, memberComparerOverride.Value);
-                }
-
-                foreach (var typeComparerOverride in parentComparer.TypeComparerOverrides)
-                {
-                    AddComparerOverride(typeComparerOverride.Key, typeComparerOverride.Value);
-                }
-            }
+                new EnumerablesComparer(Settings, this, Factory)
+            };
         }
 
-        public static IObjectsDataComparer CreateComparer(Type type, ComparisonSettings settings, IObjectsDataComparer parentComparer = null)
-        {
-            var elementComparerType = typeof(ObjectsDataComparer<>).MakeGenericType(type);
-
-            return (IObjectsDataComparer)Activator.CreateInstance(elementComparerType, settings, parentComparer);
-        }
-
-        public void AddComparerOverride<TProp>(Expression<Func<TProp>> memberLambda, IValueComparer memberValueComparer)
-        {
-            _memberComparerOverrides[PropertyHelper.GetMemberInfo(memberLambda)] = memberValueComparer;
-        }
-
-        public void AddComparerOverride(MemberInfo memberInfo, IValueComparer memberValueComparer)
-        {
-            _memberComparerOverrides[memberInfo] = memberValueComparer;
-        }
-
-        public void AddComparerOverride(Type type, IValueComparer typeValueComparer)
-        {
-            _typeComparerOverrides[type] = typeValueComparer;
-        }
-
-        public void AddComparerOverride<TType>(IValueComparer typeValueComparer)
-        {
-            AddComparerOverride(typeof(TType), typeValueComparer);
-        }
-
-        public void SetDefaultComparer(IValueComparer valueComparer)
-        {
-            if (valueComparer == null)
-            {
-                throw new ArgumentNullException(nameof(valueComparer));
-            }
-
-            DefaultValueComparer = valueComparer;
-        }
-
-        public bool Compare(object obj1, object obj2, out IEnumerable<Difference> differences)
-        {
-            return Compare((T) obj1, (T) obj2, out differences);
-        }
-
-        public bool Compare(T obj1, T obj2, out IEnumerable<Difference> differences)
-        {
-            differences = CalculateDifferences(obj1, obj2);
-
-            return !differences.Any();
-        }
-
-        public bool Compare(object obj1, object obj2)
-        {
-            return !CalculateDifferences((T)obj1, (T)obj2).Any();
-        }
-
-        public bool Compare(T obj1, T obj2)
-        {
-            return !CalculateDifferences(obj1, obj2).Any();
-        }
-
-        public IEnumerable<Difference> CalculateDifferences(object obj1, object obj2)
+        public override IEnumerable<Difference> CalculateDifferences(object obj1, object obj2)
         {
             if (typeof(T).IsComparable() ||
-                _typeComparerOverrides.ContainsKey(typeof(T)))
+                TypeComparerOverrides.Any(p => p.Key == typeof(T)))
             {
                 var comparer = DefaultValueComparer;
-                if (_typeComparerOverrides.ContainsKey(typeof(T)))
+                if (TypeComparerOverrides.Any(p => p.Key == typeof(T)))
                 {
-                    comparer = _typeComparerOverrides[typeof(T)];
+                    comparer = TypeComparerOverrides.First(p => p.Key == typeof(T)).Value;
                 }
 
                 if (!comparer.Compare(obj1, obj2, Settings))
@@ -131,7 +50,22 @@ namespace ObjectsComparer
                 yield break;
             }
 
-            if (!typeof(T).IsComparable() && typeof(T).InheritsFrom(typeof(IEnumerable<>)))
+            var conditionalComparer = _conditionalComparers.FirstOrDefault(c => c.IsMatch(typeof(T)));
+
+            if (conditionalComparer != null)
+            {
+                foreach (var difference in conditionalComparer.CalculateDifferences(obj1, obj2))
+                {
+                    yield return difference;
+                }
+
+                if (conditionalComparer.IsStopComparison(obj1, obj2))
+                {
+                    yield break;
+                }
+            }
+
+            if (typeof(T).InheritsFrom(typeof(IEnumerable<>)))
             {
                 Type elementType;
 
@@ -146,12 +80,11 @@ namespace ObjectsComparer
                         .Select(i => i.GetTypeInfo().GetGenericArguments()[0])
                         .First();
                 }
-                
-                var elementComparer = CreateComparer(elementType, Settings, this);
+
                 var enumerablesComparerType = typeof(EnumerablesComparer<>).MakeGenericType(elementType);
-                var enumerablesComparer = (IEnumerablesComparer)Activator.CreateInstance(enumerablesComparerType, Settings, elementComparer);
+                var enumerablesComparer = (IObjectsDataComparer)Activator.CreateInstance(enumerablesComparerType, Settings, this, Factory);
 
-                foreach (var difference in enumerablesComparer.Compare(obj1, obj2))
+                foreach (var difference in enumerablesComparer.CalculateDifferences(obj1, obj2))
                 {
                     yield return difference;
                 }
@@ -161,20 +94,19 @@ namespace ObjectsComparer
                     yield break;
                 }
             }
-            else if (!typeof(T).IsComparable()
-                     && typeof(T).InheritsFrom(typeof(IEnumerable)))
-            {
-                var enumerablesComparer = new EnumerablesComparer(Settings, this);
-                foreach (var difference in enumerablesComparer.Compare(obj1, obj2))
-                {
-                    yield return difference;
-                }
+            //else if (typeof(T).InheritsFrom(typeof(IEnumerable)))
+            //{
+            //    var enumerablesComparer = new EnumerablesComparer(Settings, this, Factory);
+            //    foreach (var difference in enumerablesComparer.CalculateDifferences(obj1, obj2))
+            //    {
+            //        yield return difference;
+            //    }
 
-                if (Settings.EmptyAndNullEnumerablesEqual && obj1 == null || obj2 == null)
-                {
-                    yield break;
-                }
-            }
+            //    if (Settings.EmptyAndNullEnumerablesEqual && obj1 == null || obj2 == null)
+            //    {
+            //        yield break;
+            //    }
+            //}
 
             if (obj1 == null || obj2 == null)
             {
@@ -200,21 +132,21 @@ namespace ObjectsComparer
                 var comparer = DefaultValueComparer;
                 var hasCustomComparer = false;
 
-                if (_memberComparerOverrides.ContainsKey(member))
+                if (MemberComparerOverrides.Any(p => p.Key == member))
                 {
-                    comparer = _memberComparerOverrides[member];
+                    comparer = MemberComparerOverrides.First(p => p.Key == member).Value;
                     hasCustomComparer = true;
                 }
-                else if (_typeComparerOverrides.ContainsKey(type))
+                else if (TypeComparerOverrides.Any(p => p.Key == type))
                 {
-                    comparer = _typeComparerOverrides[type];
+                    comparer = TypeComparerOverrides.First(p => p.Key == type).Value;
                     hasCustomComparer = true;
                 }
 
                 if (!hasCustomComparer
                     && !type.IsComparable())
                 {
-                    var objectDataComparer = CreateComparer(type, Settings, this);
+                    var objectDataComparer = Factory.GetObjectsComparer(type, Settings, this);
 
                     foreach (var failure in objectDataComparer.CalculateDifferences(value1, value2))
                     {

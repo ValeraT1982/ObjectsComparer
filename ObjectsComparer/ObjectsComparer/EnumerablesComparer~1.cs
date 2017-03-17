@@ -5,20 +5,19 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    public class EnumerablesComparer<T> : IEnumerablesComparer
+    public class EnumerablesComparer<T> : AbstractObjectsDataComparer<IEnumerable<T>>
     {
-        private readonly ComparisonSettings _settings;
         private readonly IObjectsDataComparer _comparer;
 
-        public EnumerablesComparer(ComparisonSettings settings, IObjectsDataComparer elementComparer = null)
+        public EnumerablesComparer(ComparisonSettings settings, IObjectsDataComparer parentComparer, IObjectsComparersFactory factory)
+            :base(settings, parentComparer, factory)
         {
-            _settings = settings;
-            _comparer = elementComparer ?? new ObjectsDataComparer<T>();
+            _comparer = new ObjectsDataComparer<T>(Settings, this);
         }
 
-        public IEnumerable<Difference> Compare(object obj1, object obj2)
+        public override IEnumerable<Difference> CalculateDifferences(object obj1, object obj2)
         {
-            if (!_settings.EmptyAndNullEnumerablesEqual &&
+            if (!Settings.EmptyAndNullEnumerablesEqual &&
                 (obj1 == null || obj2 == null) && obj1 != obj2)
             {
                 yield return new Difference("[]", obj1?.ToString() ?? string.Empty, obj2?.ToString() ?? string.Empty);

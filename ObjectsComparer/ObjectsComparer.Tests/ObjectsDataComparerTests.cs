@@ -632,6 +632,8 @@ namespace ObjectsComparer.Tests
 
             var isEqual = comparer.Compare(a1, a2);
 
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
             Assert.IsTrue(isEqual);
         }
 

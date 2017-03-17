@@ -4,11 +4,11 @@ namespace ObjectsComparer.Examples.Example2
 {
     public class MyObjectsComparersFactory: ObjectsComparersFactory
     {
-        public override IObjectsDataComparer GetObjectsComparer(Type type, ComparisonSettings settings = null)
+        public override IObjectsDataComparer GetObjectsComparer(Type type, ComparisonSettings settings = null, IObjectsDataComparer parentComparer = null)
         {
             if (type == typeof(Person))
             {
-                var comparer = new ObjectsDataComparer<Person>(settings);
+                var comparer = new ObjectsDataComparer<Person>(settings, parentComparer, this);
                 comparer.AddComparerOverride<Guid>(DoNotCompareValueComparer.Instance);
                 comparer.AddComparerOverride(
                     () => new Person().MiddleName,
@@ -22,7 +22,7 @@ namespace ObjectsComparer.Examples.Example2
                 return comparer;
             }
 
-            return base.GetObjectsComparer(type, settings);
+            return base.GetObjectsComparer(type, settings, parentComparer);
         }
     }
 }
