@@ -6,18 +6,18 @@ using System.Reflection;
 
 namespace ObjectsComparer
 {
-    public abstract class AbstractObjectsDataComparer<T> : IObjectsDataComparer<T>
+    public abstract class AbstractObjectsDataComparer
     {
-        private readonly Dictionary<MemberInfo, IValueComparer> _memberComparerOverrides = new Dictionary<MemberInfo, IValueComparer>();
-        private readonly Dictionary<Type, IValueComparer> _typeComparerOverrides = new Dictionary<Type, IValueComparer>();
-
-        protected IObjectsComparersFactory Factory { get; }
-
         public ComparisonSettings Settings { get; }
         public IEnumerable<KeyValuePair<MemberInfo, IValueComparer>> MemberComparerOverrides => _memberComparerOverrides.Select(o => o);
         public IEnumerable<KeyValuePair<Type, IValueComparer>> TypeComparerOverrides => _typeComparerOverrides.Select(o => o);
         public IValueComparer DefaultValueComparer { get; private set; }
 
+        protected IObjectsComparersFactory Factory { get; }
+
+        private readonly Dictionary<MemberInfo, IValueComparer> _memberComparerOverrides = new Dictionary<MemberInfo, IValueComparer>();
+        private readonly Dictionary<Type, IValueComparer> _typeComparerOverrides = new Dictionary<Type, IValueComparer>();
+        
         protected AbstractObjectsDataComparer(ComparisonSettings settings, IObjectsDataComparer parentComparer, IObjectsComparersFactory factory)
         {
             Factory = factory ?? new ObjectsComparersFactory();
@@ -68,22 +68,9 @@ namespace ObjectsComparer
             DefaultValueComparer = valueComparer;
         }
 
+        public abstract IEnumerable<Difference> CalculateDifferences(object obj1, object obj2);
+
         public bool Compare(object obj1, object obj2, out IEnumerable<Difference> differences)
-        {
-            if (!(obj1 is T))
-            {
-                throw new ArgumentException(nameof(obj1));
-            }
-
-            if (!(obj2 is T))
-            {
-                throw new ArgumentException(nameof(obj2));
-            }
-
-            return Compare((T) obj1, (T) obj2, out differences);
-        }
-
-        public bool Compare(T obj1, T obj2, out IEnumerable<Difference> differences)
         {
             differences = CalculateDifferences(obj1, obj2);
 
@@ -92,24 +79,7 @@ namespace ObjectsComparer
 
         public bool Compare(object obj1, object obj2)
         {
-            if (!(obj1 is T))
-            {
-                throw new ArgumentException(nameof(obj1));
-            }
-
-            if (!(obj2 is T))
-            {
-                throw new ArgumentException(nameof(obj2));
-            }
-
-            return !CalculateDifferences((T)obj1, (T)obj2).Any();
-        }
-
-        public bool Compare(T obj1, T obj2)
-        {
             return !CalculateDifferences(obj1, obj2).Any();
         }
-
-        public abstract IEnumerable<Difference> CalculateDifferences(object obj1, object obj2);
     }
 }

@@ -5,7 +5,7 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    public class EnumerablesComparer<T> : AbstractObjectsDataComparer<IEnumerable<T>>
+    public class EnumerablesComparer<T> : AbstractObjectsDataComparer<T>
     {
         private readonly IObjectsDataComparer _comparer;
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -12,7 +11,7 @@ namespace ObjectsComparer
         private readonly List<MemberInfo> _members;
         private readonly List<IObjectsDataComparerWithCondition> _conditionalComparers;
 
-        public ObjectsDataComparer(ComparisonSettings settings = null, IObjectsDataComparer parentComparer = null, IObjectsComparersFactory factory = null) 
+        public ObjectsDataComparer(ComparisonSettings settings = null, IObjectsDataComparer parentComparer = null, IObjectsComparersFactory factory = null)
             : base(settings, parentComparer, factory)
         {
             var properties = typeof(T).GetTypeInfo().GetProperties().Where(p =>
@@ -25,12 +24,23 @@ namespace ObjectsComparer
             _members = properties.Union(fields.Cast<MemberInfo>()).ToList();
             _conditionalComparers = new List<IObjectsDataComparerWithCondition>
             {
-                new EnumerablesComparer(Settings, this, Factory)
+                new EnumerablesComparer(Settings, this, Factory),
+                new GenericEnumerablesComparer(Settings, this, Factory),
             };
         }
 
         public override IEnumerable<Difference> CalculateDifferences(object obj1, object obj2)
         {
+            if (obj1 != null && !(obj1 is T))
+            {
+                throw new ArgumentException(nameof(obj1));
+            }
+
+            if (obj2 != null && !(obj2 is T))
+            {
+                throw new ArgumentException(nameof(obj2));
+            }
+
             if (typeof(T).IsComparable() ||
                 TypeComparerOverrides.Any(p => p.Key == typeof(T)))
             {
@@ -51,7 +61,6 @@ namespace ObjectsComparer
             }
 
             var conditionalComparer = _conditionalComparers.FirstOrDefault(c => c.IsMatch(typeof(T)));
-
             if (conditionalComparer != null)
             {
                 foreach (var difference in conditionalComparer.CalculateDifferences(obj1, obj2))
@@ -64,49 +73,6 @@ namespace ObjectsComparer
                     yield break;
                 }
             }
-
-            if (typeof(T).InheritsFrom(typeof(IEnumerable<>)))
-            {
-                Type elementType;
-
-                if (typeof(T).GetTypeInfo().IsGenericType && typeof(T).GetGenericTypeDefinition() == typeof(IEnumerable<>))
-                {
-                    elementType = typeof(T).GetTypeInfo().GetGenericArguments()[0];
-                }
-                else
-                {
-                    elementType = typeof(T).GetTypeInfo().GetInterfaces()
-                        .Where(i => i.GetTypeInfo().IsGenericType && i.GetTypeInfo().GetGenericTypeDefinition() == typeof(IEnumerable<>))
-                        .Select(i => i.GetTypeInfo().GetGenericArguments()[0])
-                        .First();
-                }
-
-                var enumerablesComparerType = typeof(EnumerablesComparer<>).MakeGenericType(elementType);
-                var enumerablesComparer = (IObjectsDataComparer)Activator.CreateInstance(enumerablesComparerType, Settings, this, Factory);
-
-                foreach (var difference in enumerablesComparer.CalculateDifferences(obj1, obj2))
-                {
-                    yield return difference;
-                }
-
-                if (Settings.EmptyAndNullEnumerablesEqual && obj1 == null || obj2 == null)
-                {
-                    yield break;
-                }
-            }
-            //else if (typeof(T).InheritsFrom(typeof(IEnumerable)))
-            //{
-            //    var enumerablesComparer = new EnumerablesComparer(Settings, this, Factory);
-            //    foreach (var difference in enumerablesComparer.CalculateDifferences(obj1, obj2))
-            //    {
-            //        yield return difference;
-            //    }
-
-            //    if (Settings.EmptyAndNullEnumerablesEqual && obj1 == null || obj2 == null)
-            //    {
-            //        yield break;
-            //    }
-            //}
 
             if (obj1 == null || obj2 == null)
             {
@@ -129,17 +95,17 @@ namespace ObjectsComparer
                 var value2 = member.GetMemberValue(obj2);
                 var type = member.GetMemberType();
 
-                var comparer = DefaultValueComparer;
+                var valueComparer = DefaultValueComparer;
                 var hasCustomComparer = false;
 
                 if (MemberComparerOverrides.Any(p => p.Key == member))
                 {
-                    comparer = MemberComparerOverrides.First(p => p.Key == member).Value;
+                    valueComparer = MemberComparerOverrides.First(p => p.Key == member).Value;
                     hasCustomComparer = true;
                 }
                 else if (TypeComparerOverrides.Any(p => p.Key == type))
                 {
-                    comparer = TypeComparerOverrides.First(p => p.Key == type).Value;
+                    valueComparer = TypeComparerOverrides.First(p => p.Key == type).Value;
                     hasCustomComparer = true;
                 }
 
@@ -156,9 +122,9 @@ namespace ObjectsComparer
                     continue;
                 }
 
-                if (!comparer.Compare(value1, value2, Settings))
+                if (!valueComparer.Compare(value1, value2, Settings))
                 {
-                    yield return new Difference(member.Name, comparer.ToString(value1), comparer.ToString(value2));
+                    yield return new Difference(member.Name, valueComparer.ToString(value1), valueComparer.ToString(value2));
                 }
             }
         }

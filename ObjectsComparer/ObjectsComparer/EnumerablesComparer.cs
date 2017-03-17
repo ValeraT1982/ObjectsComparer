@@ -6,7 +6,7 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    public class EnumerablesComparer : AbstractObjectsDataComparer<IEnumerable>, IObjectsDataComparerWithCondition
+    public class EnumerablesComparer : AbstractObjectsDataComparer, IObjectsDataComparerWithCondition
     {
         public EnumerablesComparer(ComparisonSettings settings, IObjectsDataComparer parentComparer, IObjectsComparersFactory factory)
             : base(settings, parentComparer, factory)
@@ -63,7 +63,7 @@ namespace ObjectsComparer
 
         public bool IsMatch(Type type)
         {
-            return type.InheritsFrom(typeof(IEnumerable));
+            return type.InheritsFrom(typeof(IEnumerable)) && !type.InheritsFrom(typeof(IEnumerable<>));
         }
 
         public bool IsStopComparison(object obj1, object obj2)
