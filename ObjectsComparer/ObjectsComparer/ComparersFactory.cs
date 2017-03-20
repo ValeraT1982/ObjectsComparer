@@ -9,7 +9,7 @@ namespace ObjectsComparer
             return new Comparer<T>(settings, parentComparer);
         }
 
-        public virtual IComparer GetObjectsComparer(Type type, ComparisonSettings settings = null, IBaseComparer parentComparer = null)
+        public IComparer GetObjectsComparer(Type type, ComparisonSettings settings = null, IBaseComparer parentComparer = null)
         {
             return new Comparer(settings, parentComparer, this);
         }

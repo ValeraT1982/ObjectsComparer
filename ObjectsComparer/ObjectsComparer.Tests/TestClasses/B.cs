@@ -1,6 +1,6 @@
 ﻿namespace ObjectsComparer.Tests.TestClasses
 {
-    class B
+    public class B
     {
         public string Property1 { get; set; }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using ObjectsComparer.Utils;
 
@@ -19,11 +20,12 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            var genericType = typeof(Comparer<>).MakeGenericType(type);
-
-            var comparer = Activator.CreateInstance(genericType, Settings, this, Factory);
-
+            var objectsComparerMethod = typeof(IComparersFactory).GetTypeInfo().GetMethods().First(m => m.IsGenericMethod);
+            var objectsComparerGenericMethod = objectsComparerMethod.MakeGenericMethod(type);
+            var comparer = objectsComparerGenericMethod.Invoke(Factory, new object[] { Settings, this });
+            var genericType = typeof(IComparer<>).MakeGenericType(type);
             var method = genericType.GetTypeInfo().GetMethod(CalculateDifferencesMethodName, new[] { type, type });
+
             return (IEnumerable<Difference>)method.Invoke(comparer, new[] { obj1, obj2 });
         }
     }
