@@ -4,9 +4,9 @@ namespace ObjectsComparer.Examples.Example2
 {
     public class MyComparersFactory: ComparersFactory
     {
-        public override IComparer GetObjectsComparer(Type type, ComparisonSettings settings = null, IComparer parentComparer = null)
+        public override IComparer<T> GetObjectsComparer<T>(ComparisonSettings settings = null, IBaseComparer parentComparer = null)
         {
-            if (type == typeof(Person))
+            if (typeof(T) == typeof(Person))
             {
                 var comparer = new Comparer<Person>(settings, parentComparer, this);
                 comparer.AddComparerOverride<Guid>(DoNotCompareValueComparer.Instance);
@@ -19,10 +19,10 @@ namespace ObjectsComparer.Examples.Example2
                     () => new Person().PhoneNumber,
                     new PhoneNumberComparer());
 
-                return comparer;
+                return (IComparer<T>)comparer;
             }
 
-            return base.GetObjectsComparer(type, settings, parentComparer);
+            return base.GetObjectsComparer<T>(settings, parentComparer);
         }
     }
 }

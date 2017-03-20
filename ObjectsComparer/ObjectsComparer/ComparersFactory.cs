@@ -4,16 +4,14 @@ namespace ObjectsComparer
 {
     public class ComparersFactory : IComparersFactory
     {
-        public virtual IComparer GetObjectsComparer(Type type, ComparisonSettings settings = null, IComparer parentComparer = null)
+        public virtual IComparer<T> GetObjectsComparer<T>(ComparisonSettings settings = null, IBaseComparer parentComparer = null)
         {
-            var comparer = typeof(Comparer<>).MakeGenericType(type);
-
-            return (IComparer)Activator.CreateInstance(comparer, settings, parentComparer, this);
+            return new Comparer<T>(settings, parentComparer);
         }
 
-        public IComparer GetObjectsComparer<T>(ComparisonSettings settings = null, IComparer parentComparer = null)
+        public virtual IComparer GetObjectsComparer(Type type, ComparisonSettings settings = null, IBaseComparer parentComparer = null)
         {
-            return GetObjectsComparer(typeof(T), settings, parentComparer);
+            return new Comparer(settings, parentComparer, this);
         }
     }
 }

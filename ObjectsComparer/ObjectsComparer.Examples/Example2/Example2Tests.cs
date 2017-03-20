@@ -9,7 +9,7 @@ namespace ObjectsComparer.Examples.Example2
     public class Example2Tests
     {
         private MyComparersFactory _factory;
-        private IComparer _comparer;
+        private IComparer<Person> _comparer;
 
         [SetUp]
         public void SetUp()

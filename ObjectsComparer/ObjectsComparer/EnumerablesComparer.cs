@@ -2,18 +2,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
     internal class EnumerablesComparer : AbstractComparer, IComparerWithCondition
     {
-        public EnumerablesComparer(ComparisonSettings settings, IComparer parentComparer, IComparersFactory factory)
+        public EnumerablesComparer(ComparisonSettings settings, IBaseComparer parentComparer, IComparersFactory factory)
             : base(settings, parentComparer, factory)
         {
         }
 
-        public override IEnumerable<Difference> CalculateDifferences(object obj1, object obj2)
+        public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
             if (!Settings.EmptyAndNullEnumerablesEqual &&
                 (obj1 == null || obj2 == null) && obj1 != obj2)
@@ -24,6 +25,11 @@ namespace ObjectsComparer
 
             obj1 = obj1 ?? Enumerable.Empty<object>();
             obj2 = obj2 ?? Enumerable.Empty<object>();
+
+            if (!type.InheritsFrom(typeof(IEnumerable)))
+            {
+                throw new ArgumentException(nameof(type));
+            }
 
             if (!obj1.GetType().InheritsFrom(typeof(IEnumerable)))
             {
@@ -44,6 +50,7 @@ namespace ObjectsComparer
                 yield break;
             }
 
+            //ToDo Extract type
             for (var i = 0; i < array2.Length; i++)
             {
                 if (array1[i].GetType() != array2[i].GetType())
@@ -54,7 +61,7 @@ namespace ObjectsComparer
 
                 var comparer = Factory.GetObjectsComparer(array1[i].GetType(), Settings, this);
 
-                foreach (var failure in comparer.CalculateDifferences(array1[i], array2[i]))
+                foreach (var failure in comparer.CalculateDifferences(array1[i].GetType(), array1[i], array2[i]))
                 {
                     yield return failure.InsertPath($"[{i}]");
                 }
@@ -66,13 +73,18 @@ namespace ObjectsComparer
             return type.InheritsFrom(typeof(IEnumerable)) && !type.InheritsFrom(typeof(IEnumerable<>));
         }
 
-        public bool IsStopComparison(object obj1, object obj2)
+        public bool IsStopComparison(Type type, object obj1, object obj2)
         {
             if (Settings.EmptyAndNullEnumerablesEqual && obj1 == null || obj2 == null)
             {
                 return true;
             }
 
+            return false;
+        }
+
+        public bool SkipMember(Type type, MemberInfo member)
+        {
             return false;
         }
     }

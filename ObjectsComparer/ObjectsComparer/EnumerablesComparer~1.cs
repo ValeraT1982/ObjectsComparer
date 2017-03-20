@@ -5,18 +5,23 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    internal class EnumerablesComparer<T> : AbstractComparer<T>
+    internal class EnumerablesComparer<T> : AbstractComparer
     {
-        private readonly IComparer _comparer;
+        private readonly Comparer<T> _comparer;
 
-        public EnumerablesComparer(ComparisonSettings settings, IComparer parentComparer, IComparersFactory factory)
+        public EnumerablesComparer(ComparisonSettings settings, IBaseComparer parentComparer, IComparersFactory factory)
             :base(settings, parentComparer, factory)
         {
             _comparer = new Comparer<T>(Settings, this);
         }
 
-        public override IEnumerable<Difference> CalculateDifferences(object obj1, object obj2)
+        public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
+            if (!type.InheritsFrom(typeof(IEnumerable<>)))
+            {
+                throw new ArgumentException("Invalid type");
+            }
+
             if (!Settings.EmptyAndNullEnumerablesEqual &&
                 (obj1 == null || obj2 == null) && obj1 != obj2)
             {

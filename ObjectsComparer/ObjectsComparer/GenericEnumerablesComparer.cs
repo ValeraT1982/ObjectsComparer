@@ -8,13 +8,13 @@ namespace ObjectsComparer
 {
     internal class GenericEnumerablesComparer : AbstractComparer, IComparerWithCondition
     {
-        public GenericEnumerablesComparer(ComparisonSettings settings, IComparer parentComparer,
+        public GenericEnumerablesComparer(ComparisonSettings settings, IBaseComparer parentComparer,
             IComparersFactory factory)
             : base(settings, parentComparer, factory)
         {
         }
 
-        public override IEnumerable<Difference> CalculateDifferences(object obj1, object obj2)
+        public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
             if (obj1 == null && obj2 == null)
             {
@@ -44,7 +44,7 @@ namespace ObjectsComparer
             var enumerablesComparer =
                 (IComparer) Activator.CreateInstance(enumerablesComparerType, Settings, this, Factory);
 
-            foreach (var difference in enumerablesComparer.CalculateDifferences(obj1, obj2))
+            foreach (var difference in enumerablesComparer.CalculateDifferences(type, obj1, obj2))
             {
                 yield return difference;
             }
@@ -55,11 +55,26 @@ namespace ObjectsComparer
             return type.InheritsFrom(typeof(IEnumerable<>));
         }
 
-        public bool IsStopComparison(object obj1, object obj2)
+        public bool IsStopComparison(Type type, object obj1, object obj2)
         {
             if (Settings.EmptyAndNullEnumerablesEqual && obj1 == null || obj2 == null)
             {
                 return true;
+            }
+
+            return false;
+        }
+
+        public bool SkipMember(Type type, MemberInfo member)
+        {
+            if (type.InheritsFrom(typeof(IDictionary<,>)))
+            {
+                var dictionary = new Dictionary<object, object>();
+                if (member.Name == PropertyHelper.GetMemberInfo(() => dictionary.Values).Name ||
+                    member.Name == PropertyHelper.GetMemberInfo(() => dictionary.Keys).Name)
+                {
+                    return true;
+                }
             }
 
             return false;

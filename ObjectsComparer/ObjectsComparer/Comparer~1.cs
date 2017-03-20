@@ -11,7 +11,7 @@ namespace ObjectsComparer
         private readonly List<MemberInfo> _members;
         private readonly List<IComparerWithCondition> _conditionalComparers;
 
-        public Comparer(ComparisonSettings settings = null, IComparer parentComparer = null, IComparersFactory factory = null)
+        public Comparer(ComparisonSettings settings = null, IBaseComparer parentComparer = null, IComparersFactory factory = null)
             : base(settings, parentComparer, factory)
         {
             var properties = typeof(T).GetTypeInfo().GetProperties().Where(p =>
@@ -29,7 +29,7 @@ namespace ObjectsComparer
             };
         }
 
-        public override IEnumerable<Difference> CalculateDifferences(object obj1, object obj2)
+        public override IEnumerable<Difference> CalculateDifferences(T obj1, T obj2)
         {
             if (obj1 != null && !(obj1 is T))
             {
@@ -63,12 +63,12 @@ namespace ObjectsComparer
             var conditionalComparer = _conditionalComparers.FirstOrDefault(c => c.IsMatch(typeof(T)));
             if (conditionalComparer != null)
             {
-                foreach (var difference in conditionalComparer.CalculateDifferences(obj1, obj2))
+                foreach (var difference in conditionalComparer.CalculateDifferences(typeof(T), obj1, obj2))
                 {
                     yield return difference;
                 }
 
-                if (conditionalComparer.IsStopComparison(obj1, obj2))
+                if (conditionalComparer.IsStopComparison(typeof(T), obj1, obj2))
                 {
                     yield break;
                 }
@@ -95,6 +95,11 @@ namespace ObjectsComparer
                 var value2 = member.GetMemberValue(obj2);
                 var type = member.GetMemberType();
 
+                if (conditionalComparer != null && conditionalComparer.SkipMember(typeof(T), member))
+                {
+                    continue;
+                }
+
                 var valueComparer = DefaultValueComparer;
                 var hasCustomComparer = false;
 
@@ -114,7 +119,7 @@ namespace ObjectsComparer
                 {
                     var objectDataComparer = Factory.GetObjectsComparer(type, Settings, this);
 
-                    foreach (var failure in objectDataComparer.CalculateDifferences(value1, value2))
+                    foreach (var failure in objectDataComparer.CalculateDifferences(type, value1, value2))
                     {
                         yield return failure.InsertPath(member.Name);
                     }

@@ -638,7 +638,7 @@ namespace ObjectsComparer.Tests
         [Test]
         public void NullAndEmptyComparisonGenericInequalityTest()
         {
-            var a1 = new A { ListOf = new List<B>() };
+            var a1 = new A { ListOfB = new List<B>() };
             var a2 = new A();
             var comparer = new Comparer<A>();
 
@@ -648,7 +648,7 @@ namespace ObjectsComparer.Tests
 
             Assert.IsFalse(isEqual);
             CollectionAssert.IsNotEmpty(differences);
-            Assert.AreEqual("ListOf[]", differences.First().MemberPath);
+            Assert.AreEqual("ListOfB[]", differences.First().MemberPath);
             Assert.AreEqual("System.Collections.Generic.List`1[ObjectsComparer.Tests.TestClasses.B]", differences.First().Value1);
             Assert.AreEqual(string.Empty, differences.First().Value2);
         }
@@ -656,7 +656,7 @@ namespace ObjectsComparer.Tests
         [Test]
         public void NullAndEmptyComparisonGenericEqualityTest()
         {
-            var a1 = new A { ListOf = new List<B>() };
+            var a1 = new A { ListOfB = new List<B>() };
             var a2 = new A();
             var comparer = new Comparer<A>(new ComparisonSettings { EmptyAndNullEnumerablesEqual = true });
 
@@ -696,6 +696,72 @@ namespace ObjectsComparer.Tests
             var isEqual = comparer.Compare(a1, a2);
 
             Assert.IsTrue(isEqual);
+        }
+
+        [Test]
+        public void DictionaryValueInequalityTest()
+        {
+            var a1 = new A
+            {
+                DictionaryOfB = new Dictionary<int, B>
+                {
+                    { 1, new B {Property1 = "Str1"} },
+                    { 2, new B {Property1 = "Str2"} }
+                }
+            };
+            var a2 = new A
+            {
+                DictionaryOfB = new Dictionary<int, B>
+                {
+                    { 1, new B {Property1 = "Str1"} },
+                    { 2, new B {Property1 = "Str3"} }
+                }
+            };
+            var comparer = new Comparer<A>();
+
+            IEnumerable<Difference> differencesEnum;
+            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(1, differences.Count);
+            Assert.AreEqual("DictionaryOfB[1].Value.Property1", differences.First().MemberPath);
+            Assert.AreEqual("Str2", differences.First().Value1);
+            Assert.AreEqual("Str3", differences.First().Value2);
+        }
+
+        [Test]
+        public void DictionaryKeyInequalityTest()
+        {
+            var a1 = new A
+            {
+                DictionaryOfB = new Dictionary<int, B>
+                {
+                    { 1, new B {Property1 = "Str1"} },
+                    { 2, new B {Property1 = "Str2"} }
+                }
+            };
+            var a2 = new A
+            {
+                DictionaryOfB = new Dictionary<int, B>
+                {
+                    { 1, new B {Property1 = "Str1"} },
+                    { 3, new B {Property1 = "Str2"} }
+                }
+            };
+            var comparer = new Comparer<A>();
+
+            IEnumerable<Difference> differencesEnum;
+            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(1, differences.Count);
+            Assert.AreEqual("DictionaryOfB[1].Key", differences.First().MemberPath);
+            Assert.AreEqual("2", differences.First().Value1);
+            Assert.AreEqual("3", differences.First().Value2);
         }
     }
 }

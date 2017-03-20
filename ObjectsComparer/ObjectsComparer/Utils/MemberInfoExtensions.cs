@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace ObjectsComparer.Utils
@@ -37,6 +38,11 @@ namespace ObjectsComparer.Utils
             }
 
             throw new Exception("Unsupported Type");
+        }
+
+        public static string GetMethodName<T>(Expression<Action<T>> expression)
+        {
+            return ((MethodCallExpression)expression.Body).Method.Name;
         }
     }
 }

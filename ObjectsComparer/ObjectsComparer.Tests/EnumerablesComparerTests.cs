@@ -15,7 +15,7 @@ namespace ObjectsComparer.Tests
             var obj1 = 25;
             var obj2 = new List<string>();
 
-            Assert.Throws<ArgumentException>(() => comparer.Compare(obj1, obj2));
+            Assert.Throws<ArgumentException>(() => comparer.Compare(typeof(List<string>), obj1, obj2));
         }
 
         [Test]
@@ -25,7 +25,7 @@ namespace ObjectsComparer.Tests
             var obj1 = new List<string>();
             var obj2 = new A();
 
-            Assert.Throws<ArgumentException>(() => comparer.Compare(obj1, obj2));
+            Assert.Throws<ArgumentException>(() => comparer.Compare(typeof(List<string>), obj1, obj2));
         }
     }
 }

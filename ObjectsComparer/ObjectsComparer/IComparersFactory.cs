@@ -4,8 +4,8 @@ namespace ObjectsComparer
 {
     public interface IComparersFactory
     {
-        IComparer GetObjectsComparer(Type type, ComparisonSettings settings = null, IComparer parentComparer = null);
+        IComparer<T> GetObjectsComparer<T>(ComparisonSettings settings = null, IBaseComparer parentComparer = null);
 
-        IComparer GetObjectsComparer<T>(ComparisonSettings settings = null, IComparer parentComparer = null);
+        IComparer GetObjectsComparer(Type type, ComparisonSettings settings = null, IBaseComparer parentComparer = null);
     }
 }
