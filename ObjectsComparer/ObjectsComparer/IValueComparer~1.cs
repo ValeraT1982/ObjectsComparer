@@ -1,6 +1,6 @@
 ﻿namespace ObjectsComparer
 {
-    public interface IValueComparer<T>: IValueComparer
+    public interface IValueComparer<in T>: IValueComparer
     {
         bool Compare(T obj1, T obj2, ComparisonSettings settings);
 

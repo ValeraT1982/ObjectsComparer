@@ -6,9 +6,10 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    public class GenericEnumerablesComparer: AbstractObjectsDataComparer, IObjectsDataComparerWithCondition
+    internal class GenericEnumerablesComparer : AbstractComparer, IComparerWithCondition
     {
-        public GenericEnumerablesComparer(ComparisonSettings settings, IObjectsDataComparer parentComparer, IObjectsComparersFactory factory) 
+        public GenericEnumerablesComparer(ComparisonSettings settings, IComparer parentComparer,
+            IComparersFactory factory)
             : base(settings, parentComparer, factory)
         {
         }
@@ -31,13 +32,17 @@ namespace ObjectsComparer
             else
             {
                 elementType = typeInfo.GetInterfaces()
-                    .Where(i => i.GetTypeInfo().IsGenericType && i.GetTypeInfo().GetGenericTypeDefinition() == typeof(IEnumerable<>))
+                    .Where(
+                        i =>
+                            i.GetTypeInfo().IsGenericType &&
+                            i.GetTypeInfo().GetGenericTypeDefinition() == typeof(IEnumerable<>))
                     .Select(i => i.GetTypeInfo().GetGenericArguments()[0])
                     .First();
             }
 
             var enumerablesComparerType = typeof(EnumerablesComparer<>).MakeGenericType(elementType);
-            var enumerablesComparer = (IObjectsDataComparer)Activator.CreateInstance(enumerablesComparerType, Settings, this, Factory);
+            var enumerablesComparer =
+                (IComparer) Activator.CreateInstance(enumerablesComparerType, Settings, this, Factory);
 
             foreach (var difference in enumerablesComparer.CalculateDifferences(obj1, obj2))
             {

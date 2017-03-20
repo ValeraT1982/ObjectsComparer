@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace ObjectsComparer
 {
-    public interface IObjectsDataComparer
+    public interface IComparer
     {
         IEnumerable<KeyValuePair<MemberInfo, IValueComparer>> MemberComparerOverrides { get; }
 

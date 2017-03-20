@@ -2,7 +2,7 @@
 
 namespace ObjectsComparer
 {
-    public interface IObjectsDataComparerWithCondition: IObjectsDataComparer
+    internal interface IComparerWithCondition: IComparer
     {
         bool IsMatch(Type type);
 

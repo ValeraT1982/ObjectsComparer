@@ -2,13 +2,13 @@
 
 namespace ObjectsComparer.Examples.Example2
 {
-    public class MyObjectsComparersFactory: ObjectsComparersFactory
+    public class MyComparersFactory: ComparersFactory
     {
-        public override IObjectsDataComparer GetObjectsComparer(Type type, ComparisonSettings settings = null, IObjectsDataComparer parentComparer = null)
+        public override IComparer GetObjectsComparer(Type type, ComparisonSettings settings = null, IComparer parentComparer = null)
         {
             if (type == typeof(Person))
             {
-                var comparer = new ObjectsDataComparer<Person>(settings, parentComparer, this);
+                var comparer = new Comparer<Person>(settings, parentComparer, this);
                 comparer.AddComparerOverride<Guid>(DoNotCompareValueComparer.Instance);
                 comparer.AddComparerOverride(
                     () => new Person().MiddleName,

@@ -7,12 +7,12 @@ namespace ObjectsComparer.Examples.Example1
     [TestFixture]
     public class Example1Tests
     {
-        private IObjectsDataComparer<Message> _comparer;
+        private IComparer<Message> _comparer;
         
         [SetUp]
         public void SetUp()
         {
-            _comparer = new ObjectsDataComparer<Message>(new ComparisonSettings { EmptyAndNullEnumerablesEqual = true });
+            _comparer = new Comparer<Message>(new ComparisonSettings { EmptyAndNullEnumerablesEqual = true });
             _comparer.AddComparerOverride<DateTime>(DoNotCompareValueComparer.Instance);
             _comparer.AddComparerOverride(() => new Message().Id, DoNotCompareValueComparer.Instance);
             _comparer.AddComparerOverride(() => new Error().Messgae, DoNotCompareValueComparer.Instance);

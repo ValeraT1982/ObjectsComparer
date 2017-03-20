@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace ObjectsComparer
 {
-    public abstract class AbstractObjectsDataComparer<T>: AbstractObjectsDataComparer, IObjectsDataComparer<T>
+    public abstract class AbstractComparer<T>: AbstractComparer, IComparer<T>
     {
-        protected AbstractObjectsDataComparer(ComparisonSettings settings, IObjectsDataComparer parentComparer, IObjectsComparersFactory factory)
+        protected AbstractComparer(ComparisonSettings settings, IComparer parentComparer, IComparersFactory factory)
             :base(settings, parentComparer, factory)
         {
         }

@@ -3,13 +3,13 @@
 namespace ObjectsComparer.Tests
 {
     [TestFixture]
-    public class ObjectsComparersFactoryTests
+    public class ComparersFactoryTests
     {
         [Test]
         public void GetObjectsComparerGenericTest()
         {
             var settings = new ComparisonSettings();
-            var factory = new ObjectsComparersFactory();
+            var factory = new ComparersFactory();
 
             var comparer = factory.GetObjectsComparer<string>(settings);
 
@@ -20,7 +20,7 @@ namespace ObjectsComparer.Tests
         public void GetObjectsComparerTest()
         {
             var settings = new ComparisonSettings();
-            var factory = new ObjectsComparersFactory();
+            var factory = new ComparersFactory();
 
             var comparer = factory.GetObjectsComparer(typeof(string), settings);
 

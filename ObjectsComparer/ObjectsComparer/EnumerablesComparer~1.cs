@@ -5,14 +5,14 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    public class EnumerablesComparer<T> : AbstractObjectsDataComparer<T>
+    internal class EnumerablesComparer<T> : AbstractComparer<T>
     {
-        private readonly IObjectsDataComparer _comparer;
+        private readonly IComparer _comparer;
 
-        public EnumerablesComparer(ComparisonSettings settings, IObjectsDataComparer parentComparer, IObjectsComparersFactory factory)
+        public EnumerablesComparer(ComparisonSettings settings, IComparer parentComparer, IComparersFactory factory)
             :base(settings, parentComparer, factory)
         {
-            _comparer = new ObjectsDataComparer<T>(Settings, this);
+            _comparer = new Comparer<T>(Settings, this);
         }
 
         public override IEnumerable<Difference> CalculateDifferences(object obj1, object obj2)

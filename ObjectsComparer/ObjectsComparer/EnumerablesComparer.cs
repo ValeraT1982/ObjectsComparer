@@ -6,9 +6,9 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    public class EnumerablesComparer : AbstractObjectsDataComparer, IObjectsDataComparerWithCondition
+    internal class EnumerablesComparer : AbstractComparer, IComparerWithCondition
     {
-        public EnumerablesComparer(ComparisonSettings settings, IObjectsDataComparer parentComparer, IObjectsComparersFactory factory)
+        public EnumerablesComparer(ComparisonSettings settings, IComparer parentComparer, IComparersFactory factory)
             : base(settings, parentComparer, factory)
         {
         }

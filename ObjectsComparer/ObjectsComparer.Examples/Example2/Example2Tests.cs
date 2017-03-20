@@ -8,13 +8,13 @@ namespace ObjectsComparer.Examples.Example2
     [TestFixture]
     public class Example2Tests
     {
-        private MyObjectsComparersFactory _factory;
-        private IObjectsDataComparer _comparer;
+        private MyComparersFactory _factory;
+        private IComparer _comparer;
 
         [SetUp]
         public void SetUp()
         {
-            _factory = new MyObjectsComparersFactory();
+            _factory = new MyComparersFactory();
             _comparer = _factory.GetObjectsComparer<Person>();
         }
 

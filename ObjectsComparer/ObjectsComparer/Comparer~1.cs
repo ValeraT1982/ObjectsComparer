@@ -6,12 +6,12 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    public class ObjectsDataComparer<T> : AbstractObjectsDataComparer<T>
+    public class Comparer<T> : AbstractComparer<T>
     {
         private readonly List<MemberInfo> _members;
-        private readonly List<IObjectsDataComparerWithCondition> _conditionalComparers;
+        private readonly List<IComparerWithCondition> _conditionalComparers;
 
-        public ObjectsDataComparer(ComparisonSettings settings = null, IObjectsDataComparer parentComparer = null, IObjectsComparersFactory factory = null)
+        public Comparer(ComparisonSettings settings = null, IComparer parentComparer = null, IComparersFactory factory = null)
             : base(settings, parentComparer, factory)
         {
             var properties = typeof(T).GetTypeInfo().GetProperties().Where(p =>
@@ -22,7 +22,7 @@ namespace ObjectsComparer
             var fields = typeof(T).GetTypeInfo().GetFields().Where(f =>
                 f.IsPublic && !f.IsStatic).ToList();
             _members = properties.Union(fields.Cast<MemberInfo>()).ToList();
-            _conditionalComparers = new List<IObjectsDataComparerWithCondition>
+            _conditionalComparers = new List<IComparerWithCondition>
             {
                 new EnumerablesComparer(Settings, this, Factory),
                 new GenericEnumerablesComparer(Settings, this, Factory),
@@ -98,9 +98,9 @@ namespace ObjectsComparer
                 var valueComparer = DefaultValueComparer;
                 var hasCustomComparer = false;
 
-                if (MemberComparerOverrides.Any(p => p.Key == member))
+                if (MemberComparerOverrides.Any(p => Equals(p.Key, member)))
                 {
-                    valueComparer = MemberComparerOverrides.First(p => p.Key == member).Value;
+                    valueComparer = MemberComparerOverrides.First(p => Equals(p.Key, member)).Value;
                     hasCustomComparer = true;
                 }
                 else if (TypeComparerOverrides.Any(p => p.Key == type))

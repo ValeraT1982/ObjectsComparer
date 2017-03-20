@@ -6,14 +6,14 @@ using ObjectsComparer.Tests.TestClasses;
 namespace ObjectsComparer.Tests
 {
     [TestFixture]
-    public class ObjectsDataComparerOverridesTests
+    public class ComparerOverridesTests
     {
         [Test]
         public void OverrideStringComparisonEqual()
         {
             var a1 = new A { TestProperty1 = "ABC", TestProperty2 = "ABC", ClassB = new B { Property1 = "Str1" } };
             var a2 = new A { TestProperty1 = "BCD", TestProperty2 = "ABC", ClassB = new B { Property1 = "Str2" } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new Comparer<A>();
             var stringComparer = Substitute.For<IValueComparer>();
             stringComparer.Compare(Arg.Any<object>(), Arg.Any<object>(), Arg.Any<ComparisonSettings>()).Returns(true);
             comparer.AddComparerOverride<string>(stringComparer);
@@ -29,7 +29,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { TestProperty1 = "ABC", TestProperty2 = "ABC", ClassB = new B { Property1 = "Str1" } };
             var a2 = new A { TestProperty1 = "BCD", TestProperty2 = "ABC", ClassB = new B { Property1 = "Str1" } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new Comparer<A>();
             var stringComparer = Substitute.For<IValueComparer>();
             stringComparer.Compare(Arg.Any<object>(), Arg.Any<object>(), Arg.Any<ComparisonSettings>()).Returns(false);
             stringComparer.ToString(Arg.Any<object>()).Returns(info => (info.Arg<object>() ?? string.Empty).ToString());
@@ -50,7 +50,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { IntArray = new[] { 1, 2 } };
             var a2 = new A { IntArray = new[] { 1, 3 } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new Comparer<A>();
             var stringComparer = Substitute.For<IValueComparer>();
             stringComparer.Compare(Arg.Any<object>(), Arg.Any<object>(), Arg.Any<ComparisonSettings>()).Returns(false);
             stringComparer.ToString(Arg.Any<object>()).Returns(info => (info.Arg<object>() ?? string.Empty).ToString());
@@ -70,7 +70,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { IntArray = new[] { 1, 2 } };
             var a2 = new A { IntArray = new[] { 1, 3 } };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new Comparer<A>();
             var intComparer = Substitute.For<IValueComparer>();
             intComparer.Compare(Arg.Any<object>(), Arg.Any<object>(), Arg.Any<ComparisonSettings>()).Returns(true);
             intComparer.ToString(Arg.Any<object>()).Returns(info => (info.Arg<object>() ?? string.Empty).ToString());
@@ -87,7 +87,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { TestProperty1 = "ABC" };
             var a2 = new A { TestProperty1 = "BCD" };
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new Comparer<A>();
             var valueComparer = Substitute.For<IValueComparer>();
             valueComparer.Compare(Arg.Any<object>(), Arg.Any<object>(), Arg.Any<ComparisonSettings>()).Returns(true);
             comparer.AddComparerOverride(() => a1.TestProperty1, valueComparer);
@@ -104,7 +104,7 @@ namespace ObjectsComparer.Tests
             var a1 = new A { ClassB = new B { Property1 = "123-456-7898" } };
             var a2 = new A { ClassB = new B { Property1 = "(123)-456-7898" } };
             var valueComparer = CreateClassBComparerAsPhone();
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new Comparer<A>();
             comparer.AddComparerOverride<B>(valueComparer);
 
             var isEqual = comparer.Compare(a1, a2);
@@ -118,7 +118,7 @@ namespace ObjectsComparer.Tests
             var a1 = new A { ClassB = new B { Property1 = "123-456-7898" } };
             var a2 = new A { ClassB = new B { Property1 = "(123)-456-7899" } };
             var valueComparer = CreateClassBComparerAsPhone();
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new Comparer<A>();
             comparer.AddComparerOverride<B>(valueComparer);
 
             var differences = comparer.CalculateDifferences(a1, a2).ToList();
@@ -135,7 +135,7 @@ namespace ObjectsComparer.Tests
             var a1 = new A { ClassB = new B { Property1 = "123-456-7898" } };
             var a2 = new A { ClassB = new B { Property1 = "(123)-456-7898" } };
             var valueComparer = CreatePhoneComparer();
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new Comparer<A>();
             comparer.AddComparerOverride(() => new B().Property1, valueComparer);
 
             var isEqual = comparer.Compare(a1, a2);
@@ -149,7 +149,7 @@ namespace ObjectsComparer.Tests
             var a1 = new A { ClassB = new B { Property1 = "123-456-7898" } };
             var a2 = new A { ClassB = new B { Property1 = "(123)-456-7899" } };
             var valueComparer = CreatePhoneComparer();
-            var comparer = new ObjectsDataComparer<A>();
+            var comparer = new Comparer<A>();
             comparer.AddComparerOverride(() => new B().Property1, valueComparer);
 
             var differences = comparer.CalculateDifferences(a1, a2).ToList();
