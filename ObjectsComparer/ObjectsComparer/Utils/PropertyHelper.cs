@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace ObjectsComparer
+namespace ObjectsComparer.Utils
 {
     public class PropertyHelper
     {
