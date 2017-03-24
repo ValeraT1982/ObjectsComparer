@@ -11,7 +11,8 @@
     "projectUrl": "https://github.com/ValeraT1982/ObjectsComparer",
     "iconUrl": "https://github.com/ValeraT1982/ObjectsComparer/blob/master/ObjectsDataComparer.png",
     "requireLicenseAcceptance": false,
-    "summary": "Objects data comparer"
+    "summary": "Objects data comparer",
+    "tags": [ "C#", "Compare", "Class", "Reflection" ]
   },
 
   "dependencies": {
