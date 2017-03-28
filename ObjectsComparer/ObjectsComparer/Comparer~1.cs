@@ -24,8 +24,9 @@ namespace ObjectsComparer
             _members = properties.Union(fields.Cast<MemberInfo>()).ToList();
             _conditionalComparers = new List<IComparerWithCondition>
             {
-                new EnumerablesComparer(Settings, this, Factory),
+                new MultidimensionalArraysComparer(Settings, this, Factory),
                 new GenericEnumerablesComparer(Settings, this, Factory),
+                new EnumerablesComparer(Settings, this, Factory),
             };
         }
 

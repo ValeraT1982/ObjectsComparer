@@ -34,8 +34,7 @@ namespace ObjectsComparer.Tests.TestClasses
 
         public Collection<B> CollectionOfB { get; set; }
 
-        // ReSharper disable once InconsistentNaming
-        public IEnumerable<B> ICollectionOfB { get; set; }
+        public IEnumerable<B> EnumerableOfB { get; set; }
 
         public List<B> ListOfB { get; set; }
 

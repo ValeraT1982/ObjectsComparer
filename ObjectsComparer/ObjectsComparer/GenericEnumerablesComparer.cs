@@ -6,7 +6,7 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    internal class GenericEnumerablesComparer : AbstractComparer, IComparerWithCondition
+    internal class GenericEnumerablesComparer : AbstractEnumerablesComparer
     {
         public GenericEnumerablesComparer(ComparisonSettings settings, IBaseComparer parentComparer,
             IComparersFactory factory)
@@ -27,7 +27,7 @@ namespace ObjectsComparer
 
             if (typeInfo.IsGenericType && typeInfo.GetGenericTypeDefinition() == typeof(IEnumerable<>))
             {
-                elementType = typeInfo.GetGenericArguments()[0];
+                elementType = typeInfo.GetElementType();
             }
             else
             {
@@ -41,32 +41,26 @@ namespace ObjectsComparer
             }
 
             var enumerablesComparerType = typeof(EnumerablesComparer<>).MakeGenericType(elementType);
-            var enumerablesComparer =
-                (IComparer) Activator.CreateInstance(enumerablesComparerType, Settings, this, Factory);
+            var comparer = (IComparer)Activator.CreateInstance(enumerablesComparerType, Settings, this, Factory);
 
-            foreach (var difference in enumerablesComparer.CalculateDifferences(type, obj1, obj2))
+            foreach (var difference in comparer.CalculateDifferences(type, obj1, obj2))
             {
                 yield return difference;
             }
         }
 
-        public bool IsMatch(Type type)
+        public override bool IsMatch(Type type)
         {
             return type.InheritsFrom(typeof(IEnumerable<>));
         }
 
-        public bool IsStopComparison(Type type, object obj1, object obj2)
+        public override bool SkipMember(Type type, MemberInfo member)
         {
-            if (Settings.EmptyAndNullEnumerablesEqual && obj1 == null || obj2 == null)
+            if (base.SkipMember(type, member))
             {
                 return true;
             }
 
-            return false;
-        }
-
-        public bool SkipMember(Type type, MemberInfo member)
-        {
             if (type.InheritsFrom(typeof(IDictionary<,>)))
             {
                 var dictionary = new Dictionary<object, object>();

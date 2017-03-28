@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
@@ -25,7 +26,6 @@ namespace ObjectsComparer
             if (!Settings.EmptyAndNullEnumerablesEqual &&
                 (obj1 == null || obj2 == null) && obj1 != obj2)
             {
-                yield return new Difference("[]", obj1?.ToString() ?? string.Empty, obj2?.ToString() ?? string.Empty);
                 yield break;
             }
 
@@ -42,19 +42,22 @@ namespace ObjectsComparer
                 throw new ArgumentException(nameof(obj2));
             }
 
-            var expectedList = ((IEnumerable<T>)obj1).ToList();
-            var actualList = ((IEnumerable<T>)obj2).ToList();
+            var list1 = ((IEnumerable<T>)obj1).ToList();
+            var list2 = ((IEnumerable<T>)obj2).ToList();
 
-            if (expectedList.Count != actualList.Count)
+            if (list1.Count != list2.Count)
             {
-                yield return new Difference("[]", expectedList.Count.ToString(), actualList.Count.ToString());
+                if (!type.InheritsFrom(typeof(ICollection<>)) && !type.GetTypeInfo().IsArray)
+                {
+                    yield return new Difference("Count", list1.Count.ToString(), list2.Count.ToString());
+                }
 
                 yield break;
             }
 
-            for (int i = 0; i < actualList.Count; i++)
+            for (int i = 0; i < list2.Count; i++)
             {
-                foreach (var failure in _comparer.CalculateDifferences(expectedList[i], actualList[i]))
+                foreach (var failure in _comparer.CalculateDifferences(list1[i], list2[i]))
                 {
                     yield return failure.InsertPath($"[{i}]");
                 }
