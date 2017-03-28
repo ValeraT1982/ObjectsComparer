@@ -763,5 +763,39 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual("2", differences.First().Value1);
             Assert.AreEqual("3", differences.First().Value2);
         }
+
+        [TestCase(FlagsEnum.Flag1 | FlagsEnum.Flag2, FlagsEnum.Flag1 | FlagsEnum.Flag3)]
+        [TestCase(FlagsEnum.Flag2, FlagsEnum.Flag3)]
+        [TestCase(FlagsEnum.Flag1, FlagsEnum.Flag1 | FlagsEnum.Flag2)]
+        public void FlagsInequalityTest(FlagsEnum flags1, FlagsEnum flags2)
+        {
+            var a1 = new A { Flags = flags1 };
+            var a2 = new A { Flags = flags2 };
+            var comparer = new Comparer<A>();
+
+            IEnumerable<Difference> differencesEnum;
+            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(1, differences.Count);
+            Assert.AreEqual("Flags", differences.First().MemberPath);
+            Assert.AreEqual(flags1.ToString(), differences.First().Value1);
+            Assert.AreEqual(flags2.ToString(), differences.First().Value2);
+        }
+
+        [TestCase(FlagsEnum.Flag1 | FlagsEnum.Flag2, FlagsEnum.Flag1 | FlagsEnum.Flag2)]
+        [TestCase(FlagsEnum.Flag2, FlagsEnum.Flag2)]
+        public void FlagsEqualityTest(FlagsEnum flags1, FlagsEnum flags2)
+        {
+            var a1 = new A { Flags = flags1 };
+            var a2 = new A { Flags = flags2 };
+            var comparer = new Comparer<A>();
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsTrue(isEqual);
+        }
     }
 }

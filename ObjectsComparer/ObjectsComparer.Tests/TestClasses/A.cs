@@ -53,6 +53,8 @@ namespace ObjectsComparer.Tests.TestClasses
 
         public EnumerableImplementation NonGenericEnumerableImplementation { get; set; }
 
+        public FlagsEnum Flags { get; set; }
+
         public int Property3
         {
             set
