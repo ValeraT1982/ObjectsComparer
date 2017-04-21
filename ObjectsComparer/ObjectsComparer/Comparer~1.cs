@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using ObjectsComparer.Utils;
@@ -32,16 +31,6 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(T obj1, T obj2)
         {
-            if (obj1 != null && !(obj1 is T))
-            {
-                throw new ArgumentException(nameof(obj1));
-            }
-
-            if (obj2 != null && !(obj2 is T))
-            {
-                throw new ArgumentException(nameof(obj2));
-            }
-
             if (typeof(T).IsComparable() ||
                 TypeComparerOverrides.Any(p => p.Key == typeof(T)))
             {
