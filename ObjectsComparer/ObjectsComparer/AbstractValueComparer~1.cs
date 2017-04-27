@@ -6,7 +6,7 @@
 
         public virtual string ToString(T value)
         {
-            return value?.ToString();
+            return base.ToString(value);
         }
 
         public override bool Compare(object obj1, object obj2, ComparisonSettings settings)
