@@ -29,7 +29,7 @@
 
         public override string ToString()
         {
-            return $"ComparisonFailure. MemberPath='{MemberPath}'. Value1='{Value1}'. Value2='{Value2}'";
+            return $"Difference: MemberPath='{MemberPath}', Value1='{Value1}', Value2='{Value2}'.";
         }
     }
 }
