@@ -4,7 +4,7 @@ namespace ObjectsComparer.Examples.Example2
 {
     public class Person
     {
-        public Guid CustomerId { get; set; }
+        public Guid PersonId { get; set; }
 
         public string FirstName { get; set; }
 

@@ -8,13 +8,21 @@ namespace ObjectsComparer.Examples.Example1
     public class Example1Tests
     {
         private IComparer<Message> _comparer;
-        
+
         [SetUp]
         public void SetUp()
         {
-            _comparer = new Comparer<Message>(new ComparisonSettings { EmptyAndNullEnumerablesEqual = true });
+            _comparer = new Comparer<Message>(
+                new ComparisonSettings
+                {
+                    //Null and empty error lists are equal
+                    EmptyAndNullEnumerablesEqual = true
+                });
+            //Do not compare DateCreated 
             _comparer.AddComparerOverride<DateTime>(DoNotCompareValueComparer.Instance);
+            //Do not compare Id
             _comparer.AddComparerOverride(() => new Message().Id, DoNotCompareValueComparer.Instance);
+            //Do not compare Message Text
             _comparer.AddComparerOverride(() => new Error().Messgae, DoNotCompareValueComparer.Instance);
         }
 
@@ -50,7 +58,7 @@ namespace ObjectsComparer.Examples.Example1
                 Errors = new List<Error>
                 {
                     new Error { Id = 2 },
-                    new Error { Id = 7 },
+                    new Error { Id = 7 }
                 }
             };
 
