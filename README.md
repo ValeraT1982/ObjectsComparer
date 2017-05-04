@@ -1,3 +1,5 @@
+![Logo](https://github.com/ValeraT1982/ObjectsComparer/blob/master/ObjectsDataComparer.png)
+
 # Objects Comparer
 ## Introduction
 Objects Comparer is an object-to-object comparer, which allows you to compare objects recursively member by member and define custom comparison rules for certain properties, fields or types.
