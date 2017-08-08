@@ -8,7 +8,7 @@ Briefly, Objects Comparer is an object-to-object comparer, which allows to compa
 
 Objects comparer can be considered as ready to use framework or as an idea for similar solutions.
 ## Installation
-*Install-Package ObjectsComparer
+>Install-Package ObjectsComparer
 ## Basic Example
 ```csharp
 public class ClassA
@@ -43,11 +43,11 @@ if (!isEqual)
     Debug.WriteLine(string.Join(Environment.NewLine, differensesList));
 }
 ```
-a1 and a2 are not equal
+>a1 and a2 are not equal
 
-Differences:
+>Differences:
 
-Difference: MemberPath='IntProperty', Value1='1', Value2='2'
+>Difference: MemberPath='IntProperty', Value1='1', Value2='2'
 
 ## Overriding comparison rules
 To override comparison rules we need to create custom value comparer. This class should be inherited from AbstractValueComparer<T> or should implement IValueComparer<T>.
@@ -68,6 +68,18 @@ Field comparison rule override.
 ```csharp
 comparer.AddComparerOverride(() => new ClassA().StringProperty, new MyComparer());
 ```
+```csharp
+comparer.AddComparerOverride(
+    () => new ClassA().StringProperty, 
+    (s1, s2, parentSettings) => s1 == s2,
+    s == s.ToString());
+```
+
+```csharp
+comparer.AddComparerOverride(
+    () => new ClassA().StringProperty, 
+    (s1, s2, parentSettings) => s1 == s2);
+```
 
 ## Comparison Settings
 Comparer has an optional settings parameter to configure comparison. 
@@ -80,7 +92,7 @@ True by default. If true, all members which are not primitive types, do not have
 
 False by default. If true, empty enumerables and null values will be considered as equal values.
 
-Comparison Settings class allows to store custom values than can be used in custom comparers.
+Comparison Settings class allows to store custom values that can be used in custom comparers.
 ```csharp
 SetCustomSetting<T>(T value, string key = null)
 GetCustomSetting<T>(string key = null)
@@ -292,9 +304,7 @@ public class MyComparersFactory: ComparersFactory
             //Sometimes MiddleName can be skipped. Compare only if property has value.
             comparer.AddComparerOverride(
                 () => new Person().MiddleName,
-                new DynamicValueComparer<string>(
-                    (s1, s2, parentSettings) => string.IsNullOrWhiteSpace(s1) || string.IsNullOrWhiteSpace(s2) || s1 == s2,
-                    s => s));
+                (s1, s2, parentSettings) => string.IsNullOrWhiteSpace(s1) || string.IsNullOrWhiteSpace(s2) || s1 == s2);
             comparer.AddComparerOverride(
                 () => new Person().PhoneNumber,
                 new PhoneNumberComparer());
@@ -384,18 +394,18 @@ public class Example2Tests
 }
 ```
 
-Persons John F Doe (111-555-8888) and John  Doe ((111) 555 8888) are equal
+>Persons John F Doe (111-555-8888) and John  Doe ((111) 555 8888) are equal
 
 
-Persons Jack F Doe (111-555-8888) and John L Doe (222-555-9999)
+>Persons Jack F Doe (111-555-8888) and John L Doe (222-555-9999)
 
-Differences:
+>Differences:
 
-Difference: MemberPath='FirstName', Value1='Jack', Value2='John'.
+>Difference: MemberPath='FirstName', Value1='Jack', Value2='John'.
 
-Difference: MemberPath='MiddleName', Value1='F', Value2='L'.
+>Difference: MemberPath='MiddleName', Value1='F', Value2='L'.
 
-Difference: MemberPath='PhoneNumber', Value1='111-555-8888', Value2='222-555-9999'.
+>Difference: MemberPath='PhoneNumber', Value1='111-555-8888', Value2='222-555-9999'.
 
 
 ## Contributing
