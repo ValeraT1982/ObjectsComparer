@@ -613,7 +613,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void NullAndEmptyComparisonNonGenericInequalityTest()
+        public void NullAndEmptyComparisonNonGenericInequality()
         {
             var a1 = new A { NonGenericEnumerable = new ArrayList() };
             var a2 = new A();
@@ -628,7 +628,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void NullAndEmptyComparisonNonGenericEqualityTest()
+        public void NullAndEmptyComparisonNonGenericEquality()
         {
             var a1 = new A { NonGenericEnumerable = new ArrayList() };
             var a2 = new A();
@@ -640,7 +640,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void NullAndEmptyComparisonGenericInequalityTest()
+        public void NullAndEmptyComparisonGenericInequality()
         {
             var a1 = new A { ListOfB = new List<B>() };
             var a2 = new A();
@@ -658,7 +658,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void NullAndEmptyComparisonGenericEqualityTest()
+        public void NullAndEmptyComparisonGenericEquality()
         {
             var a1 = new A { ListOfB = new List<B>() };
             var a2 = new A();
@@ -672,7 +672,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void InheritedAndBaseClassInequalityTest()
+        public void InheritedAndBaseClassInequality()
         {
             var a1 = new A { ClassB = new B { Property1 = "Str1" } };
             var a2 = new A { ClassB = new InheritedFromB { Property1 = "Str2", NewProperty = "SomeValue" } };
@@ -691,7 +691,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void InheritedAndBaseClassEqualityTest()
+        public void InheritedAndBaseClassEquality()
         {
             var a1 = new A { ClassB = new B { Property1 = "Str1" } };
             var a2 = new A { ClassB = new InheritedFromB { Property1 = "Str1", NewProperty = "SomeValue" } };
@@ -703,7 +703,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void DictionaryValueInequalityTest()
+        public void DictionaryValueInequality()
         {
             var a1 = new A
             {
@@ -736,7 +736,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void DictionaryKeyInequalityTest()
+        public void DictionaryKeyInequality()
         {
             var a1 = new A
             {
@@ -771,7 +771,7 @@ namespace ObjectsComparer.Tests
         [TestCase(FlagsEnum.Flag1 | FlagsEnum.Flag2, FlagsEnum.Flag1 | FlagsEnum.Flag3)]
         [TestCase(FlagsEnum.Flag2, FlagsEnum.Flag3)]
         [TestCase(FlagsEnum.Flag1, FlagsEnum.Flag1 | FlagsEnum.Flag2)]
-        public void FlagsInequalityTest(FlagsEnum flags1, FlagsEnum flags2)
+        public void FlagsInequality(FlagsEnum flags1, FlagsEnum flags2)
         {
             var a1 = new A { Flags = flags1 };
             var a2 = new A { Flags = flags2 };
@@ -791,7 +791,7 @@ namespace ObjectsComparer.Tests
 
         [TestCase(FlagsEnum.Flag1 | FlagsEnum.Flag2, FlagsEnum.Flag1 | FlagsEnum.Flag2)]
         [TestCase(FlagsEnum.Flag2, FlagsEnum.Flag2)]
-        public void FlagsEqualityTest(FlagsEnum flags1, FlagsEnum flags2)
+        public void FlagsEquality(FlagsEnum flags1, FlagsEnum flags2)
         {
             var a1 = new A { Flags = flags1 };
             var a2 = new A { Flags = flags2 };
@@ -803,7 +803,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void CollectionOfBCountInequalityTest1()
+        public void CollectionOfBCountInequality1()
         {
             var a1 = new A
             {
@@ -828,7 +828,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void CollectionOfBCountInequalityTest2()
+        public void CollectionOfBCountInequality2()
         {
             var a1 = new A
             {

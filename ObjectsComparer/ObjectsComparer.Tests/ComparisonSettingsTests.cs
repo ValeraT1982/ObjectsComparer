@@ -7,7 +7,7 @@ namespace ObjectsComparer.Tests
     public class ComparisonSettingsTests
     {
         [Test]
-        public void SetgetCustomSettingWithoutKeyTest()
+        public void SetgetCustomSettingWithoutKey()
         {
             var settings = new ComparisonSettings();
             settings.SetCustomSetting("test string");
@@ -18,7 +18,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void SetgetCustomSettingWithKeyTest()
+        public void SetgetCustomSettingWithKey()
         {
             var settings = new ComparisonSettings();
             settings.SetCustomSetting(123, "setting1");
@@ -32,7 +32,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void WronkKeyTest()
+        public void WronkKey()
         {
             var settings = new ComparisonSettings();
             settings.SetCustomSetting(123, "setting1");
@@ -41,7 +41,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void WronkTypeTest()
+        public void WronkType()
         {
             var settings = new ComparisonSettings();
             settings.SetCustomSetting(123, "setting1");

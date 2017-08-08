@@ -6,7 +6,7 @@ namespace ObjectsComparer.Tests
     public class DifferenceTests
     {
         [Test]
-        public void ToStringTest()
+        public void DifferenceToString()
         {
             var difference = new Difference("Property1", "12345", "12346");
 

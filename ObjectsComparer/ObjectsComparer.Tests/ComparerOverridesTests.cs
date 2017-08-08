@@ -99,7 +99,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void OverrideBClassComparerEqualTest()
+        public void OverrideBClassComparerEqual()
         {
             var a1 = new A { ClassB = new B { Property1 = "123-456-7898" } };
             var a2 = new A { ClassB = new B { Property1 = "(123)-456-7898" } };
@@ -113,7 +113,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void OverrideBClassComparerNotEqualTest()
+        public void OverrideBClassComparerNotEqual()
         {
             var a1 = new A { ClassB = new B { Property1 = "123-456-7898" } };
             var a2 = new A { ClassB = new B { Property1 = "(123)-456-7899" } };
@@ -130,7 +130,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void OverrideBClassProperty1ComparerEqualTest()
+        public void OverrideBClassProperty1ComparerEqual()
         {
             var a1 = new A { ClassB = new B { Property1 = "123-456-7898" } };
             var a2 = new A { ClassB = new B { Property1 = "(123)-456-7898" } };
@@ -144,13 +144,47 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void OverrideBClassProperty1ComparerNotEqualTest()
+        public void OverrideBClassProperty1ComparerNotEqual()
         {
             var a1 = new A { ClassB = new B { Property1 = "123-456-7898" } };
             var a2 = new A { ClassB = new B { Property1 = "(123)-456-7899" } };
             var valueComparer = CreatePhoneComparer();
             var comparer = new Comparer<A>();
             comparer.AddComparerOverride(() => new B().Property1, valueComparer);
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual("ClassB.Property1", differences[0].MemberPath);
+            Assert.AreEqual("123-456-7898", differences[0].Value1);
+            Assert.AreEqual("(123)-456-7899", differences[0].Value2);
+        }
+
+        [Test]
+        public void OverrideBClassProperty1ComparerWithFunction()
+        {
+            var a1 = new A { ClassB = new B { Property1 = "123-456-7898" } };
+            var a2 = new A { ClassB = new B { Property1 = "(123)-456-7898" } };
+            var comparer = new Comparer<A>();
+            comparer.AddComparerOverride(
+                () => new B().Property1,
+                (phone1, phone2, parentSettings) => ExtractDigits(phone1) == ExtractDigits(phone2),
+                s => s);
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsTrue(isEqual);
+        }
+
+        [Test]
+        public void OverrideBClassProperty1ComparerWithFunctionAndDefaultToString()
+        {
+            var a1 = new A { ClassB = new B { Property1 = "123-456-7898" } };
+            var a2 = new A { ClassB = new B { Property1 = "(123)-456-7899" } };
+            var comparer = new Comparer<A>();
+            comparer.AddComparerOverride(
+                () => new B().Property1,
+                (phone1, phone2, parentSettings) => ExtractDigits(phone1) == ExtractDigits(phone2));
 
             var differences = comparer.CalculateDifferences(a1, a2).ToList();
 

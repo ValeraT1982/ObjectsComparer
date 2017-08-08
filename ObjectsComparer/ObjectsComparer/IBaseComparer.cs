@@ -24,5 +24,14 @@ namespace ObjectsComparer
         void AddComparerOverride<TType>(IValueComparer typeValueComparer);
 
         void SetDefaultComparer(IValueComparer valueComparer);
+
+        void AddComparerOverride<TProp>(
+            Expression<Func<TProp>> memberLambda, 
+            Func<TProp, TProp, ComparisonSettings, bool> compareFunction, 
+            Func<TProp, string> toStringFunction);
+
+        void AddComparerOverride<TProp>(
+            Expression<Func<TProp>> memberLambda,
+            Func<TProp, TProp, ComparisonSettings, bool> compareFunction);
     }
 }

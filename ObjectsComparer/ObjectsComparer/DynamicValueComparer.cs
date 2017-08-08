@@ -8,6 +8,11 @@ namespace ObjectsComparer
         private readonly Func<T, T, ComparisonSettings, bool> _compareFunction;
         private readonly Func<T, string> _toStringFunction;
 
+        public DynamicValueComparer(Func<T, T, ComparisonSettings, bool> compareFunction): this(compareFunction, obj => obj?.ToString())
+        {
+            
+        }
+
         public DynamicValueComparer(Func<T, T, ComparisonSettings, bool> compareFunction, Func<T, string> toStringFunction)
         {
             if (compareFunction == null)

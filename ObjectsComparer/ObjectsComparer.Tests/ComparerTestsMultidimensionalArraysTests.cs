@@ -9,7 +9,7 @@ namespace ObjectsComparer.Tests
     public class ComparerTestsMultidimensionalArraysTests
     {
         [Test]
-        public void IntOfIntInequalityTest1()
+        public void IntOfIntInequality1()
         {
             var a1 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 2 } } };
             var a2 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 3 } } };
@@ -28,7 +28,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void IntOfIntInequalityTest2()
+        public void IntOfIntInequality2()
         {
             var a1 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 2 }, new[] { 3, 4 } } };
             var a2 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 2, 2 }, new[] { 3, 5 } } };
@@ -50,7 +50,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void IntOfIntInequalityTest3()
+        public void IntOfIntInequality3()
         {
             var a1 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 2 } } };
             var a2 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 2, 2 }, new[] { 3, 5 } } };
@@ -69,7 +69,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void IntOfIntInequalityTest4()
+        public void IntOfIntInequality4()
         {
             var a1 = new MultidimensionalArrays { IntOfInt = new int[0][] };
             var a2 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 2, 2 } } };
@@ -88,7 +88,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void IntOfIntInequalityTest5()
+        public void IntOfIntInequality5()
         {
             var a1 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 2 }, new[] { 3, 5 } } };
             var a2 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 2 }, new[] { 3, 5, 6 } } };
@@ -107,7 +107,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void IntOfIntInequalityTest6()
+        public void IntOfIntInequality6()
         {
             var a1 = new MultidimensionalArrays { IntOfInt = new int[0][] };
             var a2 = new MultidimensionalArrays();
@@ -126,7 +126,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void IntOfIntInequalityTest7()
+        public void IntOfIntInequality7()
         {
             var a1 = new MultidimensionalArrays();
             var a2 = new MultidimensionalArrays { IntOfInt = new int[0][] };
@@ -145,7 +145,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void IntOfIntEqualityTest1()
+        public void IntOfIntEquality1()
         {
             var a1 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 2 }, new[] { 3, 5 } } };
             var a2 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 2 }, new[] { 3, 5 } } };
@@ -157,7 +157,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void IntOfIntEqualityTest2()
+        public void IntOfIntEquality2()
         {
             var a1 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 2 }, new int[0] } };
             var a2 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 2 }, new int[0] } };
@@ -169,7 +169,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void IntOfIntEqualityTest3()
+        public void IntOfIntEquality3()
         {
             var a1 = new MultidimensionalArrays { IntOfInt = new int[0][] };
             var a2 = new MultidimensionalArrays { IntOfInt = new int[0][] };
@@ -181,7 +181,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void IntOfIntEqualityTest4()
+        public void IntOfIntEquality4()
         {
             var a1 = new MultidimensionalArrays { IntOfInt = new int[0][] };
             var a2 = new MultidimensionalArrays();
@@ -193,7 +193,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void IntOfIntEqualityTest5()
+        public void IntOfIntEquality5()
         {
             var a1 = new MultidimensionalArrays();
             var a2 = new MultidimensionalArrays { IntOfInt = new int[0][] };
@@ -205,7 +205,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void IntIntInequalityTest1()
+        public void IntIntInequality1()
         {
             var a1 = new MultidimensionalArrays { IntInt = new[,] { { 1, 2 } } };
             var a2 = new MultidimensionalArrays { IntInt = new[,] { { 1, 3 }, { 1, 3 } } };
@@ -224,7 +224,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void IntIntInequalityTest2()
+        public void IntIntInequality2()
         {
             var a1 = new MultidimensionalArrays { IntInt = new[,] { { 1, 2 }, { 1, 3 } } };
             var a2 = new MultidimensionalArrays { IntInt = new[,] { { 1, 3, 4 }, { 1, 3, 8 } } };
@@ -243,7 +243,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void IntIntInequalityTest3()
+        public void IntIntInequality3()
         {
             var a1 = new MultidimensionalArrays { IntInt = new[,] { { 1, 2 } } };
             var a2 = new MultidimensionalArrays { IntInt = new[,] { { 1, 3 } } };
@@ -262,7 +262,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void IntIntInequalityTest4()
+        public void IntIntInequality4()
         {
             var a1 = new MultidimensionalArrays { IntInt = new[,] { { 1, 2 }, { 3, 4 } } };
             var a2 = new MultidimensionalArrays { IntInt = new[,] { { 0, 2 }, { 3, 4 } } };
@@ -281,7 +281,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void IntIntInequalityTest5()
+        public void IntIntInequality5()
         {
             var a1 = new MultidimensionalArrays { IntInt = new[,] { { 1, 2 }, { 3, 0 } } };
             var a2 = new MultidimensionalArrays { IntInt = new[,] { { 1, 2 }, { 3, 4 } } };
@@ -300,7 +300,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void IntIntInequalityTest6()
+        public void IntIntInequality6()
         {
             var a1 = new MultidimensionalArrays { IntInt = null };
             var a2 = new MultidimensionalArrays { IntInt = new int[0, 0] };
@@ -319,7 +319,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void IntIntInequalityTest7()
+        public void IntIntInequality7()
         {
             var a1 = new MultidimensionalArrays { IntInt = new int[0, 0] };
             var a2 = new MultidimensionalArrays { IntInt = null };
@@ -338,7 +338,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void IntIntEqualityTest1()
+        public void IntIntEquality1()
         {
             var a1 = new MultidimensionalArrays { IntInt = new[,] { { 1, 2 }, { 3, 4 } } };
             var a2 = new MultidimensionalArrays { IntInt = new[,] { { 1, 2 }, { 3, 4 } } };
@@ -350,7 +350,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void IntIntEqualityTest2()
+        public void IntIntEquality2()
         {
             var a1 = new MultidimensionalArrays { IntInt = null };
             var a2 = new MultidimensionalArrays { IntInt = new int[0, 0] };
@@ -362,7 +362,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void IntIntEqualityTest3()
+        public void IntIntEquality3()
         {
             var a1 = new MultidimensionalArrays { IntInt = new int[0, 0] };
             var a2 = new MultidimensionalArrays { IntInt = null };

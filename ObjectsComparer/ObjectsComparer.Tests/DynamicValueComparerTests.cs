@@ -85,5 +85,19 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual(expectedResult, result);
             Assert.AreEqual(str1, toString);
         }
+
+        [TestCase("Str1", "Str2", true)]
+        [TestCase("Str1", "Str1", true)]
+        [TestCase("Str1", "Str", false)]
+        public void CompareWithDefaultToString(string str1, string str2, bool expectedResult)
+        {
+            var comparer = new DynamicValueComparer<string>((s1, s2, settings) => s1.Length == s2.Length);
+
+            var result = comparer.Compare(str1, str2, new ComparisonSettings());
+            var toString = comparer.ToString(str1);
+
+            Assert.AreEqual(expectedResult, result);
+            Assert.AreEqual(str1, toString);
+        }
     }
 }

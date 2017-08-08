@@ -7,7 +7,7 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    public abstract class BaseComparer
+    public abstract class BaseComparer: IBaseComparer
     {
         private readonly Dictionary<MemberInfo, IValueComparer> _memberComparerOverrides = new Dictionary<MemberInfo, IValueComparer>();
         private readonly Dictionary<Type, IValueComparer> _typeComparerOverrides = new Dictionary<Type, IValueComparer>();
@@ -41,6 +41,25 @@ namespace ObjectsComparer
         public void AddComparerOverride<TProp>(Expression<Func<TProp>> memberLambda, IValueComparer memberValueComparer)
         {
             _memberComparerOverrides[PropertyHelper.GetMemberInfo(memberLambda)] = memberValueComparer;
+        }
+
+        public void AddComparerOverride<TProp>(
+            Expression<Func<TProp>> memberLambda, 
+            Func<TProp, TProp, ComparisonSettings, bool> compareFunction, 
+            Func<TProp, string> toStringFunction)
+        {
+            _memberComparerOverrides[PropertyHelper.GetMemberInfo(memberLambda)] = new DynamicValueComparer<TProp>(
+                compareFunction,
+                toStringFunction);
+        }
+
+        public void AddComparerOverride<TProp>(
+            Expression<Func<TProp>> memberLambda,
+            Func<TProp, TProp, ComparisonSettings, bool> compareFunction)
+        {
+            _memberComparerOverrides[PropertyHelper.GetMemberInfo(memberLambda)] = new DynamicValueComparer<TProp>(
+                compareFunction,
+                obj => obj?.ToString());
         }
 
         public void AddComparerOverride(MemberInfo memberInfo, IValueComparer memberValueComparer)

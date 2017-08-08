@@ -12,7 +12,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void CompareTest()
+        public void Compare()
         {
             var result = DoNotCompareValueComparer.Instance.Compare(25, "String", new ComparisonSettings());
 
@@ -23,7 +23,7 @@ namespace ObjectsComparer.Tests
         [TestCase("String")]
         [TestCase(12.5)]
         [TestCase(null)]
-        public void ToStringTest(object value)
+        public void ToString(object value)
         {
             var result = DoNotCompareValueComparer.Instance.ToString(value);
 

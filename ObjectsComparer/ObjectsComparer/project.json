@@ -1,7 +1,7 @@
 ﻿{
   "copyright": "Copyright © Valerii Tereshchenko 2017",
   "title": "Objects Data Comparer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "authors": [ "Valerii Tereshchenko" ],
   "description": "Framework provides mechanism to compare classes, allows override comparison rules for specific properties and types.",
   "packOptions": {

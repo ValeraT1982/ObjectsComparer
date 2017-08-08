@@ -37,7 +37,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void GetObjectsComparerGenericTest()
+        public void GetObjectsComparerGeneric()
         {
             var settings = new ComparisonSettings();
             var factory = new ComparersFactory();
@@ -48,7 +48,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void GetObjectsComparerTest()
+        public void GetObjectsComparer()
         {
             var settings = new ComparisonSettings();
             var factory = new ComparersFactory();
@@ -59,7 +59,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void CustomFactoryGenericMethodTest()
+        public void CustomFactoryGenericMethod()
         {
             var factory = new CustomFactory(_comparerB);
 
@@ -69,7 +69,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void CustomFactoryNongenericMethodTest()
+        public void CustomFactoryNongenericMethod()
         {
             var factory = new CustomFactory(_comparerB);
             var comparer = factory.GetObjectsComparer(typeof(B));

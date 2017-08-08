@@ -15,10 +15,7 @@ namespace ObjectsComparer.Examples.Example2
                 //Sometimes MiddleName can be skipped. Compare only if property has value.
                 comparer.AddComparerOverride(
                     () => new Person().MiddleName,
-                    new DynamicValueComparer<string>(
-                        (s1, s2, parentSettings) => string.IsNullOrWhiteSpace(s1) || string.IsNullOrWhiteSpace(s2) ||
-                                                    s1 == s2,
-                        s => s));
+                    (s1, s2, parentSettings) => string.IsNullOrWhiteSpace(s1) || string.IsNullOrWhiteSpace(s2) || s1 == s2);
                 comparer.AddComparerOverride(
                     () => new Person().PhoneNumber,
                     new PhoneNumberComparer());
