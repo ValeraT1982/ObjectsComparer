@@ -2,10 +2,13 @@
 
 # Objects Comparer
 ## Introduction
-Objects Comparer is an object-to-object comparer, which allows you to compare objects recursively member by member and define custom comparison rules for certain properties, fields or types.
+It is quite common situation when complex objects should be compared. Sometimes objects can contain nested elements, or some members should be excluded from comparison (auto generated identifiers, create/update date etc.), or some members can have custom comparison rules (same data in different formats, like phone numbers). To solve such kind of problems I have developed small framework to compare objects.
+
+Briefly, Objects Comparer is an object-to-object comparer, which allows to compare objects recursively member by member and define custom comparison rules for certain properties, fields or types.
+
 Objects comparer can be considered as ready to use framework or as an idea for similar solutions.
 ## Installation
-*Install-Package ObjectsComparer
+>Install-Package ObjectsComparer
 ## Basic Example
 ```csharp
 public class ClassA
@@ -14,7 +17,9 @@ public class ClassA
 
     public int IntProperty { get; set; }
 }
-
+```
+There are two examples below how Objects Comparer can be used to compare instances of this class.
+```csharp
 var a1 = new ClassA { StringProperty = "String", IntProperty = 1 };
 var a2 = new ClassA { StringProperty = "String", IntProperty = 1 };
 
@@ -38,24 +43,14 @@ if (!isEqual)
     Debug.WriteLine(string.Join(Environment.NewLine, differensesList));
 }
 ```
-a1 and a2 are not equal
+>a1 and a2 are not equal
 
-Differences:
+>Differences:
 
-Difference: MemberPath='IntProperty', Value1='1', Value2='2'
+>Difference: MemberPath='IntProperty', Value1='1', Value2='2'
 
-## Comparison Settings
-RecursiveComparison. True by default.
-
-EmptyAndNullEnumerablesEqual. False by default.
-
-Comparison Settings class allows to store custom values than can be used in custom comparers.
-```csharp
-SetCustomSetting<T>(T value, string key = null)
-GetCustomSetting<T>(string key = null)
-```
 ## Overriding comparison rules
-Comparer should be inherited from AbstractValueComparer<T> or should implement IValueComparer<T>
+To override comparison rules we need to create custom value comparer. This class should be inherited from AbstractValueComparer<T> or should implement IValueComparer<T>.
 ```csharp
 public class MyComparer: AbstractValueComparer<string>
 {
@@ -73,8 +68,37 @@ Field comparison rule override.
 ```csharp
 comparer.AddComparerOverride(() => new ClassA().StringProperty, new MyComparer());
 ```
+```csharp
+comparer.AddComparerOverride(
+    () => new ClassA().StringProperty, 
+    (s1, s2, parentSettings) => s1 == s2,
+    s == s.ToString());
+```
+
+```csharp
+comparer.AddComparerOverride(
+    () => new ClassA().StringProperty, 
+    (s1, s2, parentSettings) => s1 == s2);
+```
+
+## Comparison Settings
+Comparer has an optional settings parameter to configure comparison. 
+
+**RecursiveComparison.**
+
+True by default. If true, all members which are not primitive types, do not have custom comparison rule and do not implement ICompareble will be compared as separate objects using the same rules as current objects.
+
+**EmptyAndNullEnumerablesEqual.**
+
+False by default. If true, empty enumerables and null values will be considered as equal values.
+
+Comparison Settings class allows to store custom values that can be used in custom comparers.
+```csharp
+SetCustomSetting<T>(T value, string key = null)
+GetCustomSetting<T>(string key = null)
+```
 ## Factory
-Factory should implement IComparersFactory or should be inherited from ComparersFactory.
+Factory provides a way to encapsulate comparers creeation and configuration. Factory should implement IComparersFactory or should be inherited from ComparersFactory.
 ```csharp
 public class MyComparersFactory: ComparersFactory
 {
@@ -95,24 +119,29 @@ public class MyComparersFactory: ComparersFactory
 
 ## Non-generic comparer
 ```csharp
-var comparer = new Comparer<ClassA>();
+var comparer = new Comparer();
 var isEqual = comparer.Compare(a1, a2);
 ```
 This comparer creates generic implementation of comparer for each comparison.
 
 ## Useful Value Comparers
-There are some custom comparers that can be useful.
+Framework contains several custom comparers that can be useful.
 
-DoNotCompareValueComparer. Use it to skip some fields/types. Has singleton implementation (DoNotCompareValueComparer.Instance). 
+**DoNotCompareValueComparer.**
 
-DynamicValueComparer<T>. Receives comparison rule as a constructor parameter.
+Allows to to skip some fields/types. Has singleton implementation (DoNotCompareValueComparer.Instance).
 
-NulableStringsValueComparer. Null and empty strings are equal.
+**DynamicValueComparer<T>.**
 
+Receives comparison rule as a function.
+
+**NulableStringsValueComparer.**
+
+Null and empty strings considered as equal values.
 ## Examples
 There are some examples how Objects Comparer can be used. 
 
-NSubstitute is used for developing unit tests.
+NUnit is used for developing unit tests to show how examples work.
 
 ### Example 1: Expected Message
 Challenge: Check if received message equal to the expected message.
@@ -275,9 +304,7 @@ public class MyComparersFactory: ComparersFactory
             //Sometimes MiddleName can be skipped. Compare only if property has value.
             comparer.AddComparerOverride(
                 () => new Person().MiddleName,
-                new DynamicValueComparer<string>(
-                    (s1, s2, parentSettings) => string.IsNullOrWhiteSpace(s1) || string.IsNullOrWhiteSpace(s2) || s1 == s2,
-                    s => s));
+                (s1, s2, parentSettings) => string.IsNullOrWhiteSpace(s1) || string.IsNullOrWhiteSpace(s2) || s1 == s2);
             comparer.AddComparerOverride(
                 () => new Person().PhoneNumber,
                 new PhoneNumberComparer());
@@ -367,18 +394,18 @@ public class Example2Tests
 }
 ```
 
-Persons John F Doe (111-555-8888) and John  Doe ((111) 555 8888) are equal
+>Persons John F Doe (111-555-8888) and John  Doe ((111) 555 8888) are equal
 
 
-Persons Jack F Doe (111-555-8888) and John L Doe (222-555-9999)
+>Persons Jack F Doe (111-555-8888) and John L Doe (222-555-9999)
 
-Differences:
+>Differences:
 
-Difference: MemberPath='FirstName', Value1='Jack', Value2='John'.
+>Difference: MemberPath='FirstName', Value1='Jack', Value2='John'.
 
-Difference: MemberPath='MiddleName', Value1='F', Value2='L'.
+>Difference: MemberPath='MiddleName', Value1='F', Value2='L'.
 
-Difference: MemberPath='PhoneNumber', Value1='111-555-8888', Value2='222-555-9999'.
+>Difference: MemberPath='PhoneNumber', Value1='111-555-8888', Value2='222-555-9999'.
 
 
 ## Contributing
