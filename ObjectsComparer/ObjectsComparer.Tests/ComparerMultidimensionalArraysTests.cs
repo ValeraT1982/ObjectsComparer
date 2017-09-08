@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace ObjectsComparer.Tests
 {
     [TestFixture]
-    public class ComparerTestsMultidimensionalArraysTests
+    public class ComparerMultidimensionalArraysTests
     {
         [Test]
         public void IntOfIntInequality1()

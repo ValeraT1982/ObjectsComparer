@@ -46,7 +46,8 @@ namespace ObjectsComparer
 
             if (array1.Length != array2.Length)
             {
-                yield return new Difference("[]", array1.Length.ToString(), array2.Length.ToString());
+                yield return new Difference("", array1.Length.ToString(), array2.Length.ToString(), 
+                    DifferenceTypes.NumberOfElementsMismatch);
                 yield break;
             }
 

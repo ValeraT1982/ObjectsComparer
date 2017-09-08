@@ -9,7 +9,15 @@ namespace ObjectsComparer
 {
     public abstract class BaseComparer: IBaseComparer
     {
+        public ComparisonSettings Settings { get; }
+        public IEnumerable<KeyValuePair<MemberInfo, IValueComparer>> MemberComparerOverrides => _memberComparerOverrides.Select(o => o);
+        public IEnumerable<KeyValuePair<Type, IValueComparer>> TypeComparerOverrides => _typeComparerOverrides.Select(o => o);
+        public IValueComparer DefaultValueComparer { get; private set; }
+
+        protected IComparersFactory Factory { get; }
+
         private readonly Dictionary<MemberInfo, IValueComparer> _memberComparerOverrides = new Dictionary<MemberInfo, IValueComparer>();
+        private readonly Dictionary<MemberInfo, IValueComparer> _memberComparerOverridesByName = new Dictionary<MemberInfo, IValueComparer>();
         private readonly Dictionary<Type, IValueComparer> _typeComparerOverrides = new Dictionary<Type, IValueComparer>();
 
         protected BaseComparer(ComparisonSettings settings, IBaseComparer parentComparer, IComparersFactory factory)
@@ -31,12 +39,6 @@ namespace ObjectsComparer
                 }
             }
         }
-
-        public ComparisonSettings Settings { get; }
-        public IEnumerable<KeyValuePair<MemberInfo, IValueComparer>> MemberComparerOverrides => _memberComparerOverrides.Select(o => o);
-        public IEnumerable<KeyValuePair<Type, IValueComparer>> TypeComparerOverrides => _typeComparerOverrides.Select(o => o);
-        public IValueComparer DefaultValueComparer { get; private set; }
-        protected IComparersFactory Factory { get; }
 
         public void AddComparerOverride<TProp>(Expression<Func<TProp>> memberLambda, IValueComparer memberValueComparer)
         {

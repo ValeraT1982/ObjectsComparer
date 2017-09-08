@@ -276,6 +276,7 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual("IntArray", differences.First().MemberPath);
             Assert.AreEqual(string.Empty, differences.First().Value1);
             Assert.AreEqual(a2.IntArray.ToString(), differences.First().Value2);
+            Assert.AreEqual(DifferenceTypes.ValueMismatch, differences.First().DifferenceType);
         }
 
         [Test]
@@ -550,7 +551,8 @@ namespace ObjectsComparer.Tests
             var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
-            Assert.AreEqual("NonGenericEnumerable[]", differences.First().MemberPath);
+            Assert.AreEqual("NonGenericEnumerable", differences.First().MemberPath);
+            Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences.First().DifferenceType);
             Assert.AreEqual("2", differences.First().Value1);
             Assert.AreEqual("1", differences.First().Value2);
         }
@@ -822,7 +824,8 @@ namespace ObjectsComparer.Tests
             Assert.IsFalse(isEqual);
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual(1, differences.Count);
-            Assert.AreEqual("EnumerableOfB.Count", differences.First().MemberPath);
+            Assert.AreEqual("EnumerableOfB", differences.First().MemberPath);
+            Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences.First().DifferenceType);
             Assert.AreEqual("1", differences.First().Value1);
             Assert.AreEqual("2", differences.First().Value2);
         }
@@ -847,7 +850,8 @@ namespace ObjectsComparer.Tests
             Assert.IsFalse(isEqual);
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual(1, differences.Count);
-            Assert.AreEqual("EnumerableOfB.Count", differences.First().MemberPath);
+            Assert.AreEqual("EnumerableOfB", differences.First().MemberPath);
+            Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences.First().DifferenceType);
             Assert.AreEqual("1", differences.First().Value1);
             Assert.AreEqual("0", differences.First().Value2);
         }
