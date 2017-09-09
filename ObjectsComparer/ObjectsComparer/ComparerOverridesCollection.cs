@@ -88,6 +88,56 @@ namespace ObjectsComparer
             _overridesByName[memberName].Add(new ValueComparerWithFilter(valueComparer, filter));
         }
 
+        public void Merge(ComparerOverridesCollection collection)
+        {
+            foreach (var overridePair in collection._overridesByMember)
+            {
+                AddComparer(overridePair.Key, overridePair.Value);
+            }
+
+            foreach (var overrideCollection in collection._overridesByType)
+            {
+                foreach (var overridePair in overrideCollection.Value)
+                {
+                    AddComparer(overrideCollection.Key, overridePair.ValueComparer, overridePair.Filter);
+                }
+            }
+
+            foreach (var overrideCollection in collection._overridesByName)
+            {
+                foreach (var overridePair in overrideCollection.Value)
+                {
+                    AddComparer(overrideCollection.Key, overridePair.ValueComparer, overridePair.Filter);
+                }
+            }
+        }
+
+        public IValueComparer GetComparer(Type type)
+        {
+            if (type == null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            List<ValueComparerWithFilter> overridesByType;
+            if (_overridesByType.TryGetValue(type, out overridesByType))
+            {
+                overridesByType = overridesByType.Where(o => o.Filter == null).ToList();
+
+                if (overridesByType.Count > 1)
+                {
+                    throw new AmbiguousComparerOverrideResolutionException(type);
+                }
+
+                if (overridesByType.Count == 1)
+                {
+                    return overridesByType[0].ValueComparer;
+                }
+            }
+
+            return null;
+        }
+
         public IValueComparer GetComparer(MemberInfo memberInfo)
         {
             if (memberInfo == null)

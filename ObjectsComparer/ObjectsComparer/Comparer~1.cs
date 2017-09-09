@@ -10,7 +10,7 @@ namespace ObjectsComparer
         private readonly List<MemberInfo> _members;
         private readonly List<IComparerWithCondition> _conditionalComparers;
 
-        public Comparer(ComparisonSettings settings = null, IBaseComparer parentComparer = null, IComparersFactory factory = null)
+        public Comparer(ComparisonSettings settings = null, BaseComparer parentComparer = null, IComparersFactory factory = null)
             : base(settings, parentComparer, factory)
         {
             var properties = typeof(T).GetTypeInfo().GetProperties().Where(p =>
@@ -31,15 +31,19 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(T obj1, T obj2)
         {
-            if (typeof(T).IsComparable() ||
-                TypeComparerOverrides.Any(p => p.Key == typeof(T)))
-            {
-                var comparer = DefaultValueComparer;
-                if (TypeComparerOverrides.Any(p => p.Key == typeof(T)))
-                {
-                    comparer = TypeComparerOverrides.First(p => p.Key == typeof(T)).Value;
-                }
+            return CalculateDifferences(obj1, obj2, null);
+        }
 
+        internal IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo)
+        {
+            var comparer = memberInfo != null
+                ? OverridesCollection.GetComparer(memberInfo)
+                : OverridesCollection.GetComparer(typeof(T));
+
+            if (typeof(T).IsComparable() ||
+                comparer != null)
+            {
+                comparer = comparer ?? DefaultValueComparer;
                 if (!comparer.Compare(obj1, obj2, Settings))
                 {
                     yield return
@@ -93,14 +97,10 @@ namespace ObjectsComparer
                 var valueComparer = DefaultValueComparer;
                 var hasCustomComparer = false;
 
-                if (MemberComparerOverrides.Any(p => Equals(p.Key, member)))
+                var comparerOverride = OverridesCollection.GetComparer(member);
+                if (comparerOverride != null)
                 {
-                    valueComparer = MemberComparerOverrides.First(p => Equals(p.Key, member)).Value;
-                    hasCustomComparer = true;
-                }
-                else if (TypeComparerOverrides.Any(p => p.Key == type))
-                {
-                    valueComparer = TypeComparerOverrides.First(p => p.Key == type).Value;
+                    valueComparer = comparerOverride;
                     hasCustomComparer = true;
                 }
 

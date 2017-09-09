@@ -14,7 +14,7 @@ namespace ObjectsComparer
             get { return MemberInfoExtensions.GetMethodName<Comparer<object>>(x => x.CalculateDifferences(null, null)); }
         }
 
-        public Comparer(ComparisonSettings settings = null, IBaseComparer parentComparer = null, IComparersFactory factory = null) : base(settings, parentComparer, factory)
+        public Comparer(ComparisonSettings settings = null, BaseComparer parentComparer = null, IComparersFactory factory = null) : base(settings, parentComparer, factory)
         {
         }
 

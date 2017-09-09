@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using ObjectsComparer.Utils;
@@ -10,17 +8,13 @@ namespace ObjectsComparer
     public abstract class BaseComparer: IBaseComparer
     {
         public ComparisonSettings Settings { get; }
-        public IEnumerable<KeyValuePair<MemberInfo, IValueComparer>> MemberComparerOverrides => _memberComparerOverrides.Select(o => o);
-        public IEnumerable<KeyValuePair<Type, IValueComparer>> TypeComparerOverrides => _typeComparerOverrides.Select(o => o);
         public IValueComparer DefaultValueComparer { get; private set; }
 
         protected IComparersFactory Factory { get; }
 
-        private readonly Dictionary<MemberInfo, IValueComparer> _memberComparerOverrides = new Dictionary<MemberInfo, IValueComparer>();
-        private readonly Dictionary<MemberInfo, IValueComparer> _memberComparerOverridesByName = new Dictionary<MemberInfo, IValueComparer>();
-        private readonly Dictionary<Type, IValueComparer> _typeComparerOverrides = new Dictionary<Type, IValueComparer>();
-
-        protected BaseComparer(ComparisonSettings settings, IBaseComparer parentComparer, IComparersFactory factory)
+        internal ComparerOverridesCollection OverridesCollection { get;  } = new ComparerOverridesCollection();
+        
+        protected BaseComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory)
         {
             Factory = factory ?? new ComparersFactory();
             Settings = settings ?? new ComparisonSettings();
@@ -28,21 +22,13 @@ namespace ObjectsComparer
             if (parentComparer != null)
             {
                 DefaultValueComparer = parentComparer.DefaultValueComparer;
-                foreach (var memberComparerOverride in parentComparer.MemberComparerOverrides)
-                {
-                    AddComparerOverride(memberComparerOverride.Key, memberComparerOverride.Value);
-                }
-
-                foreach (var typeComparerOverride in parentComparer.TypeComparerOverrides)
-                {
-                    AddComparerOverride(typeComparerOverride.Key, typeComparerOverride.Value);
-                }
+                OverridesCollection.Merge(parentComparer.OverridesCollection);
             }
         }
 
         public void AddComparerOverride<TProp>(Expression<Func<TProp>> memberLambda, IValueComparer memberValueComparer)
         {
-            _memberComparerOverrides[PropertyHelper.GetMemberInfo(memberLambda)] = memberValueComparer;
+            OverridesCollection.AddComparer(PropertyHelper.GetMemberInfo(memberLambda), memberValueComparer);
         }
 
         public void AddComparerOverride<TProp>(
@@ -50,28 +36,32 @@ namespace ObjectsComparer
             Func<TProp, TProp, ComparisonSettings, bool> compareFunction, 
             Func<TProp, string> toStringFunction)
         {
-            _memberComparerOverrides[PropertyHelper.GetMemberInfo(memberLambda)] = new DynamicValueComparer<TProp>(
-                compareFunction,
-                toStringFunction);
+            OverridesCollection.AddComparer(
+                PropertyHelper.GetMemberInfo(memberLambda),
+                new DynamicValueComparer<TProp>(
+                    compareFunction,
+                    toStringFunction));
         }
 
         public void AddComparerOverride<TProp>(
             Expression<Func<TProp>> memberLambda,
             Func<TProp, TProp, ComparisonSettings, bool> compareFunction)
         {
-            _memberComparerOverrides[PropertyHelper.GetMemberInfo(memberLambda)] = new DynamicValueComparer<TProp>(
-                compareFunction,
-                obj => obj?.ToString());
+            OverridesCollection.AddComparer(
+                PropertyHelper.GetMemberInfo(memberLambda),
+                new DynamicValueComparer<TProp>(
+                    compareFunction,
+                    obj => obj?.ToString()));
         }
 
         public void AddComparerOverride(MemberInfo memberInfo, IValueComparer memberValueComparer)
         {
-            _memberComparerOverrides[memberInfo] = memberValueComparer;
+            OverridesCollection.AddComparer(memberInfo, memberValueComparer);
         }
 
         public void AddComparerOverride(Type type, IValueComparer typeValueComparer)
         {
-            _typeComparerOverrides[type] = typeValueComparer;
+            OverridesCollection.AddComparer(type, typeValueComparer);
         }
 
         public void AddComparerOverride<TType>(IValueComparer typeValueComparer)

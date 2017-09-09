@@ -7,7 +7,7 @@ namespace ObjectsComparer
 {
     internal class MultidimensionalArraysComparer : AbstractEnumerablesComparer
     {
-        public MultidimensionalArraysComparer(ComparisonSettings settings, IBaseComparer parentComparer,
+        public MultidimensionalArraysComparer(ComparisonSettings settings, BaseComparer parentComparer,
             IComparersFactory factory)
             : base(settings, parentComparer, factory)
         {

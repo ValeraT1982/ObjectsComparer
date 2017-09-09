@@ -19,7 +19,7 @@ namespace ObjectsComparer.Tests
                 _comparerB = comparerB;
             }
 
-            public override IComparer<T> GetObjectsComparer<T>(ComparisonSettings settings = null, IBaseComparer parentComparer = null)
+            public override IComparer<T> GetObjectsComparer<T>(ComparisonSettings settings = null, BaseComparer parentComparer = null)
             {
                 if (typeof(T) == typeof(B))
                 {

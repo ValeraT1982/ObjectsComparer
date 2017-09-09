@@ -8,7 +8,7 @@ namespace ObjectsComparer
 {
     internal class GenericEnumerablesComparer : AbstractEnumerablesComparer
     {
-        public GenericEnumerablesComparer(ComparisonSettings settings, IBaseComparer parentComparer,
+        public GenericEnumerablesComparer(ComparisonSettings settings, BaseComparer parentComparer,
             IComparersFactory factory)
             : base(settings, parentComparer, factory)
         {

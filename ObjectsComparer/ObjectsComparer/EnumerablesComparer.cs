@@ -9,7 +9,7 @@ namespace ObjectsComparer
 {
     internal class EnumerablesComparer : AbstractComparer, IComparerWithCondition
     {
-        public EnumerablesComparer(ComparisonSettings settings, IBaseComparer parentComparer, IComparersFactory factory)
+        public EnumerablesComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory)
             : base(settings, parentComparer, factory)
         {
         }

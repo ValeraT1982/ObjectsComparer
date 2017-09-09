@@ -7,15 +7,15 @@ namespace ObjectsComparer.Tests
     [TestFixture]
     public class AbstractComparerGenericTests
     {
-        private IBaseComparer _parentComparerMock;
+        private BaseComparer _parentComparerMock;
         private IComparersFactory _factoryMock;
         private AbstractComparer<int> _comparer;
 
         [SetUp]
         public void SetUp()
         {
-            _parentComparerMock = Substitute.For<IBaseComparer>();
             _factoryMock = Substitute.For<IComparersFactory>();
+            _parentComparerMock = Substitute.ForPartsOf<BaseComparer>(new ComparisonSettings(), null, _factoryMock);
             _comparer =
                 Substitute.ForPartsOf<AbstractComparer<int>>(new ComparisonSettings(), _parentComparerMock, _factoryMock);
         }

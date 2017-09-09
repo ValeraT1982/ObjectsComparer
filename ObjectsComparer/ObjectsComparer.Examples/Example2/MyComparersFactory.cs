@@ -5,7 +5,7 @@ namespace ObjectsComparer.Examples.Example2
     public class MyComparersFactory : ComparersFactory
     {
         public override IComparer<T> GetObjectsComparer<T>(ComparisonSettings settings = null,
-            IBaseComparer parentComparer = null)
+            BaseComparer parentComparer = null)
         {
             if (typeof(T) == typeof(Person))
             {

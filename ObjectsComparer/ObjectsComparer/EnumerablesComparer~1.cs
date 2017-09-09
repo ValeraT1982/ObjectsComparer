@@ -10,7 +10,7 @@ namespace ObjectsComparer
     {
         private readonly Comparer<T> _comparer;
 
-        public EnumerablesComparer(ComparisonSettings settings, IBaseComparer parentComparer, IComparersFactory factory)
+        public EnumerablesComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory)
             :base(settings, parentComparer, factory)
         {
             _comparer = new Comparer<T>(Settings, this);

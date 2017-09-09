@@ -239,7 +239,7 @@ namespace ObjectsComparer.Tests
         {
             var collection = new ComparerOverridesCollection();
 
-            Assert.Throws<ArgumentNullException>(() => collection.GetComparer(null));
+            Assert.Throws<ArgumentNullException>(() => collection.GetComparer((MemberInfo)null));
         }
     }
 }

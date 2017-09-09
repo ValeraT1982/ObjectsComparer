@@ -5,7 +5,7 @@ namespace ObjectsComparer
 {
     public abstract class AbstractComparer<T>: BaseComparer, IComparer<T>
     {
-        protected AbstractComparer(ComparisonSettings settings, IBaseComparer parentComparer, IComparersFactory factory)
+        protected AbstractComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory)
             :base(settings, parentComparer, factory)
         {
         }
