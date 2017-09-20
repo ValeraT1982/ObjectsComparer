@@ -41,9 +41,11 @@ namespace ObjectsComparer.Tests
         [Test]
         public void GetOverrideByMemberInfoComparer()
         {
-            var memberInfo1 = Substitute.ForPartsOf<MemberInfo>();
+            var memberInfo1 = Substitute.ForPartsOf<PropertyInfo>();
+            memberInfo1.PropertyType.Returns(typeof(string));
             var valueComparer1 = Substitute.For<IValueComparer>();
-            var memberInfo2 = Substitute.ForPartsOf<MemberInfo>();
+            var memberInfo2 = Substitute.ForPartsOf<PropertyInfo>();
+            memberInfo2.PropertyType.Returns(typeof(string));
             var valueComparer2 = Substitute.For<IValueComparer>();
             var collection = new ComparerOverridesCollection();
             collection.AddComparer(memberInfo1, valueComparer1);
@@ -60,6 +62,7 @@ namespace ObjectsComparer.Tests
         public void GetComparerByMemberInfoWhenNotExists()
         {
             var memberInfo1 = Substitute.ForPartsOf<PropertyInfo>();
+            memberInfo1.PropertyType.Returns(typeof(string));
             var valueComparer1 = Substitute.For<IValueComparer>();
             var memberInfo2 = Substitute.ForPartsOf<PropertyInfo>();
             memberInfo2.PropertyType.Returns(typeof(string));
@@ -89,7 +92,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void GetOverrideByTypeComparer()
+        public void GetOverrideByTypeComparerByMemberInfo()
         {
             var valueComparer = Substitute.For<IValueComparer>();
             var collection = new ComparerOverridesCollection();
@@ -100,6 +103,28 @@ namespace ObjectsComparer.Tests
             var valueComparerFromCollection = collection.GetComparer(memberInfo);
 
             Assert.AreEqual(valueComparer, valueComparerFromCollection);
+        }
+
+        [Test]
+        public void GetOverrideByTypeComparerByType()
+        {
+            var valueComparer = Substitute.For<IValueComparer>();
+            var collection = new ComparerOverridesCollection();
+            var memberInfo = Substitute.ForPartsOf<PropertyInfo>();
+            memberInfo.PropertyType.Returns(typeof(string));
+            collection.AddComparer(typeof(string), valueComparer);
+
+            var valueComparerFromCollection = collection.GetComparer(typeof(string));
+
+            Assert.AreEqual(valueComparer, valueComparerFromCollection);
+        }
+
+        [Test]
+        public void GetComparerNullType()
+        {
+            var collection = new ComparerOverridesCollection();
+
+            Assert.Throws<ArgumentNullException>(() => collection.GetComparer((Type)null));
         }
 
         [Test]
@@ -147,6 +172,58 @@ namespace ObjectsComparer.Tests
             collection.AddComparer(typeof(string), valueComparer2, mi => false);
 
             var valueComparerFromCollection = collection.GetComparer(memberInfo);
+
+            Assert.IsNull(valueComparerFromCollection);
+        }
+
+        [Test]
+        public void GetOverrideByTypeWhenOnlyOneComparerDoNotHaveFilter()
+        {
+            var valueComparer1 = Substitute.For<IValueComparer>();
+            var valueComparer2 = Substitute.For<IValueComparer>();
+            var collection = new ComparerOverridesCollection();
+            collection.AddComparer(typeof(string), valueComparer1, mi => true);
+            collection.AddComparer(typeof(string), valueComparer2);
+
+            var valueComparerFromCollection = collection.GetComparer(typeof(string));
+
+            Assert.AreEqual(valueComparer2, valueComparerFromCollection);
+        }
+
+        [Test]
+        public void GetOverrideByTypeWhenMoreThanOneComparerMatchCriteria()
+        {
+            var valueComparer1 = Substitute.For<IValueComparer>();
+            var valueComparer2 = Substitute.For<IValueComparer>();
+            var collection = new ComparerOverridesCollection();
+            collection.AddComparer(typeof(string), valueComparer1);
+            collection.AddComparer(typeof(string), valueComparer2);
+
+            Assert.Throws<AmbiguousComparerOverrideResolutionException>(() => collection.GetComparer(typeof(string)));
+        }
+
+        [Test]
+        public void GetOverrideByTypeWhenNoComparerMatchCriteria()
+        {
+            var valueComparer1 = Substitute.For<IValueComparer>();
+            var collection = new ComparerOverridesCollection();
+            collection.AddComparer(typeof(string), valueComparer1);
+
+            var valueComparerFromCollection = collection.GetComparer(typeof(int));
+
+            Assert.IsNull(valueComparerFromCollection);
+        }
+
+        [Test]
+        public void GetOverrideByTypeWhenAllComparersHaveFilters()
+        {
+            var valueComparer1 = Substitute.For<IValueComparer>();
+            var valueComparer2 = Substitute.For<IValueComparer>();
+            var collection = new ComparerOverridesCollection();
+            collection.AddComparer(typeof(string), valueComparer1, mi => true);
+            collection.AddComparer(typeof(string), valueComparer2, mi => true);
+
+            var valueComparerFromCollection = collection.GetComparer(typeof(string));
 
             Assert.IsNull(valueComparerFromCollection);
         }

@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Reflection;
 using NSubstitute;
 using NUnit.Framework;
 using ObjectsComparer.Tests.TestClasses;
@@ -192,6 +193,109 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual("ClassB.Property1", differences[0].MemberPath);
             Assert.AreEqual("123-456-7898", differences[0].Value1);
             Assert.AreEqual("(123)-456-7899", differences[0].Value2);
+        }
+
+        [Test]
+        public void OverrideBClassProperty1ByMemberInfo()
+        {
+            var a1 = new A { ClassB = new B { Property1 = "S1" } };
+            var a2 = new A { ClassB = new B { Property1 = "S2" } };
+            var comparer = new Comparer<A>();
+            var valueComparer = Substitute.For<IValueComparer>();
+            valueComparer.Compare(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<ComparisonSettings>()).Returns(true);
+            comparer.AddComparerOverride(
+                typeof(B).GetTypeInfo().GetMember("Property1").First(),
+                valueComparer);
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            CollectionAssert.IsEmpty(differences);
+            valueComparer.Received().Compare("S1", "S2", Arg.Any<ComparisonSettings>());
+        }
+
+        [Test]
+        public void OverrideByName()
+        {
+            var a1 = new A { ClassB = new B { Property1 = "123-456-7899" } };
+            var a2 = new A { ClassB = new B { Property1 = "(123)-456-7899" } };
+            var comparer = new Comparer<A>();
+            var phoneComparer = Substitute.For<IValueComparer>();
+            phoneComparer.Compare("123-456-7899", "(123)-456-7899", Arg.Any<ComparisonSettings>()).Returns(true);
+
+            comparer.AddComparerOverride("Property1", phoneComparer);
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            CollectionAssert.IsEmpty(differences);
+            phoneComparer.Received().Compare("123-456-7899", "(123)-456-7899", Arg.Any<ComparisonSettings>());
+        }
+
+        [Test]
+        public void OverrideTypeHighestPriority()
+        {
+            var a1 = new A { ClassB = new B { Property1 = "S1" } };
+            var a2 = new A { ClassB = new B { Property1 = "S2" } };
+            var comparer = new Comparer<A>();
+            var valueComparer1 = Substitute.For<IValueComparer>();
+            valueComparer1.Compare(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<ComparisonSettings>()).Returns(true);
+            var valueComparer2 = Substitute.For<IValueComparer>();
+            valueComparer2.Compare(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<ComparisonSettings>()).Returns(true);
+            var valueComparer3 = Substitute.For<IValueComparer>();
+            valueComparer3.Compare(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<ComparisonSettings>()).Returns(true);
+
+            comparer.AddComparerOverride<string>(valueComparer1);
+            comparer.AddComparerOverride(() => a1.ClassB.Property1, valueComparer2);
+            comparer.AddComparerOverride("Property1", valueComparer3);
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            CollectionAssert.IsEmpty(differences);
+            valueComparer1.Received().Compare("S1", "S2", Arg.Any<ComparisonSettings>());
+            valueComparer2.DidNotReceive().Compare("S1", "S2", Arg.Any<ComparisonSettings>());
+            valueComparer3.DidNotReceive().Compare("S1", "S2", Arg.Any<ComparisonSettings>());
+        }
+
+        [Test]
+        public void OverrideMemberHigherPriorityThanBuName()
+        {
+            var a1 = new A { ClassB = new B { Property1 = "S1" } };
+            var a2 = new A { ClassB = new B { Property1 = "S2" } };
+            var comparer = new Comparer<A>();
+            var valueComparer1 = Substitute.For<IValueComparer>();
+            valueComparer1.Compare(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<ComparisonSettings>()).Returns(true);
+            var valueComparer2 = Substitute.For<IValueComparer>();
+            valueComparer2.Compare(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<ComparisonSettings>()).Returns(true);
+
+            comparer.AddComparerOverride<string>(valueComparer1);
+            comparer.AddComparerOverride(() => a1.ClassB.Property1, valueComparer1);
+            comparer.AddComparerOverride("Property1", valueComparer2);
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            CollectionAssert.IsEmpty(differences);
+            valueComparer1.Received().Compare("S1", "S2", Arg.Any<ComparisonSettings>());
+            valueComparer2.DidNotReceive().Compare("S1", "S2", Arg.Any<ComparisonSettings>());
+        }
+
+        [Test]
+        public void OverrideTypeWithFilterAndByName()
+        {
+            var a1 = new A { ClassB = new B { Property1 = "S1" } };
+            var a2 = new A { ClassB = new B { Property1 = "S2" } };
+            var comparer = new Comparer<A>();
+            var valueComparer1 = Substitute.For<IValueComparer>();
+            valueComparer1.Compare(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<ComparisonSettings>()).Returns(true);
+            var valueComparer2 = Substitute.For<IValueComparer>();
+            valueComparer2.Compare(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<ComparisonSettings>()).Returns(true);
+
+            comparer.AddComparerOverride<string>(valueComparer1, memberInfo => memberInfo.Name != "Property1");
+            comparer.AddComparerOverride("Property1", valueComparer2);
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            CollectionAssert.IsEmpty(differences);
+            valueComparer1.DidNotReceive().Compare("S1", "S2", Arg.Any<ComparisonSettings>());
+            valueComparer2.Received().Compare("S1", "S2", Arg.Any<ComparisonSettings>());
         }
 
         private IValueComparer CreateClassBComparerAsPhone()

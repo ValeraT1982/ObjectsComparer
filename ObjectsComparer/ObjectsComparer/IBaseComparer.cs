@@ -10,13 +10,13 @@ namespace ObjectsComparer
 
         ComparisonSettings Settings { get; }
 
-        void AddComparerOverride<TProp>(Expression<Func<TProp>> memberLambda, IValueComparer memberValueComparer);
+        void AddComparerOverride<TProp>(Expression<Func<TProp>> memberLambda, IValueComparer valueComparer);
 
-        void AddComparerOverride(MemberInfo memberInfo, IValueComparer memberValueComparer);
+        void AddComparerOverride(MemberInfo memberInfo, IValueComparer valueComparer);
 
-        void AddComparerOverride(Type type, IValueComparer typeValueComparer);
+        void AddComparerOverride(Type type, IValueComparer valueComparer, Func<MemberInfo, bool> filter = null);
 
-        void AddComparerOverride<TType>(IValueComparer typeValueComparer);
+        void AddComparerOverride<TType>(IValueComparer valueComparer, Func<MemberInfo, bool> filter = null);
 
         void SetDefaultComparer(IValueComparer valueComparer);
 
@@ -28,5 +28,7 @@ namespace ObjectsComparer
         void AddComparerOverride<TProp>(
             Expression<Func<TProp>> memberLambda,
             Func<TProp, TProp, ComparisonSettings, bool> compareFunction);
+
+        void AddComparerOverride(string memberName, IValueComparer valueComparer, Func<MemberInfo, bool> filter = null);
     }
 }

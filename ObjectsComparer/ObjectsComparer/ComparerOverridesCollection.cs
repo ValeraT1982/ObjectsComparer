@@ -145,12 +145,6 @@ namespace ObjectsComparer
                 throw new ArgumentNullException(nameof(memberInfo));
             }
 
-            IValueComparer overrideByMemberInfo;
-            if (_overridesByMember.TryGetValue(memberInfo, out overrideByMemberInfo))
-            {
-                return overrideByMemberInfo;
-            }
-
             List<ValueComparerWithFilter> overridesByType;
             if (_overridesByType.TryGetValue(memberInfo.GetMemberType(), out overridesByType))
             {
@@ -165,6 +159,12 @@ namespace ObjectsComparer
                 {
                     return overridesByType[0].ValueComparer;
                 }
+            }
+
+            IValueComparer overrideByMemberInfo;
+            if (_overridesByMember.TryGetValue(memberInfo, out overrideByMemberInfo))
+            {
+                return overrideByMemberInfo;
             }
 
             List<ValueComparerWithFilter> overridesByName;

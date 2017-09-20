@@ -26,9 +26,9 @@ namespace ObjectsComparer
             }
         }
 
-        public void AddComparerOverride<TProp>(Expression<Func<TProp>> memberLambda, IValueComparer memberValueComparer)
+        public void AddComparerOverride<TProp>(Expression<Func<TProp>> memberLambda, IValueComparer valueComparer)
         {
-            OverridesCollection.AddComparer(PropertyHelper.GetMemberInfo(memberLambda), memberValueComparer);
+            OverridesCollection.AddComparer(PropertyHelper.GetMemberInfo(memberLambda), valueComparer);
         }
 
         public void AddComparerOverride<TProp>(
@@ -54,19 +54,24 @@ namespace ObjectsComparer
                     obj => obj?.ToString()));
         }
 
-        public void AddComparerOverride(MemberInfo memberInfo, IValueComparer memberValueComparer)
+        public void AddComparerOverride(MemberInfo memberInfo, IValueComparer valueComparer)
         {
-            OverridesCollection.AddComparer(memberInfo, memberValueComparer);
+            OverridesCollection.AddComparer(memberInfo, valueComparer);
         }
 
-        public void AddComparerOverride(Type type, IValueComparer typeValueComparer)
+        public void AddComparerOverride(Type type, IValueComparer valueComparer, Func<MemberInfo, bool> filter = null)
         {
-            OverridesCollection.AddComparer(type, typeValueComparer);
+            OverridesCollection.AddComparer(type, valueComparer, filter);
         }
 
-        public void AddComparerOverride<TType>(IValueComparer typeValueComparer)
+        public void AddComparerOverride<TType>(IValueComparer valueComparer, Func<MemberInfo, bool> filter = null)
         {
-            AddComparerOverride(typeof(TType), typeValueComparer);
+            AddComparerOverride(typeof(TType), valueComparer, filter);
+        }
+
+        public void AddComparerOverride(string memberName, IValueComparer valueComparer, Func<MemberInfo, bool> filter = null)
+        {
+            OverridesCollection.AddComparer(memberName, valueComparer, filter);
         }
 
         public void SetDefaultComparer(IValueComparer valueComparer)
