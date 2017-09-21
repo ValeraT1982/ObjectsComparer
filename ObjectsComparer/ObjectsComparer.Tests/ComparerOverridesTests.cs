@@ -10,7 +10,7 @@ namespace ObjectsComparer.Tests
     public class ComparerOverridesTests
     {
         [Test]
-        public void OverrideStringComparisonEqual()
+        public void OverrideStringComparisonWhenEqual()
         {
             var a1 = new A { TestProperty1 = "ABC", TestProperty2 = "ABC", ClassB = new B { Property1 = "Str1" } };
             var a2 = new A { TestProperty1 = "BCD", TestProperty2 = "ABC", ClassB = new B { Property1 = "Str2" } };
@@ -26,7 +26,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void OverrideStringComparisonNotEqual()
+        public void OverrideStringComparisonWhenNotEqual()
         {
             var a1 = new A { TestProperty1 = "ABC", TestProperty2 = "ABC", ClassB = new B { Property1 = "Str1" } };
             var a2 = new A { TestProperty1 = "BCD", TestProperty2 = "ABC", ClassB = new B { Property1 = "Str1" } };
@@ -47,7 +47,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void OverrideIntComparisonNotEqual()
+        public void OverrideIntComparisonWhenNotEqual()
         {
             var a1 = new A { IntArray = new[] { 1, 2 } };
             var a2 = new A { IntArray = new[] { 1, 3 } };
@@ -67,7 +67,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void OverrideIntComparisonEqual()
+        public void OverrideIntComparisonWhenEqual()
         {
             var a1 = new A { IntArray = new[] { 1, 2 } };
             var a2 = new A { IntArray = new[] { 1, 3 } };
@@ -84,7 +84,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void OverridePropertyComparisonEqual()
+        public void OverridePropertyComparisonWhenEqual()
         {
             var a1 = new A { TestProperty1 = "ABC" };
             var a2 = new A { TestProperty1 = "BCD" };
@@ -100,7 +100,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void OverrideBClassComparerEqual()
+        public void OverrideBClassComparerWhenEqual()
         {
             var a1 = new A { ClassB = new B { Property1 = "123-456-7898" } };
             var a2 = new A { ClassB = new B { Property1 = "(123)-456-7898" } };
@@ -114,7 +114,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void OverrideBClassComparerNotEqual()
+        public void OverrideBClassComparerWhenNotEqual()
         {
             var a1 = new A { ClassB = new B { Property1 = "123-456-7898" } };
             var a2 = new A { ClassB = new B { Property1 = "(123)-456-7899" } };
@@ -131,7 +131,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void OverrideBClassProperty1ComparerEqual()
+        public void OverrideBClassProperty1ComparerWhenEqual()
         {
             var a1 = new A { ClassB = new B { Property1 = "123-456-7898" } };
             var a2 = new A { ClassB = new B { Property1 = "(123)-456-7898" } };
@@ -145,7 +145,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void OverrideBClassProperty1ComparerNotEqual()
+        public void OverrideBClassProperty1ComparerWhenNotEqual()
         {
             var a1 = new A { ClassB = new B { Property1 = "123-456-7898" } };
             var a2 = new A { ClassB = new B { Property1 = "(123)-456-7899" } };
@@ -256,7 +256,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void OverrideMemberHigherPriorityThanBuName()
+        public void OverrideMemberHigherPriorityThanByName()
         {
             var a1 = new A { ClassB = new B { Property1 = "S1" } };
             var a2 = new A { ClassB = new B { Property1 = "S2" } };

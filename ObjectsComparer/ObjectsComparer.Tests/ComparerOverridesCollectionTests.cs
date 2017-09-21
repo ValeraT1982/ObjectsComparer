@@ -10,7 +10,7 @@ namespace ObjectsComparer.Tests
     public class ComparerOverridesCollectionTests
     {
         [Test]
-        public void AddComparerByMemberInfoMemberNull()
+        public void AddComparerByMemberInfoWhenMemberNull()
         {
             var valueComparer = Substitute.For<IValueComparer>();
             var collection = new ComparerOverridesCollection();
@@ -19,7 +19,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void AddComparerByMemberInfoComparerNull()
+        public void AddComparerByMemberInfoWhenComparerNull()
         {
             var memberInfo = Substitute.ForPartsOf<MemberInfo>();
             var collection = new ComparerOverridesCollection();
@@ -75,7 +75,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void AddComparerByTypeTypeNull()
+        public void AddComparerByTypeWhenTypeNull()
         {
             var valueComparer = Substitute.For<IValueComparer>();
             var collection = new ComparerOverridesCollection();
@@ -84,7 +84,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void AddComparerByTypeComparerNull()
+        public void AddComparerByTypeWhenComparerNull()
         {
             var collection = new ComparerOverridesCollection();
 
@@ -120,7 +120,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void GetComparerNullType()
+        public void GetComparerByTypeWhenNull()
         {
             var collection = new ComparerOverridesCollection();
 
@@ -160,7 +160,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void GetOverrideByTypeComparerWhenNoneComparerMatchCriteria()
+        public void GetOverrideByTypeComparerWhenNoComparerMatchCriteria()
         {
             var valueComparer1 = Substitute.For<IValueComparer>();
             var valueComparer2 = Substitute.For<IValueComparer>();
@@ -231,7 +231,7 @@ namespace ObjectsComparer.Tests
         [TestCase(null)]
         [TestCase("")]
         [TestCase("  ")]
-        public void AddComparerByNameNameEmpty(string memberName)
+        public void AddComparerByNameWhenNameEmpty(string memberName)
         {
             var valueComparer = Substitute.For<IValueComparer>();
             var collection = new ComparerOverridesCollection();
@@ -240,7 +240,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void AddComparerByNameComparerNull()
+        public void AddComparerByNameWhenComparerNull()
         {
             var collection = new ComparerOverridesCollection();
 
@@ -278,7 +278,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void GetOverrideByNameComparerWhenNoneComparersMatchCriteria()
+        public void GetOverrideByNameComparerWhenNoComparerMatchCriteria()
         {
             var valueComparer1 = Substitute.For<IValueComparer>();
             var valueComparer2 = Substitute.For<IValueComparer>();
@@ -312,7 +312,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void GetComparerNullMember()
+        public void GetComparerByMemberWhenNull()
         {
             var collection = new ComparerOverridesCollection();
 

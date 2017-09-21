@@ -15,14 +15,10 @@
     "tags": [ "C#", "Compare", "Class", "Reflection" ]
   },
 
-  "dependencies": {
-    "NETStandard.Library": "1.6.0"
-  },
-
   "frameworks": {
     "NET45": {},
-    "netstandard1.5": {
-      "imports": "dnxcore50"
+    "netstandard1.6": {
+      "dependencies": { "NETStandard.Library": "1.6.0" }
     }
   },
 
