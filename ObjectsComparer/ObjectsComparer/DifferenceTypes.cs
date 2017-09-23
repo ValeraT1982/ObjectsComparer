@@ -4,7 +4,8 @@
     {
         ValueMismatch,
         TypeMismatch,
-        MemberMissed,
+        MissedMemberInFirstObject,
+        MissedMemberInSecondObject,
         NumberOfElementsMismatch
     }
 }

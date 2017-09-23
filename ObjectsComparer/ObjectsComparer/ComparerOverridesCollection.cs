@@ -123,7 +123,6 @@ namespace ObjectsComparer
             if (_overridesByType.TryGetValue(type, out overridesByType))
             {
                 overridesByType = overridesByType.Where(o => o.Filter == null).ToList();
-
                 if (overridesByType.Count > 1)
                 {
                     throw new AmbiguousComparerOverrideResolutionException(type);
@@ -175,6 +174,31 @@ namespace ObjectsComparer
                 if (overridesByName.Count > 1)
                 {
                     throw new AmbiguousComparerOverrideResolutionException(memberInfo);
+                }
+
+                if (overridesByName.Count == 1)
+                {
+                    return overridesByName[0].ValueComparer;
+                }
+            }
+
+            return null;
+        }
+
+        public IValueComparer GetComparer(string memberName)
+        {
+            if (string.IsNullOrWhiteSpace(memberName))
+            {
+                throw new ArgumentNullException(nameof(memberName));
+            }
+
+            List<ValueComparerWithFilter> overridesByName;
+            if (_overridesByName.TryGetValue(memberName, out overridesByName))
+            {
+                overridesByName = overridesByName.Where(o => o.Filter == null).ToList();
+                if (overridesByName.Count > 1)
+                {
+                    throw new AmbiguousComparerOverrideResolutionException(memberName);
                 }
 
                 if (overridesByName.Count == 1)

@@ -24,6 +24,7 @@ namespace ObjectsComparer
             _conditionalComparers = new List<IComparerWithCondition>
             {
                 new MultidimensionalArraysComparer(Settings, this, Factory),
+                new ExpandoObjectComparer(Settings, this, Factory),
                 new GenericEnumerablesComparer(Settings, this, Factory),
                 new EnumerablesComparer(Settings, this, Factory),
             };
