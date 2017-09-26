@@ -248,7 +248,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void GetOverrideByNameComparer()
+        public void GetOverrideByNameComparerByMemberInfo()
         {
             var valueComparer = Substitute.For<IValueComparer>();
             var collection = new ComparerOverridesCollection();
@@ -263,7 +263,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void GetOverrideByNameComparerWhenTwoComparersMatchCriteria()
+        public void GetOverrideByNameComparerByMemberInfoWhenTwoComparersMatchCriteria()
         {
             var valueComparer1 = Substitute.For<IValueComparer>();
             var valueComparer2 = Substitute.For<IValueComparer>();
@@ -278,7 +278,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void GetOverrideByNameComparerWhenNoComparerMatchCriteria()
+        public void GetOverrideByNameComparerByMemberInfoWhenNoComparerMatchCriteria()
         {
             var valueComparer1 = Substitute.For<IValueComparer>();
             var valueComparer2 = Substitute.For<IValueComparer>();
@@ -295,7 +295,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void GetOverrideByNameComparerWhenOneComparerMatchCriteria()
+        public void GetOverrideByNameComparerByMemberInfoWhenOneComparerMatchCriteria()
         {
             var valueComparer1 = Substitute.For<IValueComparer>();
             var valueComparer2 = Substitute.For<IValueComparer>();
@@ -312,11 +312,57 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void GetComparerByMemberWhenNull()
+        public void GetComparerByMemberInfoWhenNull()
         {
             var collection = new ComparerOverridesCollection();
 
             Assert.Throws<ArgumentNullException>(() => collection.GetComparer((MemberInfo)null));
+        }
+
+        [Test]
+        public void GetOverrideByNameComparerByMemberName()
+        {
+            var valueComparer = Substitute.For<IValueComparer>();
+            var collection = new ComparerOverridesCollection();
+            collection.AddComparer("Prop1", valueComparer);
+
+            var valueComparerFromCollection = collection.GetComparer("Prop1");
+
+            Assert.AreEqual(valueComparer, valueComparerFromCollection);
+        }
+
+        [Test]
+        public void GetOverrideByNameComparerByMemberNameWhenTwoComparersMatchCriteria()
+        {
+            var valueComparer1 = Substitute.For<IValueComparer>();
+            var valueComparer2 = Substitute.For<IValueComparer>();
+            var collection = new ComparerOverridesCollection();
+            collection.AddComparer("Prop1", valueComparer1);
+            collection.AddComparer("Prop1", valueComparer2);
+
+            Assert.Throws<AmbiguousComparerOverrideResolutionException>(() => collection.GetComparer("Prop1"));
+        }
+
+        [Test]
+        public void GetOverrideByNameComparerByMemberNameWhenNoComparerMatchCriteria()
+        {
+            var valueComparer1 = Substitute.For<IValueComparer>();
+            var valueComparer2 = Substitute.For<IValueComparer>();
+            var collection = new ComparerOverridesCollection();
+            collection.AddComparer("Prop1", valueComparer1, mi => false);
+            collection.AddComparer("Prop1", valueComparer2, mi => false);
+
+            var valueComparerFromCollection = collection.GetComparer("Prop1");
+
+            Assert.IsNull(valueComparerFromCollection);
+        }
+
+        [Test]
+        public void GetComparerByMemberNameWhenNull()
+        {
+            var collection = new ComparerOverridesCollection();
+
+            Assert.Throws<ArgumentNullException>(() => collection.GetComparer((string)null));
         }
     }
 }

@@ -55,7 +55,6 @@ namespace ObjectsComparer
                 var value1 = existsInObject1 ? dictionary1[propertyKey] : null;
                 var value2 = existsInObject2 ? dictionary2[propertyKey] : null;
                 var propertType = (value1 ?? value2)?.GetType() ?? typeof(object);
-                var comparer = Factory.GetObjectsComparer(type, Settings, this);
                 var customComparer = OverridesCollection.GetComparer(propertType) ??
                                     OverridesCollection.GetComparer(propertyKey);
                 var valueComparer = customComparer ?? DefaultValueComparer;
@@ -76,7 +75,18 @@ namespace ObjectsComparer
 
                 if (value1 != null && value2 != null && value1.GetType() != value2.GetType())
                 {
-                    yield return new Difference(propertyKey, string.Empty, string.Empty,
+                    //It is OK because ToString conversion will be retired soon
+                    yield return new Difference(propertyKey, value1.ToString(), value1.ToString(),
+                        DifferenceTypes.TypeMismatch);
+                    continue;
+                }
+
+                //null cannot be casted to ValueType
+                if ((value1 == null && value2 != null && value2.GetType().GetTypeInfo().IsValueType) ||
+                    (value2 == null && value1 != null && value1.GetType().GetTypeInfo().IsValueType))
+                {
+                    //It is OK because ToString conversion will be retired soon
+                    yield return new Difference(propertyKey, value1?.ToString(), value2?.ToString(),
                         DifferenceTypes.TypeMismatch);
                     continue;
                 }
@@ -91,6 +101,7 @@ namespace ObjectsComparer
                     continue;
                 }
 
+                var comparer = Factory.GetObjectsComparer(propertType, Settings, this);
                 foreach (var failure in comparer.CalculateDifferences(propertType, value1, value2))
                 {
                     yield return failure.InsertPath(propertyKey);

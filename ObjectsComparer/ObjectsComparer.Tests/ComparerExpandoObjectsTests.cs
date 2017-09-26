@@ -109,7 +109,7 @@ namespace ObjectsComparer.Tests
             a1.Field2 = null;
             dynamic a2 = new ExpandoObject();
             a2.Field1 = null;
-            a2.Field2 = 5;
+            a2.Field2 = "B";
             var comparer = new Comparer();
 
             IEnumerable<Difference> differencesEnum;
@@ -121,7 +121,7 @@ namespace ObjectsComparer.Tests
             Assert.IsTrue(differences.Any(
                 d => d.MemberPath == "Field1" && d.Value1 == "A" && d.DifferenceType == DifferenceTypes.ValueMismatch));
             Assert.IsTrue(differences.Any(
-                d => d.MemberPath == "Field2" && d.Value2 == "5" && d.DifferenceType == DifferenceTypes.ValueMismatch));
+                d => d.MemberPath == "Field2" && d.Value2 == "B" && d.DifferenceType == DifferenceTypes.ValueMismatch));
         }
 
         [Test]
@@ -166,7 +166,6 @@ namespace ObjectsComparer.Tests
                 d => d.MemberPath == "Field1" && d.Value1 == "A" && d.Value2 == "B" && d.DifferenceType == DifferenceTypes.ValueMismatch));
         }
 
-        //ToDo
         [Test]
         public void ComparerOverrideWhenNullAndValueType()
         {
@@ -177,7 +176,6 @@ namespace ObjectsComparer.Tests
             var comparer = new Comparer();
             var intComparer = Substitute.For<IValueComparer>();
             intComparer.Compare(Arg.Any<object>(), Arg.Any<object>(), Arg.Any<ComparisonSettings>()).Returns(false);
-            intComparer.ToString(Arg.Any<object>()).Returns(callInfo => callInfo.Arg<object>().ToString());
             comparer.AddComparerOverride<int>(intComparer);
 
             IEnumerable<Difference> differencesEnum;
@@ -186,11 +184,8 @@ namespace ObjectsComparer.Tests
 
             Assert.IsFalse(isEqual);
             Assert.AreEqual(1, differences.Count);
-            //ToDo: what to expect???
-            //Assert.IsTrue(differences.Any(
-            //    d => d.MemberPath == "Field1" && d.Value1 == "A" && d.DifferenceType == DifferenceTypes.ValueMismatch));
-            //Assert.IsTrue(differences.Any(
-            //    d => d.MemberPath == "Field2" && d.Value2 == "5" && d.DifferenceType == DifferenceTypes.ValueMismatch));
+            Assert.IsTrue(differences.Any(
+                d => d.MemberPath == "Field1" && d.Value1 == null && d.Value2 == "5" && d.DifferenceType == DifferenceTypes.TypeMismatch));
         }
     }
 }
