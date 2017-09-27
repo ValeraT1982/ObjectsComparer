@@ -25,6 +25,7 @@ namespace ObjectsComparer
             {
                 new MultidimensionalArraysComparer(Settings, this, Factory),
                 new ExpandoObjectComparer(Settings, this, Factory),
+                new CompilerGeneratedObjectComparer(Settings, this, Factory),
                 new GenericEnumerablesComparer(Settings, this, Factory),
                 new EnumerablesComparer(Settings, this, Factory),
             };

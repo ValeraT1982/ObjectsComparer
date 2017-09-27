@@ -7,7 +7,7 @@ using NSubstitute;
 namespace ObjectsComparer.Tests
 {
     [TestFixture]
-    public class ComparerDynamicObjectsTests
+    public class ComparerCompilerGeneratedObjectComparerObjectsTests
     {
         [Test]
         public void DifferentValues()
@@ -24,7 +24,6 @@ namespace ObjectsComparer.Tests
                 Field2 = 8,
                 Field3 = false
             };
-
             var comparer = new Comparer();
 
             IEnumerable<Difference> differencesEnum;
@@ -35,7 +34,7 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual(3, differences.Count);
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Field1" && d.Value1 == "A" && d.Value2 == "B"));
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Field2" && d.Value1 == "5" && d.Value2 == "8"));
-            Assert.IsTrue(differences.Any(d => d.MemberPath == "Field3" && d.Value1 == "true" && d.Value2 == "false"));
+            Assert.IsTrue(differences.Any(d => d.MemberPath == "Field3" && d.Value1 == "True" && d.Value2 == "False"));
         }
 
         [Test]
@@ -69,9 +68,9 @@ namespace ObjectsComparer.Tests
         public void Hierarchy()
         {
             dynamic a1Sub1 = new { FieldSub1 = 10 };
-            dynamic a1 = new { FieldSub1 = a1Sub1 };
+            dynamic a1 = new { Field1 = a1Sub1 };
             dynamic a2Sub1 = new { FieldSub1 = 8 };
-            dynamic a2 = new { FieldSub1 = a2Sub1 };
+            dynamic a2 = new { Field1 = a2Sub1 };
             var comparer = new Comparer();
 
             IEnumerable<Difference> differencesEnum;
@@ -80,7 +79,7 @@ namespace ObjectsComparer.Tests
 
             Assert.IsFalse(isEqual);
             Assert.AreEqual(1, differences.Count);
-            Assert.IsTrue(differences.Any(d => d.MemberPath == "FieldSub1.Field1" && d.Value1 == "10" && d.Value2 == "8"));
+            Assert.IsTrue(differences.Any(d => d.MemberPath == "Field1.FieldSub1" && d.Value1 == "10" && d.Value2 == "8"));
         }
 
         [Test]
@@ -122,14 +121,14 @@ namespace ObjectsComparer.Tests
                 Field1 = " A "
             };
             var stringComparer = Substitute.For<IValueComparer>();
-            stringComparer.Compare(Arg.Any<string>(), Arg.Any<string>(), new ComparisonSettings()).Returns(true);
+            stringComparer.Compare(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<ComparisonSettings>()).Returns(true);
             var comparer = new Comparer();
             comparer.AddComparerOverride("Field1", stringComparer);
 
             var isEqual = comparer.Compare(a1, a2);
 
             Assert.IsTrue(isEqual);
-            stringComparer.Received().Compare("A", " A ", new ComparisonSettings()).Returns(true);
+            stringComparer.Received().Compare("A", " A ", Arg.Any<ComparisonSettings>());
         }
 
         [Test]
@@ -144,7 +143,8 @@ namespace ObjectsComparer.Tests
                 Field1 = "B"
             };
             var stringComparer = Substitute.For<IValueComparer>();
-            stringComparer.Compare(Arg.Any<string>(), Arg.Any<string>(), new ComparisonSettings()).Returns(false);
+            stringComparer.Compare(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<ComparisonSettings>()).Returns(false);
+            stringComparer.ToString(Arg.Any<object>()).Returns(callInfo => callInfo.Arg<object>()?.ToString());
             var comparer = new Comparer();
             comparer.AddComparerOverride("Field1", stringComparer);
 
@@ -153,7 +153,7 @@ namespace ObjectsComparer.Tests
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
-            stringComparer.Received().Compare("A", "B", new ComparisonSettings()).Returns(false);
+            stringComparer.Received().Compare("A", "B", Arg.Any<ComparisonSettings>());
             Assert.AreEqual(1, differences.Count);
             Assert.IsTrue(differences.Any(
                 d => d.MemberPath == "Field1" && d.Value1 == "A" && d.Value2 == "B" && d.DifferenceType == DifferenceTypes.ValueMismatch));

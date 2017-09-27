@@ -102,6 +102,41 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
+        public void NullsAreEqual()
+        {
+            dynamic a1 = new ExpandoObject();
+            a1.Field1 = null;
+            dynamic a2 = new ExpandoObject();
+            a2.Field1 = null;
+            var comparer = new Comparer();
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsTrue(isEqual);
+        }
+
+        [Test]
+        public void NullAndMissedMemberAreNotEqual()
+        {
+            dynamic a1 = new ExpandoObject();
+            a1.Field1 = null;
+            dynamic a2 = new ExpandoObject();
+            a2.Field2 = null;
+            var comparer = new Comparer();
+
+            IEnumerable<Difference> differencesEnum;
+            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            Assert.AreEqual(2, differences.Count);
+            Assert.IsTrue(differences.Any(
+                d => d.MemberPath == "Field1" && d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject));
+            Assert.IsTrue(differences.Any(
+                d => d.MemberPath == "Field2" && d.DifferenceType == DifferenceTypes.MissedMemberInFirstObject));
+        }
+
+        [Test]
         public void NullValues()
         {
             dynamic a1 = new ExpandoObject();
