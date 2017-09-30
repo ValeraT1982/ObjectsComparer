@@ -69,7 +69,7 @@ namespace ObjectsComparer
             }
         }
 
-        public bool IsMatch(Type type)
+        public bool IsMatch(Type type, object obj1, object obj2)
         {
             return type.InheritsFrom(typeof(IEnumerable)) && !type.InheritsFrom(typeof(IEnumerable<>));
         }

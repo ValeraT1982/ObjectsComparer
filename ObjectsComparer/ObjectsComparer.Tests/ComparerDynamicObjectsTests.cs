@@ -1,32 +1,52 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.Dynamic;
 using NSubstitute;
 
 namespace ObjectsComparer.Tests
 {
     [TestFixture]
-    public class ComparerCompilerGeneratedObjectComparerObjectsTests
+    public class ComparerDynamicObjectsTests
     {
+        private class DynamicDictionary : DynamicObject
+        {
+            public int IntProperty { get; set; }
+
+            private readonly Dictionary<string, object> _dictionary = new Dictionary<string, object>();
+            
+            public override bool TryGetMember(GetMemberBinder binder, out object result)
+            {
+                var name = binder.Name.ToLower();
+
+                return _dictionary.TryGetValue(name, out result);
+            }
+
+            public override bool TrySetMember(SetMemberBinder binder, object value)
+            {
+                _dictionary[binder.Name.ToLower()] = value;
+
+                return true;
+            }
+        }
+
+
         [Test]
         public void DifferentValues()
         {
-            dynamic a1 = new
-            {
-                Field1 = "A",
-                Field2 = 5,
-                Field3 = true
-            };
-            dynamic a2 = new
-            {
-                Field1 = "B",
-                Field2 = 8,
-                Field3 = false
-            };
+            dynamic a1 = new DynamicDictionary();
+            a1.Field1 = "A";
+            a1.Field2 = 5;
+            a1.Field3 = true;
+            dynamic a2 = new DynamicDictionary();
+            a2.Field1 = "B";
+            a2.Field2 = 8;
+            a2.Field3 = false;
+
             var comparer = new Comparer();
 
             IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare((object)a1, (object)a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -39,86 +59,77 @@ namespace ObjectsComparer.Tests
         [Test]
         public void MissedFields()
         {
-            dynamic a1 = new
-            {
-                Field1 = "A",
-                Field2 = 5
-            };
-            dynamic a2 = new
-            {
-                Field1 = "B",
-                Field2 = 8,
-                Field3 = false
-            };
+            dynamic a1 = new DynamicDictionary();
+            a1.Field1 = "A";
+            a1.Field2 = 5;
+            dynamic a2 = new DynamicDictionary();
+            a2.Field1 = "B";
+            a2.Field3 = false;
             var comparer = new Comparer();
 
             IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare((object)a1, (object)a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
             Assert.AreEqual(3, differences.Count);
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Field1" && d.Value1 == "A" && d.Value2 == "B"));
-            Assert.IsTrue(differences.Any(d => d.MemberPath == "Field2" && d.Value1 == "5" && d.Value2 == "8"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject && d.MemberPath == "Field2" && d.Value1 == "5"));
             Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.MissedMemberInFirstObject && d.MemberPath == "Field3" && d.Value2 == "False"));
         }
 
         [Test]
         public void Hierarchy()
         {
-            dynamic a1Sub1 = new { FieldSub1 = 10 };
-            dynamic a1 = new { Field1 = a1Sub1 };
-            dynamic a2Sub1 = new { FieldSub1 = 8 };
-            dynamic a2 = new { Field1 = a2Sub1 };
+            dynamic a1Sub1 = new DynamicDictionary();
+            a1Sub1.Field1 = 10;
+            dynamic a1 = new DynamicDictionary();
+            a1.FieldSub1 = a1Sub1;
+            dynamic a2Sub1 = new DynamicDictionary();
+            a2Sub1.Field1 = 8;
+            dynamic a2 = new DynamicDictionary();
+            a2.FieldSub1 = a2Sub1;
             var comparer = new Comparer();
 
             IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare((object)a1, (object)a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
             Assert.AreEqual(1, differences.Count);
-            Assert.IsTrue(differences.Any(d => d.MemberPath == "Field1.FieldSub1" && d.Value1 == "10" && d.Value2 == "8"));
+            Assert.IsTrue(differences.Any(d => d.MemberPath == "FieldSub1.Field1" && d.Value1 == "10" && d.Value2 == "8"));
         }
 
         [Test]
         public void DifferentTypes()
         {
-            dynamic a1 = new
-            {
-                Field1 = "A",
-                Field2 = 5
-            };
-            dynamic a2 = new
-            {
-                Field1 = 5,
-                Field2 = "5"
-            };
+            dynamic a1 = new DynamicDictionary();
+            a1.Field1 = "A";
+            a1.Field2 = 5;
+            dynamic a2 = new DynamicDictionary();
+            a2.Field1 = 5;
+            a2.Field2 = "5";
             var comparer = new Comparer();
 
             IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare((object)a1, (object)a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
             Assert.AreEqual(2, differences.Count);
             Assert.IsTrue(differences.Any(
-                d => d.MemberPath == "Field1" && d.Value1 == "A" && d.Value2 == "5" && d.DifferenceType == DifferenceTypes.TypeMismatch));
+                d => d.MemberPath == "Field1" && d.DifferenceType == DifferenceTypes.TypeMismatch));
             Assert.IsTrue(differences.Any(
-                d => d.MemberPath == "Field2" && d.Value1 == "5" && d.Value2 == "5" && d.DifferenceType == DifferenceTypes.TypeMismatch));
+                d => d.MemberPath == "Field2" && d.DifferenceType == DifferenceTypes.TypeMismatch));
         }
 
         [Test]
         public void NullsAreEqual()
         {
-            dynamic a1 = new
-            {
-                Field1 = (object)null
-            };
-            dynamic a2 = new
-            {
-                Field1 = (object)null
-            };
+            dynamic a1 = new DynamicDictionary();
+            a1.Field1 = null;
+            dynamic a2 = new DynamicDictionary();
+            a2.Field1 = null;
             var comparer = new Comparer();
 
             var isEqual = comparer.Compare(a1, a2);
@@ -129,18 +140,14 @@ namespace ObjectsComparer.Tests
         [Test]
         public void NullAndMissedMemberAreNotEqual()
         {
-            dynamic a1 = new
-            {
-                Field1 = (object)null
-            };
-            dynamic a2 = new
-            {
-                Field2 = (object)null
-            };
+            dynamic a1 = new DynamicDictionary();
+            a1.Field1 = null;
+            dynamic a2 = new DynamicDictionary();
+            a2.Field2 = null;
             var comparer = new Comparer();
 
             IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare((object)a1, (object)a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -154,20 +161,16 @@ namespace ObjectsComparer.Tests
         [Test]
         public void NullValues()
         {
-            dynamic a1 = new
-            {
-                Field1 = "A",
-                Field2 = (object) null
-            };
-            dynamic a2 = new
-            {
-                Field1 = (object)null,
-                Field2 = "B"
-            };
+            dynamic a1 = new DynamicDictionary();
+            a1.Field1 = "A";
+            a1.Field2 = null;
+            dynamic a2 = new DynamicDictionary();
+            a2.Field1 = null;
+            a2.Field2 = "B";
             var comparer = new Comparer();
 
             IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare((object)a1, (object)a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -181,20 +184,16 @@ namespace ObjectsComparer.Tests
         [Test]
         public void ComparerOverrideWhenEqual()
         {
-            dynamic a1 = new
-            {
-                Field1 = "A"
-            };
-            dynamic a2 = new
-            {
-                Field1 = " A "
-            };
+            dynamic a1 = new DynamicDictionary();
+            a1.Field1 = "A";
+            dynamic a2 = new DynamicDictionary();
+            a2.Field1 = " A ";
             var stringComparer = Substitute.For<IValueComparer>();
             stringComparer.Compare(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<ComparisonSettings>()).Returns(true);
             var comparer = new Comparer();
             comparer.AddComparerOverride("Field1", stringComparer);
 
-            var isEqual = comparer.Compare((object)a1, (object)a2);
+            var isEqual = comparer.Compare(a1, a2);
 
             Assert.IsTrue(isEqual);
             stringComparer.Received().Compare("A", " A ", Arg.Any<ComparisonSettings>());
@@ -203,22 +202,18 @@ namespace ObjectsComparer.Tests
         [Test]
         public void ComparerOverrideWhenNotEqual()
         {
-            dynamic a1 = new
-            {
-                Field1 = "A"
-            };
-            dynamic a2 = new
-            {
-                Field1 = "B"
-            };
+            dynamic a1 = new DynamicDictionary();
+            a1.Field1 = "A";
+            dynamic a2 = new DynamicDictionary();
+            a2.Field1 = "B";
             var stringComparer = Substitute.For<IValueComparer>();
             stringComparer.Compare(Arg.Any<string>(), Arg.Any<string>(), Arg.Any<ComparisonSettings>()).Returns(false);
-            stringComparer.ToString(Arg.Any<object>()).Returns(callInfo => callInfo.Arg<object>()?.ToString());
+            stringComparer.ToString(Arg.Any<string>()).Returns(callInfo => callInfo.Arg<string>());
             var comparer = new Comparer();
             comparer.AddComparerOverride("Field1", stringComparer);
 
             IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare((object)a1, (object)a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -231,27 +226,42 @@ namespace ObjectsComparer.Tests
         [Test]
         public void ComparerOverrideWhenNullAndValueType()
         {
-            dynamic a1 = new
-            {
-                Field1 = (object)null
-            };
-            dynamic a2 = new
-            {
-                Field1 = 5
-            };
+            dynamic a1 = new DynamicDictionary();
+            a1.Field1 = null;
+            dynamic a2 = new DynamicDictionary();
+            a2.Field1 = 5;
             var comparer = new Comparer();
             var intComparer = Substitute.For<IValueComparer>();
             intComparer.Compare(Arg.Any<object>(), Arg.Any<object>(), Arg.Any<ComparisonSettings>()).Returns(false);
             comparer.AddComparerOverride<int>(intComparer);
 
             IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare((object)a1, (object)a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
             Assert.AreEqual(1, differences.Count);
             Assert.IsTrue(differences.Any(
                 d => d.MemberPath == "Field1" && d.Value1 == null && d.Value2 == "5" && d.DifferenceType == DifferenceTypes.TypeMismatch));
+        }
+
+        [Test]
+        public void ComperaNonDynamicProperty()
+        {
+            dynamic a1 = new DynamicDictionary();
+            a1.IntProperty = 5;
+            dynamic a2 = new DynamicDictionary();
+            a2.IntProperty = 7;
+            var comparer = new Comparer();
+            
+            IEnumerable<Difference> differencesEnum;
+            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            Assert.AreEqual(1, differences.Count);
+            Assert.IsTrue(differences.Any(
+                d => d.MemberPath == "IntProperty" && d.Value1 == "5" && d.Value2 == "7" && d.DifferenceType == DifferenceTypes.ValueMismatch));
         }
     }
 }

@@ -49,7 +49,7 @@ namespace ObjectsComparer
             }
         }
 
-        public override bool IsMatch(Type type)
+        public override bool IsMatch(Type type, object obj1, object obj2)
         {
             return type.InheritsFrom(typeof(IEnumerable<>));
         }
@@ -63,9 +63,8 @@ namespace ObjectsComparer
 
             if (type.InheritsFrom(typeof(IDictionary<,>)))
             {
-                var dictionary = new Dictionary<object, object>();
-                if (member.Name == PropertyHelper.GetMemberInfo(() => dictionary.Values).Name ||
-                    member.Name == PropertyHelper.GetMemberInfo(() => dictionary.Keys).Name)
+                if (member.Name == PropertyHelper.GetMemberInfo(() => new Dictionary<object, object>().Values).Name ||
+                    member.Name == PropertyHelper.GetMemberInfo(() => new Dictionary<object, object>().Keys).Name)
                 {
                     return true;
                 }

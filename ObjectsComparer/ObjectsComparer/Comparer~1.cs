@@ -25,6 +25,7 @@ namespace ObjectsComparer
             {
                 new MultidimensionalArraysComparer(Settings, this, Factory),
                 new ExpandoObjectComparer(Settings, this, Factory),
+                new DynamicObjectComparer(Settings, this, Factory),
                 new CompilerGeneratedObjectComparer(Settings, this, Factory),
                 new GenericEnumerablesComparer(Settings, this, Factory),
                 new EnumerablesComparer(Settings, this, Factory),
@@ -56,7 +57,7 @@ namespace ObjectsComparer
                 yield break;
             }
 
-            var conditionalComparer = _conditionalComparers.FirstOrDefault(c => c.IsMatch(typeof(T)));
+            var conditionalComparer = _conditionalComparers.FirstOrDefault(c => c.IsMatch(typeof(T), obj1, obj2));
             if (conditionalComparer != null)
             {
                 foreach (var difference in conditionalComparer.CalculateDifferences(typeof(T), obj1, obj2))

@@ -30,7 +30,7 @@ namespace ObjectsComparer
             }
         }
 
-        public override bool IsMatch(Type type)
+        public override bool IsMatch(Type type, object obj1, object obj2)
         {
             return type.GetTypeInfo().IsArray && type.GetTypeInfo().GetArrayRank() > 1;
         }

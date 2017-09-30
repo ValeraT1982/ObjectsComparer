@@ -41,6 +41,6 @@ namespace ObjectsComparer
 
         public abstract override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2);
 
-        public abstract bool IsMatch(Type type);
+        public abstract bool IsMatch(Type type, object obj1, object obj2);
     }
 }

@@ -15,20 +15,8 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            if (obj1 == null || obj2 == null)
-            {
-                if (obj1 != obj2)
-                {
-                    yield return new Difference("[]", obj1?.ToString() ?? string.Empty,
-                        obj2?.ToString() ?? string.Empty);
-                    yield break;
-                }
-
-                yield break;
-            }
-
             var propertyKeys = obj1.GetType().GetTypeInfo().GetMembers()
-                .Union(obj1.GetType().GetTypeInfo().GetMembers())
+                .Union(obj2.GetType().GetTypeInfo().GetMembers())
                 .Where(memberInfo => memberInfo is PropertyInfo)
                 .Select(memberInfo => memberInfo.Name)
                 .Distinct()
@@ -64,7 +52,7 @@ namespace ObjectsComparer
                 if (value1 != null && value2 != null && value1.GetType() != value2.GetType())
                 {
                     //It is OK because ToString conversion will be retired soon
-                    yield return new Difference(propertyKey, value1.ToString(), value1.ToString(),
+                    yield return new Difference(propertyKey, value1.ToString(), value2.ToString(),
                         DifferenceTypes.TypeMismatch);
                     continue;
                 }
@@ -97,9 +85,11 @@ namespace ObjectsComparer
             }
         }
 
-        public bool IsMatch(Type type)
+        public bool IsMatch(Type type, object obj1, object obj2)
         {
-            return type.GetTypeInfo().GetCustomAttribute(typeof(CompilerGeneratedAttribute)) != null;
+            return obj1 != null && obj2 != null &&
+                   obj1.GetType().GetTypeInfo().GetCustomAttribute(typeof(CompilerGeneratedAttribute)) != null &&
+                   obj2.GetType().GetTypeInfo().GetCustomAttribute(typeof(CompilerGeneratedAttribute)) != null;
         }
 
         public bool IsStopComparison(Type type, object obj1, object obj2)

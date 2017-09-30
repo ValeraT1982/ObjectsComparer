@@ -7,9 +7,9 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    internal class ExpandoObjectComparer : AbstractComparer, IComparerWithCondition
+    internal class DynamicObjectComparer : AbstractComparer, IComparerWithCondition
     {
-        public ExpandoObjectComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory)
+        public DynamicObjectComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory)
             : base(settings, parentComparer, factory)
         {
         }
@@ -28,32 +28,34 @@ namespace ObjectsComparer
                 yield break;
             }
 
-            if (!type.InheritsFrom(typeof(ExpandoObject)))
+            if (!type.InheritsFrom(typeof(DynamicObject)))
             {
                 throw new ArgumentException(nameof(type));
             }
 
-            if (!obj1.GetType().InheritsFrom(typeof(ExpandoObject)))
+            if (!obj1.GetType().InheritsFrom(typeof(DynamicObject)))
             {
                 throw new ArgumentException(nameof(obj1));
             }
 
-            if (!obj2.GetType().InheritsFrom(typeof(ExpandoObject)))
+            if (!obj2.GetType().InheritsFrom(typeof(DynamicObject)))
             {
                 throw new ArgumentException(nameof(obj2));
             }
 
-            var dictionary1 = (IDictionary<string, object>)obj1;
-            var dictionary2 = (IDictionary<string, object>)obj2;
+            var dynamicObject1 = (DynamicObject)obj1;
+            var dynamicObject2 = (DynamicObject)obj2;
+            var propertyKeys1 = dynamicObject1.GetDynamicMemberNames().ToList();
+            var propertyKeys2 = dynamicObject2.GetDynamicMemberNames().ToList();
 
-            var propertyKeys = dictionary1.Keys.Union(dictionary2.Keys);
+            var propertyKeys = propertyKeys1.Union(propertyKeys2);
             
             foreach (var propertyKey in propertyKeys)
             {
-                var existsInObject1 = dictionary1.ContainsKey(propertyKey);
-                var existsInObject2 = dictionary2.ContainsKey(propertyKey);
-                var value1 = existsInObject1 ? dictionary1[propertyKey] : null;
-                var value2 = existsInObject2 ? dictionary2[propertyKey] : null;
+                var existsInObject1 = propertyKeys1.Contains(propertyKey);
+                var existsInObject2 = propertyKeys2.Contains(propertyKey);
+                var value1 = existsInObject1 ? dynamicObject1.GetType().GetTypeInfo().GetProperty(propertyKey)?.GetValue(dynamicObject1, null) : null;
+                var value2 = existsInObject2 ? dynamicObject2.GetType().GetTypeInfo().GetProperty(propertyKey)?.GetValue(dynamicObject2, null) : null;
                 var propertType = (value1 ?? value2)?.GetType() ?? typeof(object);
                 var customComparer = OverridesCollection.GetComparer(propertType) ??
                                     OverridesCollection.GetComparer(propertyKey);
@@ -111,7 +113,7 @@ namespace ObjectsComparer
 
         public bool IsMatch(Type type, object obj1, object obj2)
         {
-            return type.InheritsFrom(typeof(ExpandoObject));
+            return type.InheritsFrom(typeof(DynamicObject));
         }
 
         public bool IsStopComparison(Type type, object obj1, object obj2)
