@@ -17,16 +17,21 @@ namespace ObjectsComparer.Tests
             
             public override bool TryGetMember(GetMemberBinder binder, out object result)
             {
-                var name = binder.Name.ToLower();
+                var name = binder.Name;
 
                 return _dictionary.TryGetValue(name, out result);
             }
 
             public override bool TrySetMember(SetMemberBinder binder, object value)
             {
-                _dictionary[binder.Name.ToLower()] = value;
+                _dictionary[binder.Name] = value;
 
                 return true;
+            }
+
+            public override IEnumerable<string> GetDynamicMemberNames()
+            {
+                return _dictionary.Keys;
             }
         }
 
@@ -229,11 +234,11 @@ namespace ObjectsComparer.Tests
             dynamic a1 = new DynamicDictionary();
             a1.Field1 = null;
             dynamic a2 = new DynamicDictionary();
-            a2.Field1 = 5;
+            a2.Field1 = 5.0;
             var comparer = new Comparer();
-            var intComparer = Substitute.For<IValueComparer>();
-            intComparer.Compare(Arg.Any<object>(), Arg.Any<object>(), Arg.Any<ComparisonSettings>()).Returns(false);
-            comparer.AddComparerOverride<int>(intComparer);
+            var doubleComparer = Substitute.For<IValueComparer>();
+            doubleComparer.Compare(Arg.Any<object>(), Arg.Any<object>(), Arg.Any<ComparisonSettings>()).Returns(false);
+            comparer.AddComparerOverride<double>(doubleComparer);
 
             IEnumerable<Difference> differencesEnum;
             var isEqual = comparer.Compare(a1, a2, out differencesEnum);
@@ -242,7 +247,7 @@ namespace ObjectsComparer.Tests
             Assert.IsFalse(isEqual);
             Assert.AreEqual(1, differences.Count);
             Assert.IsTrue(differences.Any(
-                d => d.MemberPath == "Field1" && d.Value1 == null && d.Value2 == "5" && d.DifferenceType == DifferenceTypes.TypeMismatch));
+                d => d.MemberPath == "Field1" && d.Value1 == null && d.Value2 == 5.0.ToString() && d.DifferenceType == DifferenceTypes.TypeMismatch));
         }
 
         [Test]

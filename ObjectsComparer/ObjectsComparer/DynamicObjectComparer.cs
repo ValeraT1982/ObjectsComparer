@@ -9,6 +9,18 @@ namespace ObjectsComparer
 {
     internal class DynamicObjectComparer : AbstractComparer, IComparerWithCondition
     {
+        private class FakeGetMemberBinder: GetMemberBinder
+        {
+            public FakeGetMemberBinder(string name, bool ignoreCase) : base(name, ignoreCase)
+            {
+            }
+
+            public override DynamicMetaObject FallbackGetMember(DynamicMetaObject target, DynamicMetaObject errorSuggestion)
+            {
+                throw new NotSupportedException();
+            }
+        }
+
         public DynamicObjectComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory)
             : base(settings, parentComparer, factory)
         {
@@ -52,10 +64,21 @@ namespace ObjectsComparer
             
             foreach (var propertyKey in propertyKeys)
             {
+                var getBinder = new FakeGetMemberBinder(propertyKey, false);
                 var existsInObject1 = propertyKeys1.Contains(propertyKey);
                 var existsInObject2 = propertyKeys2.Contains(propertyKey);
-                var value1 = existsInObject1 ? dynamicObject1.GetType().GetTypeInfo().GetProperty(propertyKey)?.GetValue(dynamicObject1, null) : null;
-                var value2 = existsInObject2 ? dynamicObject2.GetType().GetTypeInfo().GetProperty(propertyKey)?.GetValue(dynamicObject2, null) : null;
+                object value1 = null;
+                if (existsInObject1)
+                {
+                    dynamicObject1.TryGetMember(getBinder, out value1);
+                }
+
+                object value2 = null;
+                if (existsInObject2)
+                {
+                    dynamicObject2.TryGetMember(getBinder, out value2);
+                }
+
                 var propertType = (value1 ?? value2)?.GetType() ?? typeof(object);
                 var customComparer = OverridesCollection.GetComparer(propertType) ??
                                     OverridesCollection.GetComparer(propertyKey);
