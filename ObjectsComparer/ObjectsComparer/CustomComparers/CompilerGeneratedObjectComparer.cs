@@ -1,0 +1,57 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+
+namespace ObjectsComparer
+{
+    internal class CompilerGeneratedObjectComparer : AbstractDynamicObjectsComprer<object>
+    {
+        public CompilerGeneratedObjectComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory)
+            : base(settings, parentComparer, factory)
+        {
+        }
+
+        public override bool IsMatch(Type type, object obj1, object obj2)
+        {
+            return obj1 != null && obj2 != null &&
+                   obj1.GetType().GetTypeInfo().GetCustomAttribute(typeof(CompilerGeneratedAttribute)) != null &&
+                   obj2.GetType().GetTypeInfo().GetCustomAttribute(typeof(CompilerGeneratedAttribute)) != null;
+        }
+
+        public override bool IsStopComparison(Type type, object obj1, object obj2)
+        {
+            return true;
+        }
+
+        public override bool SkipMember(Type type, MemberInfo member)
+        {
+            return false;
+        }
+
+        protected override IList<string> GetProperties(object obj)
+        {
+            return obj.GetType().GetTypeInfo().GetMembers()
+                .Where(memberInfo => memberInfo is PropertyInfo)
+                .Select(memberInfo => memberInfo.Name)
+                .Distinct()
+                .ToList();
+        }
+
+        protected override bool TryGetMemberValue(object obj, string propertyName, out object value)
+        {
+            value = null;
+            var propertyInfo = obj.GetType().GetTypeInfo().GetProperty(propertyName);
+
+            if (propertyInfo != null)
+            {
+                value = propertyInfo.GetValue(obj);
+
+                return true;
+            }
+
+            return false;
+        }
+    }
+}

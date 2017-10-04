@@ -64,6 +64,33 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
+        public void MissedFieldsAndUseDefaults()
+        {
+            dynamic a1 = new
+            {
+                Field1 = "A",
+                Field2 = 5
+            };
+            dynamic a2 = new
+            {
+                Field1 = "B",
+                Field3 = false,
+                Field4 = "S"
+            };
+            var comparer = new Comparer(new ComparisonSettings { UseDefaultIfMemberNotExist = true });
+
+            IEnumerable<Difference> differencesEnum;
+            var isEqual = comparer.Compare((object)a1, (object)a2, out differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            Assert.AreEqual(3, differences.Count);
+            Assert.IsTrue(differences.Any(d => d.MemberPath == "Field1" && d.Value1 == "A" && d.Value2 == "B"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "Field2" && d.Value1 == "5" && d.Value2 == "0"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "Field4" && d.Value2 == "S"));
+        }
+
+        [Test]
         public void Hierarchy()
         {
             dynamic a1Sub1 = new { FieldSub1 = 10 };
@@ -157,7 +184,7 @@ namespace ObjectsComparer.Tests
             dynamic a1 = new
             {
                 Field1 = "A",
-                Field2 = (object) null
+                Field2 = (object)null
             };
             dynamic a2 = new
             {

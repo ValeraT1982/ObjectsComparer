@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace ObjectsComparer.Utils
 {
-    public static class TypeExtensions
+    internal static class TypeExtensions
     {
         public static bool InheritsFrom(this Type t1, Type t2)
         {
@@ -39,15 +39,20 @@ namespace ObjectsComparer.Utils
 
         public static bool IsComparable(this Type type)
         {
-            if (type.GetTypeInfo().IsPrimitive ||
-                type.GetTypeInfo().IsEnum ||
-                type.InheritsFrom(typeof(IComparable)) ||
-                type.InheritsFrom(typeof(IComparable<>)))
+            return type.GetTypeInfo().IsPrimitive ||
+                   type.GetTypeInfo().IsEnum ||
+                   type.InheritsFrom(typeof(IComparable)) ||
+                   type.InheritsFrom(typeof(IComparable<>));
+        }
+
+        public static object GetDefaultValue(this Type t)
+        {
+            if (t.GetTypeInfo().IsValueType && Nullable.GetUnderlyingType(t) == null)
             {
-                return true;
+                return Activator.CreateInstance(t);
             }
 
-            return false;
+            return null;
         }
     }
 }

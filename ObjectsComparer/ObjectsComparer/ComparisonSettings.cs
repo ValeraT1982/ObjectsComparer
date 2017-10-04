@@ -9,12 +9,15 @@ namespace ObjectsComparer
 
         public bool EmptyAndNullEnumerablesEqual { get; set; }
 
+        public bool UseDefaultIfMemberNotExist { get; set; }
+
         private readonly Dictionary<Tuple<Type, string>, object> _settings = new Dictionary<Tuple<Type, string>, object>();
 
         public ComparisonSettings()
         {
             RecursiveComparison = true;
             EmptyAndNullEnumerablesEqual = false;
+            UseDefaultIfMemberNotExist = false;
         }
 
         public void SetCustomSetting<T>(T value, string key = null)

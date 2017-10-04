@@ -1,28 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    internal class DynamicObjectComparer : AbstractComparer, IComparerWithCondition
+    internal abstract class AbstractDynamicObjectsComprer<T>: AbstractComparer, IComparerWithCondition
     {
-        private class FakeGetMemberBinder: GetMemberBinder
-        {
-            public FakeGetMemberBinder(string name, bool ignoreCase) : base(name, ignoreCase)
-            {
-            }
-
-            public override DynamicMetaObject FallbackGetMember(DynamicMetaObject target, DynamicMetaObject errorSuggestion)
-            {
-                throw new NotSupportedException();
-            }
-        }
-
-        public DynamicObjectComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory)
-            : base(settings, parentComparer, factory)
+        protected AbstractDynamicObjectsComprer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory) : base(settings, parentComparer, factory)
         {
         }
 
@@ -40,68 +26,83 @@ namespace ObjectsComparer
                 yield break;
             }
 
-            if (!type.InheritsFrom(typeof(DynamicObject)))
+            if (!type.InheritsFrom(typeof(T)))
             {
                 throw new ArgumentException(nameof(type));
             }
 
-            if (!obj1.GetType().InheritsFrom(typeof(DynamicObject)))
+            if (!obj1.GetType().InheritsFrom(typeof(T)))
             {
                 throw new ArgumentException(nameof(obj1));
             }
 
-            if (!obj2.GetType().InheritsFrom(typeof(DynamicObject)))
+            if (!obj2.GetType().InheritsFrom(typeof(T)))
             {
                 throw new ArgumentException(nameof(obj2));
             }
 
-            var dynamicObject1 = (DynamicObject)obj1;
-            var dynamicObject2 = (DynamicObject)obj2;
-            var propertyKeys1 = dynamicObject1.GetDynamicMemberNames().ToList();
-            var propertyKeys2 = dynamicObject2.GetDynamicMemberNames().ToList();
+            var castedObject1 = (T)obj1;
+            var castedObject2 = (T)obj2;
+            var propertyKeys1 = GetProperties(castedObject1);
+            var propertyKeys2 = GetProperties(castedObject2);
 
             var propertyKeys = propertyKeys1.Union(propertyKeys2);
-            
+
             foreach (var propertyKey in propertyKeys)
             {
-                var getBinder = new FakeGetMemberBinder(propertyKey, false);
                 var existsInObject1 = propertyKeys1.Contains(propertyKey);
                 var existsInObject2 = propertyKeys2.Contains(propertyKey);
                 object value1 = null;
                 if (existsInObject1)
                 {
-                    dynamicObject1.TryGetMember(getBinder, out value1);
+                    TryGetMemberValue(castedObject1, propertyKey, out value1);
                 }
 
                 object value2 = null;
                 if (existsInObject2)
                 {
-                    dynamicObject2.TryGetMember(getBinder, out value2);
+                    TryGetMemberValue(castedObject2, propertyKey, out value2);
                 }
 
-                var propertType = (value1 ?? value2)?.GetType() ?? typeof(object);
-                var customComparer = OverridesCollection.GetComparer(propertType) ??
-                                    OverridesCollection.GetComparer(propertyKey);
+                var propertyType = (value1 ?? value2)?.GetType() ?? typeof(object);
+                var customComparer = OverridesCollection.GetComparer(propertyType) ??
+                                     OverridesCollection.GetComparer(propertyKey);
                 var valueComparer = customComparer ?? DefaultValueComparer;
 
-                if (!existsInObject1)
+                if (Settings.UseDefaultIfMemberNotExist)
                 {
-                    yield return new Difference(propertyKey, string.Empty, valueComparer.ToString(value2),
-                        DifferenceTypes.MissedMemberInFirstObject);
-                    continue;
+                    if (!existsInObject1)
+                    {
+                        value1 = propertyType.GetDefaultValue();
+                    }
+
+                    if (!existsInObject2)
+                    {
+                        value2 = propertyType.GetDefaultValue();
+                    }
                 }
 
-                if (!existsInObject2)
+                if (!Settings.UseDefaultIfMemberNotExist)
                 {
-                    yield return new Difference(propertyKey, valueComparer.ToString(value1), string.Empty,
-                        DifferenceTypes.MissedMemberInSecondObject);
-                    continue;
+                    if (!existsInObject1)
+                    {
+                        yield return new Difference(propertyKey, string.Empty, valueComparer.ToString(value2),
+                            DifferenceTypes.MissedMemberInFirstObject);
+                        continue;
+                    }
+
+                    if (!existsInObject2)
+                    {
+                        yield return new Difference(propertyKey, valueComparer.ToString(value1), string.Empty,
+                            DifferenceTypes.MissedMemberInSecondObject);
+                        continue;
+                    }
                 }
 
                 if (value1 != null && value2 != null && value1.GetType() != value2.GetType())
                 {
                     //It is OK because ToString conversion will be retired soon
-                    yield return new Difference(propertyKey, value1.ToString(), value1.ToString(),
+                    yield return new Difference(propertyKey, value1.ToString(), value2.ToString(),
                         DifferenceTypes.TypeMismatch);
                     continue;
                 }
@@ -126,27 +127,22 @@ namespace ObjectsComparer
                     continue;
                 }
 
-                var comparer = Factory.GetObjectsComparer(propertType, Settings, this);
-                foreach (var failure in comparer.CalculateDifferences(propertType, value1, value2))
+                var comparer = Factory.GetObjectsComparer(propertyType, Settings, this);
+                foreach (var failure in comparer.CalculateDifferences(propertyType, value1, value2))
                 {
                     yield return failure.InsertPath(propertyKey);
                 }
             }
         }
 
-        public bool IsMatch(Type type, object obj1, object obj2)
-        {
-            return type.InheritsFrom(typeof(DynamicObject));
-        }
+        public abstract bool IsMatch(Type type, object obj1, object obj2);
 
-        public bool IsStopComparison(Type type, object obj1, object obj2)
-        {
-            return false;
-        }
+        public abstract bool IsStopComparison(Type type, object obj1, object obj2);
 
-        public bool SkipMember(Type type, MemberInfo member)
-        {
-            return false;
-        }
+        public abstract bool SkipMember(Type type, MemberInfo member);
+
+        protected abstract IList<string> GetProperties(T obj);
+        
+        protected abstract bool TryGetMemberValue(T obj, string propertyName, out object value);
     }
 }
