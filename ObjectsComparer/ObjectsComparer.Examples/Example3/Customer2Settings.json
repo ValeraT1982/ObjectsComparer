@@ -6,41 +6,32 @@
     "EmailAddress": "test@MyHost.com"
   },
   "Settings": {
-    "DataCompression": "On",
     "DataSourceType": "MultiDataSource",
     "SomeUrl": "http://MyHost.com/VeryImportantData",
     "SomeOtherUrl": "http://MyHost.com/NotSoImportantData/",
     "CacheMode": "Memory",
     "MaxCacheSize": "1GB",
     "SuperModes": {
-      "SmartMode1": "Enabled",
-      "SmartMode2": "Disabled",
       "SmartMode3": "Enabled"
     }
   },
   "Timeouts": {
     "TotalProcessTimeout": 500,
-    "ProcessTaskTimeout": 100
+    "ProcessTaskTimeout": 200
   },
   "BackupSettings": {
-    "BackupIntervalUnit": "Day",
-    "BackupInterval": 100
+    "BackupIntervalUnit": "Week",
+    "BackupInterval": 2
   },
   "Notifications": [
-    {
-      "Phone": "111-222-3333"
-    },
-    {
-      "Phone": "111-222-4444"
-    },
     {
       "EMail": "support@MyHost.com"
     }
   ],
   "Logging": {
-    "Enabled": true,
+    "Enabled": false,
     "Pattern": "Logs\\MyApplication.%data{yyyyMMdd}.log",
-    "MaximumFileSize": "20MB",
-    "Level": "ALL"
+    "MaximumFileSize": "40MB",
+    "Level": "ERROR"
   }
 }

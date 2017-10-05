@@ -280,5 +280,50 @@ namespace ObjectsComparer.Tests
             Assert.IsTrue(differences.Any(
                 d => d.MemberPath == "Field1" && d.Value1 == null && d.Value2 == "5" && d.DifferenceType == DifferenceTypes.TypeMismatch));
         }
+
+        [Test]
+        public void UseDefaultValuesWhenSubclassNotSpecified()
+        {
+            dynamic a1 = new
+            {
+                Field1 = new
+                {
+                    SubField1 = 0,
+                    SubField2 = (object) null,
+                    SubField3 = 0.0
+                }
+            };
+            dynamic a2 = new {};
+            var comparer = new Comparer(new ComparisonSettings { UseDefaultIfMemberNotExist = true });
+
+            var isEqual = comparer.Compare((object)a1, (object)a2);
+
+            Assert.IsTrue(isEqual);
+        }
+
+        [Test]
+        public void DifferenceWhenSubclassNotSpecified()
+        {
+            dynamic a1 = new
+            {
+                Field1 = new
+                {
+                    SubField1 = 0,
+                    SubField2 = (object)null,
+                    SubField3 = 0.0
+                }
+            };
+            dynamic a2 = new { };
+            var comparer = new Comparer();
+
+            IEnumerable<Difference> differencesEnum;
+            var isEqual = comparer.Compare((object)a1, (object)a2, out differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            Assert.AreEqual(1, differences.Count);
+            Assert.IsTrue(differences.Any(
+                d => d.MemberPath == "Field1" && d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject));
+        }
     }
 }

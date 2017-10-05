@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace ObjectsComparer.Utils
 {
-    public class PropertyHelper
+    internal class PropertyHelper
     {
         public static MemberInfo GetMemberInfo<T>(Expression<Func<T>> memberLambda)
         {

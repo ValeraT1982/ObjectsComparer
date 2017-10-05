@@ -21,7 +21,7 @@ namespace ObjectsComparer
 
         public override bool IsStopComparison(Type type, object obj1, object obj2)
         {
-            return false;
+            return obj1 == null || obj2 == null;
         }
 
         public override bool SkipMember(Type type, MemberInfo member)
@@ -31,11 +31,22 @@ namespace ObjectsComparer
 
         protected override IList<string> GetProperties(ExpandoObject obj)
         {
+            if (obj == null)
+            {
+                return new List<string>();
+            }
+
             return ((IDictionary<string, object>)obj).Keys.ToList();
         }
 
         protected override bool TryGetMemberValue(ExpandoObject obj, string propertyName, out object value)
         {
+            if (obj == null)
+            {
+                value = null;
+                return false;
+            }
+
             return ((IDictionary<string, object>)obj).TryGetValue(propertyName, out value);
         }
     }

@@ -15,9 +15,9 @@ namespace ObjectsComparer
 
         public override bool IsMatch(Type type, object obj1, object obj2)
         {
-            return obj1 != null && obj2 != null &&
-                   obj1.GetType().GetTypeInfo().GetCustomAttribute(typeof(CompilerGeneratedAttribute)) != null &&
-                   obj2.GetType().GetTypeInfo().GetCustomAttribute(typeof(CompilerGeneratedAttribute)) != null;
+            return (obj1 != null || obj2 != null) &&
+                   (obj1 == null || obj1.GetType().GetTypeInfo().GetCustomAttribute(typeof(CompilerGeneratedAttribute)) != null) &&
+                   (obj2 == null || obj2.GetType().GetTypeInfo().GetCustomAttribute(typeof(CompilerGeneratedAttribute)) != null);
         }
 
         public override bool IsStopComparison(Type type, object obj1, object obj2)
@@ -32,16 +32,21 @@ namespace ObjectsComparer
 
         protected override IList<string> GetProperties(object obj)
         {
-            return obj.GetType().GetTypeInfo().GetMembers()
+            return obj?.GetType().GetTypeInfo().GetMembers()
                 .Where(memberInfo => memberInfo is PropertyInfo)
                 .Select(memberInfo => memberInfo.Name)
                 .Distinct()
-                .ToList();
+                .ToList() ?? new List<string>();
         }
 
         protected override bool TryGetMemberValue(object obj, string propertyName, out object value)
         {
             value = null;
+            if (obj == null)
+            {
+                return false;
+            }
+
             var propertyInfo = obj.GetType().GetTypeInfo().GetProperty(propertyName);
 
             if (propertyInfo != null)

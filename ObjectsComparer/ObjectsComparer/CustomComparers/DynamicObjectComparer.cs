@@ -33,7 +33,7 @@ namespace ObjectsComparer
 
         public override bool IsStopComparison(Type type, object obj1, object obj2)
         {
-            return false;
+            return obj1 == null || obj2 == null;
         }
 
         public override bool SkipMember(Type type, MemberInfo member)
@@ -43,11 +43,17 @@ namespace ObjectsComparer
 
         protected override IList<string> GetProperties(DynamicObject obj)
         {
-            return obj.GetDynamicMemberNames().ToList();
+            return obj?.GetDynamicMemberNames().ToList() ?? new List<string>();
         }
 
         protected override bool TryGetMemberValue(DynamicObject obj, string propertyName, out object value)
         {
+            if (obj == null)
+            {
+                value = null;
+                return false;
+            }
+
             var getBinder = new FakeGetMemberBinder(propertyName, false);
 
             return obj.TryGetMember(getBinder, out value);

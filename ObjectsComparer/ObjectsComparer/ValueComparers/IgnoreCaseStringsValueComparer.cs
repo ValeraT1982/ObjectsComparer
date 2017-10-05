@@ -1,6 +1,8 @@
-﻿namespace ObjectsComparer
+﻿using System;
+
+namespace ObjectsComparer
 {
-    public class DefaultValueComparer: IValueComparer
+    public class IgnoreCaseStringsValueComparer : AbstractValueComparer<string>
     {
         private static volatile IValueComparer _instance;
         public static IValueComparer Instance
@@ -13,7 +15,7 @@
                     {
                         if (_instance == null)
                         {
-                            _instance = new DefaultValueComparer();
+                            _instance = new IgnoreCaseStringsValueComparer();
                         }
                     }
                 }
@@ -24,19 +26,9 @@
 
         private static readonly object SyncRoot = new object();
 
-        public bool Compare(object obj1, object obj2, ComparisonSettings settings)
+        public override bool Compare(string obj1, string obj2, ComparisonSettings settings)
         {
-            if (obj1 == null || obj2 == null)
-            {
-                return obj1 == obj2;
-            }
-
-            return obj1.Equals(obj2);
-        }
-
-        public string ToString(object value)
-        {
-            return value?.ToString() ?? string.Empty;
+            return string.Compare(obj1, obj2, StringComparison.CurrentCultureIgnoreCase) == 0;
         }
     }
 }

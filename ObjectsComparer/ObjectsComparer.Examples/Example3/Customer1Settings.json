@@ -1,45 +1,38 @@
 {
-	"ConnectionString": "USER ID=admin;PASSWORD=*****;DATA SOURCE=localhost:22222",
-	"Email": {
-		"Port": 25,
-		"Host": "MyHost.com",
-		"EmailAddress": "test@MyHost.com"
-	},
-	"Settings": {
-		"DataCompression": "On",
-		"DataSourceType": "MultiDataSource",
-		"SomeUrl": "http://MyHost.com/VeryImportantData",
-		"SomeOtherUrl": "http://MyHost.com/NotSoImportantData/",
-		"CacheMode": "Memory",
-		"MaxCacheSize": "1GB",
-		"SuperModes": {
-			"SmartMode1": "Enabled",
-			"SmartMode2": "Disabled",
-			"SmartMode3": "Enabled"
-		}
-	},
-	"Timeouts": {
-		"TotalProcessTimeout": 500,
-		"ProcessTaskTimeout": 100
-	},
-	"BackupSettings": {
-		"BackupIntervalUnit": "Day",
-		"BackupInterval": 100
-	},
-	"FailuresReporting": [{
-			"Phone": "111-222-3333"
-		},
-		{
-			"Phone": "111-222-4444"
-		},
-		{
-			"EMail": "support@MyHost.com"
-		}
-	],
-	"Logging": {
-		"Enabled": true,
-		"Pattern": "Logs\\MyApplication.%data{yyyyMMdd}.log",
-		"MaximumFileSize": "20MB",
-		"Level": "ALL"
-	}
+  "ConnectionString": "USER ID=admin;PASSWORD=*****;DATA SOURCE=localhost:22222",
+  "Email": {
+    "Port": 25,
+    "Host": "MyHost.com",
+    "EmailAddress": "test@MyHost.com"
+  },
+  "Settings": {
+    "DataCompression": "On",
+    "DataSourceType": "MultiDataSource",
+    "SomeUrl": "MyHost.com/VeryImportantData",
+    "SomeOtherUrl": "MyHost.com/NotSoImportantData/",
+    "CacheMode": "Memory",
+    "MaxCacheSize": "1GB",
+    "SuperModes": {
+      "SmartMode1": "enabled",
+      "SmartMode3": "enabled"
+    }
+  },
+  "BackupSettings": {
+    "BackupIntervalUnit": "Day",
+    "BackupInterval": 100
+  },
+  "Notifications": [
+    {
+      "Phone": "111-222-3333"
+    },
+    {
+      "EMail": "support@MyHost.com"
+    }
+  ],
+  "Logging": {
+    "Enabled": true,
+    "Pattern": "Logs\\MyApplication.%data{yyyyMMdd}.log",
+    "MaximumFileSize": "20MB",
+    "Level": "ALL"
+  }
 }

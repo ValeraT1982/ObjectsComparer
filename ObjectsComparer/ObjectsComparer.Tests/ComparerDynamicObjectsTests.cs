@@ -11,6 +11,7 @@ namespace ObjectsComparer.Tests
     {
         private class DynamicDictionary : DynamicObject
         {
+            // ReSharper disable once UnusedMember.Local
             public int IntProperty { get; set; }
 
             private readonly Dictionary<string, object> _dictionary = new Dictionary<string, object>();
@@ -270,7 +271,7 @@ namespace ObjectsComparer.Tests
             Assert.IsFalse(isEqual);
             Assert.AreEqual(1, differences.Count);
             Assert.IsTrue(differences.Any(
-                d => d.MemberPath == "Field1" && d.Value1 == null && d.Value2 == 5.0.ToString() && d.DifferenceType == DifferenceTypes.TypeMismatch));
+                d => d.MemberPath == "Field1" && d.Value1 == null && d.Value2 == "5.0" && d.DifferenceType == DifferenceTypes.TypeMismatch));
         }
 
         [Test]
@@ -290,6 +291,43 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual(1, differences.Count);
             Assert.IsTrue(differences.Any(
                 d => d.MemberPath == "IntProperty" && d.Value1 == "5" && d.Value2 == "7" && d.DifferenceType == DifferenceTypes.ValueMismatch));
+        }
+
+        [Test]
+        public void UseDefaultValuesWhenSubclassNotSpecified()
+        {
+            dynamic a1 = new DynamicDictionary();
+            a1.Field1 = new DynamicDictionary();
+            a1.Field1.SubField1 = 0;
+            a1.Field1.SubField2 = null;
+            a1.Field1.SubField3 = 0.0;
+            dynamic a2 = new DynamicDictionary();
+            var comparer = new Comparer(new ComparisonSettings { UseDefaultIfMemberNotExist = true });
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsTrue(isEqual);
+        }
+
+        [Test]
+        public void DifferenceWhenSubclassNotSpecified()
+        {
+            dynamic a1 = new DynamicDictionary();
+            a1.Field1 = new DynamicDictionary();
+            a1.Field1.SubField1 = 0;
+            a1.Field1.SubField2 = null;
+            a1.Field1.SubField3 = 0.0;
+            dynamic a2 = new DynamicDictionary();
+            var comparer = new Comparer();
+
+            IEnumerable<Difference> differencesEnum;
+            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            Assert.AreEqual(1, differences.Count);
+            Assert.IsTrue(differences.Any(
+                d => d.MemberPath == "Field1" && d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject));
         }
     }
 }

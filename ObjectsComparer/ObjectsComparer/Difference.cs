@@ -10,16 +10,12 @@
 
         public DifferenceTypes DifferenceType { get; }
 
-        public string AdditionalInfo { get; }
-
-        public Difference(string memberPath, string value1, string value2, 
-            DifferenceTypes differenceType = DifferenceTypes.ValueMismatch, 
-            string additionalInfo = "")
+        public Difference(string memberPath, string value1, string value2,
+            DifferenceTypes differenceType = DifferenceTypes.ValueMismatch)
         {
             MemberPath = memberPath;
             Value1 = value1;
             Value2 = value2;
-            AdditionalInfo = additionalInfo;
             DifferenceType = differenceType;
         }
 
@@ -33,8 +29,7 @@
                 newPath,
                 Value1,
                 Value2,
-                DifferenceType,
-                AdditionalInfo);
+                DifferenceType);
         }
 
         public override string ToString()

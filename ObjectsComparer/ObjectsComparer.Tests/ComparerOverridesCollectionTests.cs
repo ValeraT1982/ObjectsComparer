@@ -15,6 +15,7 @@ namespace ObjectsComparer.Tests
             var valueComparer = Substitute.For<IValueComparer>();
             var collection = new ComparerOverridesCollection();
 
+            // ReSharper disable once RedundantCast
             Assert.Throws<ArgumentNullException>(() => collection.AddComparer((MemberInfo)null, valueComparer));
         }
 

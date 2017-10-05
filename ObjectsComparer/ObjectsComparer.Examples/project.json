@@ -10,7 +10,8 @@
 
   "resource": [
     "Example3/MySettings.json",
-    "Example3/Customer1Settings.json"
+    "Example3/Customer1Settings.json",
+    "Example3/Customer2Settings.json"
   ],
 
   "testRunner": "nunit",

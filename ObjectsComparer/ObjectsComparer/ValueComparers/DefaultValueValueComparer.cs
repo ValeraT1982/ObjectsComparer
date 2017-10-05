@@ -23,7 +23,7 @@
 
         public string ToString(object value)
         {
-            return value?.ToString();
+            return value?.Equals(_typeDefaultValue) != false ? _defaultValue?.ToString() : _valueComparer.ToString(value);
         }
     }
 }

@@ -7,7 +7,6 @@ namespace ObjectsComparer.Exceptions
     {
         public string MemberName { get; }
         public MemberInfo MemberInfo { get; }
-
         public Type Type { get; }
 
         public AmbiguousComparerOverrideResolutionException(MemberInfo memberInfo) 

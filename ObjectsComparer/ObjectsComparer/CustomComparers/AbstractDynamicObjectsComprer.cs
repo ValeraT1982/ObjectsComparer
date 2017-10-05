@@ -14,33 +14,6 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            if (obj1 == null || obj2 == null)
-            {
-                if (obj1 != obj2)
-                {
-                    yield return new Difference("", obj1?.ToString() ?? string.Empty,
-                        obj2?.ToString() ?? string.Empty);
-                    yield break;
-                }
-
-                yield break;
-            }
-
-            if (!type.InheritsFrom(typeof(T)))
-            {
-                throw new ArgumentException(nameof(type));
-            }
-
-            if (!obj1.GetType().InheritsFrom(typeof(T)))
-            {
-                throw new ArgumentException(nameof(obj1));
-            }
-
-            if (!obj2.GetType().InheritsFrom(typeof(T)))
-            {
-                throw new ArgumentException(nameof(obj2));
-            }
-
             var castedObject1 = (T)obj1;
             var castedObject2 = (T)obj2;
             var propertyKeys1 = GetProperties(castedObject1);
