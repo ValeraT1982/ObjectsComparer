@@ -1,7 +1,7 @@
 ﻿namespace ObjectsComparer
 {
     /// <summary>
-    /// Allows to compare strings considering that null and empty string are equal./>
+    /// Allows to compare strings considering that null and empty string are equal.
     /// </summary>
     public class NulableStringsValueComparer: IValueComparer
     {

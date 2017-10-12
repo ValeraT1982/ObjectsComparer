@@ -271,7 +271,7 @@ namespace ObjectsComparer.Tests
             Assert.IsFalse(isEqual);
             Assert.AreEqual(1, differences.Count);
             Assert.IsTrue(differences.Any(
-                d => d.MemberPath == "Field1" && d.Value1 == null && d.Value2 == "5.0" && d.DifferenceType == DifferenceTypes.TypeMismatch));
+                d => d.MemberPath == "Field1" && d.Value1 == null && d.Value2 == 5.0.ToString() && d.DifferenceType == DifferenceTypes.TypeMismatch));
         }
 
         [Test]
