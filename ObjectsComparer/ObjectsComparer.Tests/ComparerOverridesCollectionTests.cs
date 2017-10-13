@@ -36,7 +36,8 @@ namespace ObjectsComparer.Tests
             var collection = new ComparerOverridesCollection();
             collection.AddComparer(memberInfo, valueComparer);
 
-            Assert.Throws<ValueComparerExistsException>(() => collection.AddComparer(memberInfo, valueComparer));
+            var exception = Assert.Throws<ValueComparerExistsException>(() => collection.AddComparer(memberInfo, valueComparer));
+            Assert.AreEqual(memberInfo, exception.MemberInfo);
         }
 
         [Test]
@@ -140,7 +141,9 @@ namespace ObjectsComparer.Tests
             collection.AddComparer(typeof(string), valueComparer1);
             collection.AddComparer(typeof(string), valueComparer2, mi => mi.Name == "Prop1");
 
-            Assert.Throws<AmbiguousComparerOverrideResolutionException>(() => collection.GetComparer(memberInfo));
+            var exception = Assert.Throws<AmbiguousComparerOverrideResolutionException>(() => collection.GetComparer(memberInfo));
+            Assert.AreEqual(memberInfo, exception.MemberInfo);
+            Assert.AreEqual("Prop1", exception.MemberName);
         }
 
         [Test]
@@ -200,7 +203,8 @@ namespace ObjectsComparer.Tests
             collection.AddComparer(typeof(string), valueComparer1);
             collection.AddComparer(typeof(string), valueComparer2);
 
-            Assert.Throws<AmbiguousComparerOverrideResolutionException>(() => collection.GetComparer(typeof(string)));
+            var exception = Assert.Throws<AmbiguousComparerOverrideResolutionException>(() => collection.GetComparer(typeof(string)));
+            Assert.AreEqual(typeof(string), exception.Type);
         }
 
         [Test]

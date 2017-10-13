@@ -28,8 +28,7 @@ namespace ObjectsComparer
             if (type.InheritsFrom(typeof(Array)))
             {
 #if NET45
-                var array = new int[0];
-                if (member.Name == PropertyHelper.GetMemberInfo(() => array.LongLength).Name)
+                if (member.Name == PropertyHelper.GetMemberInfo(() => new int[0].LongLength).Name)
                 {
                     return true;
                 }

@@ -54,14 +54,33 @@ namespace ObjectsComparer
             //ToDo Extract type
             for (var i = 0; i < array2.Length; i++)
             {
+                if (array1[i] == null && array2[i] == null)
+                {
+                    continue;
+                }
+
+                var valueComparer1 = array1[i] != null ? OverridesCollection.GetComparer(array1[i].GetType()) ?? DefaultValueComparer : DefaultValueComparer;
+                var valueComparer2 = array2[i] != null ? OverridesCollection.GetComparer(array2[i].GetType()) ?? DefaultValueComparer : DefaultValueComparer;
+
+                if (array1[i] == null)
+                {
+                    yield return new Difference($"[{i}]", string.Empty, valueComparer2.ToString(array2[i]));
+                    continue;
+                }
+
+                if (array2[i] == null)
+                {
+                    yield return new Difference($"[{i}]", valueComparer1.ToString(array1[i]), string.Empty);
+                    continue;
+                }
+
                 if (array1[i].GetType() != array2[i].GetType())
                 {
-                    yield return new Difference($"[{i}]", array1[i] + string.Empty, array2[i] + string.Empty);
+                    yield return new Difference($"[{i}]", valueComparer1.ToString(array1[i]), valueComparer2.ToString(array2[i]), DifferenceTypes.TypeMismatch);
                     continue;
                 }
 
                 var comparer = Factory.GetObjectsComparer(array1[i].GetType(), Settings, this);
-
                 foreach (var failure in comparer.CalculateDifferences(array1[i].GetType(), array1[i], array2[i]))
                 {
                     yield return failure.InsertPath($"[{i}]");

@@ -234,6 +234,7 @@ namespace ObjectsComparer.Tests
             var comparer = new Comparer();
             var intComparer = Substitute.For<IValueComparer>();
             intComparer.Compare(Arg.Any<object>(), Arg.Any<object>(), Arg.Any<ComparisonSettings>()).Returns(false);
+            intComparer.ToString(5).Returns("5");
             comparer.AddComparerOverride<int>(intComparer);
 
             IEnumerable<Difference> differencesEnum;
@@ -243,7 +244,7 @@ namespace ObjectsComparer.Tests
             Assert.IsFalse(isEqual);
             Assert.AreEqual(1, differences.Count);
             Assert.IsTrue(differences.Any(
-                d => d.MemberPath == "Field1" && d.Value1 == null && d.Value2 == "5" && d.DifferenceType == DifferenceTypes.TypeMismatch));
+                d => d.MemberPath == "Field1" && d.Value1 == string.Empty && d.Value2 == "5" && d.DifferenceType == DifferenceTypes.TypeMismatch));
         }
 
         [Test]

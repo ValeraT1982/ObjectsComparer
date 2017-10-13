@@ -74,8 +74,10 @@ namespace ObjectsComparer
 
                 if (value1 != null && value2 != null && value1.GetType() != value2.GetType())
                 {
-                    //It is OK because ToString conversion will be retired soon
-                    yield return new Difference(propertyKey, value1.ToString(), value2.ToString(),
+                    var valueComparer2 = OverridesCollection.GetComparer(value2.GetType()) ??
+                        OverridesCollection.GetComparer(propertyKey) ?? 
+                        DefaultValueComparer;
+                    yield return new Difference(propertyKey, valueComparer.ToString(value1), valueComparer2.ToString(value2),
                         DifferenceTypes.TypeMismatch);
                     continue;
                 }
@@ -84,8 +86,10 @@ namespace ObjectsComparer
                 if ((value1 == null && value2 != null && value2.GetType().GetTypeInfo().IsValueType) ||
                     (value2 == null && value1 != null && value1.GetType().GetTypeInfo().IsValueType))
                 {
-                    //It is OK because ToString conversion will be retired soon
-                    yield return new Difference(propertyKey, value1?.ToString(), value2?.ToString(),
+                    var valueComparer2 = value2 != null ? 
+                        OverridesCollection.GetComparer(value2.GetType()) ?? OverridesCollection.GetComparer(propertyKey) ?? DefaultValueComparer :
+                        DefaultValueComparer;
+                    yield return new Difference(propertyKey, valueComparer.ToString(value1), valueComparer2.ToString(value2),
                         DifferenceTypes.TypeMismatch);
                     continue;
                 }
