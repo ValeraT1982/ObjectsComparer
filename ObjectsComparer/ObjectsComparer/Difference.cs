@@ -63,7 +63,7 @@
         /// <returns>A string that represents the current object.</returns>
         public override string ToString()
         {
-            return $"Difference: MemberPath='{MemberPath}', Value1='{Value1}', Value2='{Value2}'.";
+            return $"Difference: DifferenceType={DifferenceType}, MemberPath='{MemberPath}', Value1='{Value1}', Value2='{Value2}'.";
         }
     }
 }

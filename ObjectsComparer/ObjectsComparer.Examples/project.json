@@ -26,7 +26,8 @@
         "Microsoft.NETCore.App": {
           "version": "1.0.0-*",
           "type": "platform"
-        }
+        },
+        "System.Collections.NonGeneric": "4.3.0"
       }
     },
     "NET451": {}
