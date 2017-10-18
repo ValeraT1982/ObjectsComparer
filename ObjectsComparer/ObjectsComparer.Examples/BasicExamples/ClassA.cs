@@ -1,4 +1,4 @@
-﻿namespace ObjectsComparer.Examples.BasicExample
+﻿namespace ObjectsComparer.Examples.BasicExamples
 {
     public class ClassA
     {

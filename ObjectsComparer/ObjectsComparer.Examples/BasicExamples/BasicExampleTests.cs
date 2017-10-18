@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
 using NUnit.Framework;
-using ObjectsComparer.Examples.BasicExample;
+
 // ReSharper disable PossibleMultipleEnumeration
 
 namespace ObjectsComparer.Examples.BasicExamples
@@ -19,8 +19,8 @@ namespace ObjectsComparer.Examples.BasicExamples
         {
             var a1 = new ClassA { StringProperty = "String", IntProperty = 1 };
             var a2 = new ClassA { StringProperty = "String", IntProperty = 1 };
-
             var comparer = new Comparer<ClassA>();
+
             IEnumerable<Difference> differences;
             var isEqual = comparer.Compare(a1, a2, out differences);
 
@@ -34,8 +34,8 @@ namespace ObjectsComparer.Examples.BasicExamples
         {
             var a1 = new ClassA { StringProperty = "String", IntProperty = 1 };
             var a2 = new ClassA { StringProperty = "String", IntProperty = 2 };
-
             var comparer = new Comparer<ClassA>();
+
             IEnumerable<Difference> differences;
             var isEqual = comparer.Compare(a1, a2, out differences);
 
@@ -51,8 +51,8 @@ namespace ObjectsComparer.Examples.BasicExamples
         {
             var a1 = new ClassA { SubClass = new SubClassA { BoolProperty = true } };
             var a2 = new ClassA { SubClass = new SubClassA { BoolProperty = false } };
-
             var comparer = new Comparer<ClassA>();
+
             IEnumerable<Difference> differences;
             var isEqual = comparer.Compare(a1, a2, out differences);
 
@@ -72,9 +72,10 @@ namespace ObjectsComparer.Examples.BasicExamples
             var a2 = new[] { 1, 2, 3 };
             var comparer = new Comparer<int[]>();
 
-            var isEqual = comparer.Compare(a1, a2);
+            IEnumerable<Difference> differences;
+            var isEqual = comparer.Compare(a1, a2, out differences);
 
-            Debug.WriteLine("a1 and a2 are " + (isEqual ? "equal" : "not equal"));
+            ResultToOutput(isEqual, differences);
 
             Assert.IsTrue(isEqual);
         }
@@ -196,7 +197,7 @@ namespace ObjectsComparer.Examples.BasicExamples
         }
 
         [Test]
-        public void IntIntInequality3()
+        public void IntIntInequality()
         {
             var a1 = new[,] { { 1, 2 } };
             var a2 = new[,] { { 1, 3 } };
@@ -238,17 +239,16 @@ namespace ObjectsComparer.Examples.BasicExamples
 
         #region Dynamic objects (ExpandoObject)
         [Test]
-        public void ExpandoObjectWhenDifferentValues()
+        public void ExpandoObject()
         {
             dynamic a1 = new ExpandoObject();
             a1.Field1 = "A";
             a1.Field2 = 5;
-            a1.Field3 = true;
+            a1.Field4 = 4;
             dynamic a2 = new ExpandoObject();
             a2.Field1 = "B";
-            a2.Field2 = 8;
             a2.Field3 = false;
-
+            a2.Field4 = "C";
             var comparer = new Comparer();
 
             IEnumerable<Difference> differences;
@@ -257,33 +257,11 @@ namespace ObjectsComparer.Examples.BasicExamples
             ResultToOutput(isEqual, differences);
 
             Assert.IsFalse(isEqual);
-            Assert.AreEqual(3, differences.Count());
-            Assert.IsTrue(differences.Any(d => d.MemberPath == "Field1" && d.Value1 == "A" && d.Value2 == "B"));
-            Assert.IsTrue(differences.Any(d => d.MemberPath == "Field2" && d.Value1 == "5" && d.Value2 == "8"));
-            Assert.IsTrue(differences.Any(d => d.MemberPath == "Field3" && d.Value1 == "True" && d.Value2 == "False"));
-        }
-
-        [Test]
-        public void ExpandoObjectWhenMissedFields()
-        {
-            dynamic a1 = new ExpandoObject();
-            a1.Field1 = "A";
-            a1.Field2 = 5;
-            dynamic a2 = new ExpandoObject();
-            a2.Field1 = "B";
-            a2.Field3 = false;
-            var comparer = new Comparer();
-
-            IEnumerable<Difference> differences;
-            var isEqual = comparer.Compare(a1, a2, out differences);
-
-            ResultToOutput(isEqual, differences);
-
-            Assert.IsFalse(isEqual);
-            Assert.AreEqual(3, differences.Count());
+            Assert.AreEqual(4, differences.Count());
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Field1" && d.Value1 == "A" && d.Value2 == "B"));
             Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject && d.MemberPath == "Field2" && d.Value1 == "5"));
             Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.MissedMemberInFirstObject && d.MemberPath == "Field3" && d.Value2 == "False"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.TypeMismatch && d.MemberPath == "Field4" && d.Value1 == "4" && d.Value2 == "C"));
         }
 
         [Test]
@@ -307,30 +285,6 @@ namespace ObjectsComparer.Examples.BasicExamples
             Assert.AreEqual(2, differences.Count());
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Field1" && d.Value1 == "A" && d.Value2 == "B"));
             Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "Field4" && d.Value2 == "S"));
-        }
-
-        [Test]
-        public void ExpandoObjectWhenDifferentTypes()
-        {
-            dynamic a1 = new ExpandoObject();
-            a1.Field1 = "A";
-            a1.Field2 = 5;
-            dynamic a2 = new ExpandoObject();
-            a2.Field1 = 5;
-            a2.Field2 = "5";
-            var comparer = new Comparer();
-
-            IEnumerable<Difference> differences;
-            var isEqual = comparer.Compare(a1, a2, out differences);
-
-            ResultToOutput(isEqual, differences);
-
-            Assert.IsFalse(isEqual);
-            Assert.AreEqual(2, differences.Count());
-            Assert.IsTrue(differences.Any(
-                d => d.MemberPath == "Field1" && d.DifferenceType == DifferenceTypes.TypeMismatch));
-            Assert.IsTrue(differences.Any(
-                d => d.MemberPath == "Field2" && d.DifferenceType == DifferenceTypes.TypeMismatch));
         }
         #endregion
 
@@ -361,17 +315,17 @@ namespace ObjectsComparer.Examples.BasicExamples
                 return _dictionary.Keys;
             }
         }
-        public void DynamicObjectWhenDifferentValues()
+
+        [Test]
+        public void DynamicObject()
         {
             dynamic a1 = new DynamicDictionary();
             a1.Field1 = "A";
-            a1.Field2 = 5;
             a1.Field3 = true;
             dynamic a2 = new DynamicDictionary();
             a2.Field1 = "B";
             a2.Field2 = 8;
-            a2.Field3 = false;
-
+            a2.Field3 = 1;
             var comparer = new Comparer();
 
             IEnumerable<Difference> differences;
@@ -382,13 +336,14 @@ namespace ObjectsComparer.Examples.BasicExamples
             Assert.IsFalse(isEqual);
             Assert.AreEqual(3, differences.Count());
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Field1" && d.Value1 == "A" && d.Value2 == "B"));
-            Assert.IsTrue(differences.Any(d => d.MemberPath == "Field2" && d.Value1 == "5" && d.Value2 == "8"));
-            Assert.IsTrue(differences.Any(d => d.MemberPath == "Field3" && d.Value1 == "True" && d.Value2 == "False"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.MissedMemberInFirstObject && d.MemberPath == "Field2" && d.Value2 == "8"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.TypeMismatch && d.MemberPath == "Field3" && d.Value1 == "True" && d.Value2 == "1"));
         }
         #endregion
 
         #region Dynamic objects (compiler generated)
-        public void CompilerGeneratedDynamicObjectsWhenDifferentValues()
+        [Test]
+        public void CompilerGeneratedDynamicObjects()
         {
             dynamic a1 = new
             {
@@ -399,29 +354,26 @@ namespace ObjectsComparer.Examples.BasicExamples
             dynamic a2 = new
             {
                 Field1 = "B",
-                Field2 = 8,
-                Field3 = false
+                Field2 = 8.0
             };
             var comparer = new Comparer();
 
             IEnumerable<Difference> differences;
-            var isEqual = comparer.Compare(a1, a2, out differences);
+            var isEqual = comparer.Compare((object)a1, (object)a2, out differences);
+
+            ResultToOutput(isEqual, differences);
 
             Assert.IsFalse(isEqual);
             Assert.AreEqual(3, differences.Count());
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Field1" && d.Value1 == "A" && d.Value2 == "B"));
-            Assert.IsTrue(differences.Any(d => d.MemberPath == "Field2" && d.Value1 == "5" && d.Value2 == "8"));
-            Assert.IsTrue(differences.Any(d => d.MemberPath == "Field3" && d.Value1 == "True" && d.Value2 == "False"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.TypeMismatch && d.MemberPath == "Field2" && d.Value1 == "5" && d.Value2 == 8.0.ToString()));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject && d.MemberPath == "Field3" && d.Value1 == "True"));
         }
         #endregion
 
         private void ResultToOutput(bool isEqual, IEnumerable<Difference> differenses)
         {
-            Debug.WriteLine("Objects are " + (isEqual ? "equal" : "not equal"));
-            if (!isEqual)
-            {
-                Debug.WriteLine(string.Join(Environment.NewLine, differenses));
-            }
+            Debug.WriteLine(isEqual ? "Objects are equal" : string.Join(Environment.NewLine, differenses));
         }
     }
 }
