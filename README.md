@@ -2,52 +2,270 @@
 
 # Objects Comparer
 ## Introduction
-It is quite common situation when complex objects should be compared. Sometimes objects can contain nested elements, or some members should be excluded from comparison (auto generated identifiers, create/update date etc.), or some members can have custom comparison rules (same data in different formats, like phone numbers). To solve such kind of problems I have developed small framework to compare objects.
+It is quite common situation when complex objects should be compared. Sometimes objects can contain nested elements, or some members should be excluded from comparison (auto generated identifiers, create/update date etc.), or some members can have custom comparison rules (same data in different formats, like phone numbers). To solve such kind of problems I have developed this small framework to compare objects.
 
 Briefly, Objects Comparer is an object-to-object comparer, which allows to compare objects recursively member by member and define custom comparison rules for certain properties, fields or types.
 
 Objects comparer can be considered as ready to use framework or as an idea for similar solutions.
 ## Installation
 >Install-Package ObjectsComparer
-## Basic Example
+## Basic Examples
+Let's suppose that we have 2 classes
 ```csharp
 public class ClassA
 {
     public string StringProperty { get; set; }
 
     public int IntProperty { get; set; }
+
+    public SubClassA SubClass { get; set; }
+}
+
+public class SubClassA
+{
+    public bool BoolProperty { get; set; }
 }
 ```
-There are two examples below how Objects Comparer can be used to compare instances of this class.
+
+There are some examples below how Objects Comparer can be used to compare instances of these classes.
+
 ```csharp
+//Initialize objects and comparer
 var a1 = new ClassA { StringProperty = "String", IntProperty = 1 };
 var a2 = new ClassA { StringProperty = "String", IntProperty = 1 };
-
 var comparer = new Comparer<ClassA>();
-var isEqual = comparer.Compare(a1, a2);
 
-Debug.WriteLine("a1 and a2 are " + (isEqual ? "equal" : "not equal"));
-a1 and a2 are equal
+//Compare objects
+IEnumerable<Difference> differences;
+var isEqual = comparer.Compare(a1, a2, out differences);
+
+//Print results
+Debug.WriteLine(isEqual ? "Objects are equal" : string.Join(Environment.NewLine, differenses));
+```
+>Objects are equal
+
+In examples below **Compare objects** and **Print results** blocks will be skipped for brevity except some cases.
+
+```csharp
 var a1 = new ClassA { StringProperty = "String", IntProperty = 1 };
 var a2 = new ClassA { StringProperty = "String", IntProperty = 2 };
-
 var comparer = new Comparer<ClassA>();
-IEnumerable<Difference> differenses;
-var isEqual = comparer.Compare(a1, a2, out differenses);
+```
+>Difference: DifferenceType=ValueMismatch, MemberPath='IntProperty', Value1='1', Value2='2'.
 
-var differensesList = differenses.ToList();
-Debug.WriteLine("a1 and a2 are " + (isEqual ? "equal" : "not equal"));
-if (!isEqual)
+```csharp
+var a1 = new ClassA { SubClass = new SubClassA { BoolProperty = true } };
+var a2 = new ClassA { SubClass = new SubClassA { BoolProperty = false } };
+var comparer = new Comparer<ClassA>();
+```
+>Difference: DifferenceType=ValueMismatch, MemberPath='SubClass.BoolProperty', Value1='True', Value2='False'.
+
+## Enumerables (arrays)
+```csharp
+var a1 = new[] { 1, 2, 3 };
+var a2 = new[] { 1, 2, 3 };
+var comparer = new Comparer<int[]>();
+```
+>Objects are equal
+
+```csharp
+var a1 = new[] { 1, 2 };
+var a2 = new[] { 1, 2, 3 };
+var comparer = new Comparer<int[]>();
+```
+>Difference: DifferenceType=ValueMismatch, MemberPath='Length', Value1='2', Value2='3'.
+
+```csharp
+var a1 = new[] { 1, 2, 3 };
+var a2 = new[] { 1, 4, 3 };
+var comparer = new Comparer<int[]>();
+```
+>Difference: DifferenceType=ValueMismatch, MemberPath='[1]', Value1='2', Value2='4'.
+
+```csharp
+var a1 = new ArrayList { "Str1", "Str2" };
+var a2 = new ArrayList { "Str1", 5 };
+var comparer = new Comparer<ArrayList>();
+```
+>Difference: DifferenceType=TypeMismatch, MemberPath='[1]', Value1='Str2', Value2='5'.
+
+## Multidimensional arrays
+
+```csharp
+var a1 = new[] { new[] { 1, 2 } };
+var a2 = new[] { new[] { 1, 3 } };
+var comparer = new Comparer<int[][]>();
+```
+
+>Difference: DifferenceType=ValueMismatch, MemberPath='[0][1]', Value1='2', Value2='3'.
+
+```csharp
+var a1 = new[] { new[] { 1, 2 } };
+var a2 = new[] { new[] { 2, 2 }, new[] { 3, 5 } };
+var comparer = new Comparer<int[][]>();
+```
+>Difference: DifferenceType=ValueMismatch, MemberPath='Length', Value1='1', Value2='2'.
+
+```csharp
+var a1 = new[] { new[] { 1, 2 }, new[] { 3, 5 } };
+var a2 = new[] { new[] { 1, 2 }, new[] { 3, 5, 6 } };
+var comparer = new Comparer<int[][]>();
+```
+
+>Difference: DifferenceType=ValueMismatch, MemberPath='[1].Length', Value1='2', Value2='3'.
+
+```csharp
+var a1 = new[,] { { 1, 2 }, { 1, 3 } };
+var a2 = new[,] { { 1, 3, 4 }, { 1, 3, 8 } };
+var comparer = new Comparer<int[,]>();
+```
+
+>Difference: DifferenceType=ValueMismatch, MemberPath='Dimension1', Value1='2', Value2='3'.
+
+```csharp
+var a1 = new[,] { { 1, 2 } };
+var a2 = new[,] { { 1, 3 } };
+var comparer = new Comparer<int[,]>();
+```
+
+>Difference: DifferenceType=ValueMismatch, MemberPath='[0,1]', Value1='2', Value2='3'.
+
+## Dynamic objects
+
+C# supports several types of dynamic objects. 
+
+### ExpandoObject
+
+```csharp
+dynamic a1 = new ExpandoObject();
+a1.Field1 = "A";
+a1.Field2 = 5;
+a1.Field4 = 4;
+dynamic a2 = new ExpandoObject();
+a2.Field1 = "B";
+a2.Field3 = false;
+a2.Field4 = "C";
+var comparer = new Comparer();
+```
+
+>Difference: DifferenceType=ValueMismatch, MemberPath='Field1', Value1='A', Value2='B'.
+
+>Difference: DifferenceType=MissedMemberInSecondObject, MemberPath='Field2', Value1='5', Value2=''.
+
+>Difference: DifferenceType=TypeMismatch, MemberPath='Field4', Value1='4', Value2='C'.
+
+>Difference: DifferenceType=MissedMemberInFirstObject, MemberPath='Field3', Value1='', Value2='False'.
+
+
+```csharp
+dynamic a1 = new ExpandoObject();
+a1.Field1 = "A";
+a1.Field2 = 5;
+dynamic a2 = new ExpandoObject();
+a2.Field1 = "B";
+a2.Field3 = false;
+var comparer = new Comparer();
+```
+
+>Difference: DifferenceType=ValueMismatch, MemberPath='Field1', Value1='A', Value2='B'.
+
+>Difference: DifferenceType=MissedMemberInSecondObject, MemberPath='Field2', Value1='5', Value2=''.
+
+>Difference: DifferenceType=MissedMemberInFirstObject, MemberPath='Field3', Value1='', Value2='False'.
+
+Behavior if member not exists could be changed by providing custom ComparisonSettings (see Comparison Settings below).
+
+```csharp
+dynamic a1 = new ExpandoObject();
+a1.Field1 = "A";
+a1.Field2 = 0;
+dynamic a2 = new ExpandoObject();
+a2.Field1 = "B";
+a2.Field3 = false;
+a2.Field4 = "S";
+var comparer = new Comparer(new ComparisonSettings { UseDefaultIfMemberNotExist = true });
+```
+
+>Difference: DifferenceType=ValueMismatch, MemberPath='Field1', Value1='A', Value2='B'.
+
+>Difference: DifferenceType=ValueMismatch, MemberPath='Field4', Value1='', Value2='S'.
+
+### DynamicObject
+Let’s assume that we have such implementation of the **DynamicObject** class. It is necessary to have a correct implementation of the method **GetDynamicMemberNames**, otherwise Objects Comparer wouldn't work in a right way.
+
+```csharp
+private class DynamicDictionary : DynamicObject
 {
-    Debug.WriteLine("Differences:");
-    Debug.WriteLine(string.Join(Environment.NewLine, differensesList));
+    // ReSharper disable once UnusedMember.Local
+    public int IntProperty { get; set; }
+
+    private readonly Dictionary<string, object> _dictionary = new Dictionary<string, object>();
+
+    public override bool TryGetMember(GetMemberBinder binder, out object result)
+    {
+        var name = binder.Name;
+
+        return _dictionary.TryGetValue(name, out result);
+    }
+
+    public override bool TrySetMember(SetMemberBinder binder, object value)
+    {
+        _dictionary[binder.Name] = value;
+
+        return true;
+    }
+
+    public override IEnumerable<string> GetDynamicMemberNames()
+    {
+        return _dictionary.Keys;
+    }
 }
 ```
->a1 and a2 are not equal
 
->Differences:
+```csharp
+dynamic a1 = new DynamicDictionary();
+a1.Field1 = "A";
+a1.Field3 = true;
+dynamic a2 = new DynamicDictionary();
+a2.Field1 = "B";
+a2.Field2 = 8;
+a2.Field3 = 1;
+var comparer = new Comparer();
+```
 
->Difference: MemberPath='IntProperty', Value1='1', Value2='2'
+>Difference: DifferenceType=ValueMismatch, MemberPath='Field1', Value1='A', Value2='B'.
+
+>Difference: DifferenceType=TypeMismatch, MemberPath='Field3', Value1='True', Value2='1'.
+
+>Difference: DifferenceType=MissedMemberInFirstObject, MemberPath='Field2', Value1='', Value2='8'.
+
+### Compiler generated objects
+
+```csharp
+dynamic a1 = new
+{
+    Field1 = "A",
+    Field2 = 5,
+    Field3 = true
+};
+dynamic a2 = new
+{
+    Field1 = "B",
+    Field2 = 8
+};
+var comparer = new Comparer();
+
+IEnumerable<Difference> differences;
+var isEqual = comparer.Compare((object)a1, (object)a2, out differences);
+```
+
+>Difference: DifferenceType=ValueMismatch, MemberPath='Field1', Value1='A', Value2='B'.
+
+>Difference: DifferenceType=TypeMismatch, MemberPath='Field2', Value1='5', Value2='8'.
+
+>Difference: DifferenceType=MissedMemberInSecondObject, MemberPath='Field3', Value1='True', Value2=''.
+
+This example requires some additional explanations. Types of the objects a1 and a2 were generated by compiler and are considered as the same type if and only if objects a1 and a2 have same set of fields and these fields have the same types. If casting to **(object)** is skipped in case of different set of fields/types **RuntimeBinderException** will be thrown.
 
 ## Overriding comparison rules
 To override comparison rules we need to create custom value comparer. This class should be inherited from AbstractValueComparer<T> or should implement IValueComparer<T>.
@@ -73,12 +291,6 @@ comparer.AddComparerOverride(
     () => new ClassA().StringProperty, 
     (s1, s2, parentSettings) => s1 == s2,
     s == s.ToString());
-```
-
-```csharp
-comparer.AddComparerOverride(
-    () => new ClassA().StringProperty, 
-    (s1, s2, parentSettings) => s1 == s2);
 ```
 
 ## Comparison Settings
