@@ -37,6 +37,28 @@ namespace ObjectsComparer
         }
 
         /// <summary>
+        /// Adds Comparer Override by Type.
+        /// </summary>
+        /// <param name="type">Type.</param>
+        /// <param name="valueComparer">Value Comparer.</param>
+        /// <param name="filter">Value Comparer will be used only if filter(memberInfo) == true. Null by default.</param>
+        public void AddComparerOverride(Type type, IValueComparer valueComparer, Func<MemberInfo, bool> filter = null)
+        {
+            OverridesCollection.AddComparer(type, valueComparer, filter);
+        }
+
+        /// <summary>
+        /// Adds Comparer Override by Type.
+        /// </summary>
+        /// <typeparam name="TType">Type.</typeparam>
+        /// <param name="valueComparer">Value Comparer.</param>
+        /// <param name="filter">Value Comparer will be used only if filter(memberInfo) == true. Null by default.</param>
+        public void AddComparerOverride<TType>(IValueComparer valueComparer, Func<MemberInfo, bool> filter = null)
+        {
+            AddComparerOverride(typeof(TType), valueComparer, filter);
+        }
+
+        /// <summary>
         /// Adds Comparer Override by Member.
         /// </summary>
         /// <typeparam name="TProp">Type of the member.</typeparam>
@@ -91,28 +113,6 @@ namespace ObjectsComparer
         public void AddComparerOverride(MemberInfo memberInfo, IValueComparer valueComparer)
         {
             OverridesCollection.AddComparer(memberInfo, valueComparer);
-        }
-
-        /// <summary>
-        /// Adds Comparer Override by Type.
-        /// </summary>
-        /// <param name="type">Type.</param>
-        /// <param name="valueComparer">Value Comparer.</param>
-        /// <param name="filter">Value Comparer will be used only if filter(memberInfo) == true. Null by default.</param>
-        public void AddComparerOverride(Type type, IValueComparer valueComparer, Func<MemberInfo, bool> filter = null)
-        {
-            OverridesCollection.AddComparer(type, valueComparer, filter);
-        }
-
-        /// <summary>
-        /// Adds Comparer Override by Type.
-        /// </summary>
-        /// <typeparam name="TType">Type.</typeparam>
-        /// <param name="valueComparer">Value Comparer.</param>
-        /// <param name="filter">Value Comparer will be used only if filter(memberInfo) == true. Null by default.</param>
-        public void AddComparerOverride<TType>(IValueComparer valueComparer, Func<MemberInfo, bool> filter = null)
-        {
-            AddComparerOverride(typeof(TType), valueComparer, filter);
         }
 
         /// <summary>

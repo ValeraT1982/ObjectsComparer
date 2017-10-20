@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
+using System.Reflection;
 using NUnit.Framework;
 
 // ReSharper disable PossibleMultipleEnumeration
@@ -370,6 +371,56 @@ namespace ObjectsComparer.Examples.BasicExamples
             Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject && d.MemberPath == "Field3" && d.Value1 == "True"));
         }
         #endregion
+
+        #region Overrides
+        public class MyValueComparer : AbstractValueComparer<string>
+        {
+            public override bool Compare(string obj1, string obj2, ComparisonSettings settings)
+            {
+                return obj1 == obj2; //Implement comparison logic here
+            }
+        }
+        [Test]
+        public void Overrides()
+        {
+            var comparer = new Comparer<ClassA>();
+
+            //  Type
+            //Use MyComparer to compare all members of type string 
+            comparer.AddComparerOverride<string>(new MyValueComparer());
+            comparer.AddComparerOverride(typeof(string), new MyValueComparer());
+            //Use MyComparer to compare all members of type string except members which name starts with "Xyz"
+            comparer.AddComparerOverride<string>(new MyValueComparer(), member => !member.Name.StartsWith("Xyz"));
+
+            //  Member Info
+            //Use MyValueComparer to compare StringProperty of ClassA
+            comparer.AddComparerOverride(() => new ClassA().StringProperty, new MyValueComparer());
+            comparer.AddComparerOverride(
+                typeof(ClassA).GetTypeInfo().GetMember("StringProperty").First(),
+                new MyValueComparer());
+            //Compare StringProperty of ClassA by length. If length equal consider that values are equal
+            comparer.AddComparerOverride(
+                () => new ClassA().StringProperty,
+                (s1, s2, parentSettings) => s1?.Length == s2?.Length,
+                s => s.ToString());
+            comparer.AddComparerOverride(
+                () => new ClassA().StringProperty,
+                (s1, s2, parentSettings) => s1?.Length == s2?.Length);
+
+            //  Member Name
+            comparer.AddComparerOverride("StringProperty", new MyValueComparer());
+
+
+            //Exception
+            var a1 = new ClassA();
+            var a2 = new ClassA();
+            comparer.AddComparerOverride<string>(new MyValueComparer(), member => member.Name.StartsWith("String"));
+            comparer.AddComparerOverride<string>(DoNotCompareValueComparer.Instance, member => member.Name.EndsWith("Property"));
+
+            //var result = comparer.Compare(a1, a2);//Exception here
+        }
+        #endregion
+
 
         private void ResultToOutput(bool isEqual, IEnumerable<Difference> differenses)
         {
