@@ -396,8 +396,6 @@ Allows to compare string ignoring case.
 ## Examples
 There are some examples how Objects Comparer can be used. 
 
-NUnit is used for developing unit tests to show how examples work.
-
 ### Example 1: Expected Message
 Challenge: Check if received message equal to the expected message.
 ```csharp
@@ -427,84 +425,104 @@ public class Message
     }
 }
 ```
+Configuring comparer.
 ```csharp
-[TestFixture]
-public class Example1Tests
-{
-    private IComparer<Message> _comparer;
-        
-    [SetUp]
-    public void SetUp()
+_comparer = new Comparer<Message>(
+    new ComparisonSettings
     {
-        _comparer = new Comparer<Message>(
-            new ComparisonSettings
-            {
-                //Null and empty error lists are equal
-                EmptyAndNullEnumerablesEqual = true
-            });
-        //Do not compare DateCreated 
-        _comparer.AddComparerOverride<DateTime>(DoNotCompareValueComparer.Instance);
-        //Do not compare Id
-        _comparer.AddComparerOverride(() => new Message().Id, DoNotCompareValueComparer.Instance);
-        //Do not compare Message Text
-        _comparer.AddComparerOverride(() => new Error().Messgae, DoNotCompareValueComparer.Instance);
-    }
-
-    [Test]
-    public void EqualMessagesWithoutErrorsTest()
-    {
-        var expectedMessage = new Message
-        {
-            MessageType = 1,
-            Status = 0,
-        };
-
-        var actualMessage = new Message
-        {
-            Id = "M12345",
-            DateCreated = DateTime.Now,
-            MessageType = 1,
-            Status = 0,
-        };
-
-        var isEqual = _comparer.Compare(expectedMessage, actualMessage);
-
-        Assert.IsTrue(isEqual);
-    }
-
-    [Test]
-    public void EqualMessagesWithErrorsTest()
-    {
-        var expectedMessage = new Message
-        {
-            MessageType = 1,
-            Status = 1,
-            Errors = new List<Error>
-            {
-                new Error { Id = 2 },
-                new Error { Id = 7 }
-            }
-        };
-
-        var actualMessage = new Message
-        {
-            Id = "M12345",
-            DateCreated = DateTime.Now,
-            MessageType = 1,
-            Status = 1,
-            Errors = new List<Error>
-            {
-                new Error { Id = 2, Messgae = "Some error #2" },
-                new Error { Id = 7, Messgae = "Some error #7" },
-            }
-        };
-
-        var isEqual = _comparer.Compare(expectedMessage, actualMessage);
-
-        Assert.IsTrue(isEqual);
-    }
-}
+        //Null and empty error lists are equal
+        EmptyAndNullEnumerablesEqual = true
+    });
+//Do not compare DateCreated 
+_comparer.AddComparerOverride<DateTime>(DoNotCompareValueComparer.Instance);
+//Do not compare Id
+_comparer.AddComparerOverride(() => new Message().Id, DoNotCompareValueComparer.Instance);
+//Do not compare Message Text
+_comparer.AddComparerOverride(() => new Error().Messgae, DoNotCompareValueComparer.Instance);
 ```
+
+```csharp
+var expectedMessage = new Message
+{
+    DateCreated = DateTime.Now.AddDays(-1),
+    MessageType = 1,
+    Status = 0
+};
+
+var actualMessage = new Message
+{
+    Id = "M12345",
+    DateCreated = DateTime.Now,
+    MessageType = 1,
+    Status = 0
+};
+
+IEnumerable<Difference> differences;
+var isEqual = _comparer.Compare(expectedMessage, actualMessage, out differences);
+```
+> Objects are equal
+
+```csharp
+var expectedMessage = new Message
+{
+    MessageType = 1,
+    Status = 1,
+    Errors = new List<Error>
+    {
+        new Error { Id = 2 },
+        new Error { Id = 7 }
+    }
+};
+
+var actualMessage = new Message
+{
+    Id = "M12345",
+    DateCreated = DateTime.Now,
+    MessageType = 1,
+    Status = 1,
+    Errors = new List<Error>
+    {
+        new Error { Id = 2, Messgae = "Some error #2" },
+        new Error { Id = 7, Messgae = "Some error #7" },
+    }
+};
+
+IEnumerable<Difference> differences;
+var isEqual = _comparer.Compare(expectedMessage, actualMessage, out differences);
+```
+> Objects are equal
+
+```csharp
+var expectedMessage = new Message
+{
+    MessageType = 1,
+    Status = 1,
+    Errors = new List<Error>
+    {
+        new Error { Id = 2, Messgae = "Some error #2" },
+        new Error { Id = 8, Messgae = "Some error #8" }
+    }
+};
+
+var actualMessage = new Message
+{
+    Id = "M12345",
+    DateCreated = DateTime.Now,
+    MessageType = 1,
+    Status = 2,
+    Errors = new List<Error>
+    {
+        new Error { Id = 2, Messgae = "Some error #2" },
+        new Error { Id = 7, Messgae = "Some error #7" }
+    }
+};
+
+IEnumerable<Difference> differences;
+var isEqual = _comparer.Compare(expectedMessage, actualMessage, out differences);
+```
+> Difference: DifferenceType=ValueMismatch, MemberPath='Status', Value1='1', Value2='2'.
+
+> Difference: DifferenceType=ValueMismatch, MemberPath='Errors[1].Id', Value1='8', Value2='7'.
 ### Example 2: Persons comparison
 Challenge: Compare persons from different sources.
 ```csharp
@@ -571,100 +589,258 @@ public class MyComparersFactory: ComparersFactory
     }
 }
 ```
+Configuring comparer.
 ```csharp
-[TestFixture]
-public class Example2Tests
-{
-    private MyComparersFactory _factory;
-    private IComparer<Person> _comparer;
-
-    [SetUp]
-    public void SetUp()
-    {
-        _factory = new MyComparersFactory();
-        _comparer = _factory.GetObjectsComparer<Person>();
-    }
-
-    [Test]
-    public void EqualPersonsTest()
-    {
-        var person1 = new Person
-        {
-            PersonId = Guid.NewGuid(),
-            FirstName = "John",
-            LastName = "Doe",
-            MiddleName = "F",
-            PhoneNumber = "111-555-8888"
-        };
-        var person2 = new Person
-        {
-            PersonId = Guid.NewGuid(),
-            FirstName = "John",
-            LastName = "Doe",
-            PhoneNumber = "(111) 555 8888"
-        };
-            
-        IEnumerable<Difference> differenses;
-        var isEqual = _comparer.Compare(person1, person2, out differenses);
-
-        Assert.IsTrue(isEqual);
-
-        Debug.WriteLine($"Persons {person1} and {person2} are equal");
-    }
-
-    [Test]
-    public void DifferentPersonsTest()
-    {
-        var person1 = new Person
-        {
-            PersonId = Guid.NewGuid(),
-            FirstName = "Jack",
-            LastName = "Doe",
-            MiddleName = "F",
-            PhoneNumber = "111-555-8888"
-        };
-        var person2 = new Person
-        {
-            PersonId = Guid.NewGuid(),
-            FirstName = "John",
-            LastName = "Doe",
-            MiddleName = "L",
-            PhoneNumber = "222-555-9999"
-        };
-
-        IEnumerable<Difference> differenses;
-        var isEqual = _comparer.Compare(person1, person2, out differenses);
-
-        var differensesList = differenses.ToList();
-        Assert.IsFalse(isEqual);
-        Assert.AreEqual(3, differensesList.Count);
-        Assert.IsTrue(differensesList.Any(d => d.MemberPath == "FirstName" && d.Value1 == "Jack" && d.Value2 == "John"));
-        Assert.IsTrue(differensesList.Any(d => d.MemberPath == "MiddleName" && d.Value1 == "F" && d.Value2 == "L"));
-        Assert.IsTrue(differensesList.Any(d => d.MemberPath == "PhoneNumber" && d.Value1 == "111-555-8888" && d.Value2 == "222-555-9999"));
-
-        Debug.WriteLine($"Persons {person1} and {person2}");
-        Debug.WriteLine("Differences:");
-        Debug.WriteLine(string.Join(Environment.NewLine, differensesList));
-    }
-}
+_factory = new MyComparersFactory();
+_comparer = _factory.GetObjectsComparer<Person>();
 ```
 
->Persons John F Doe (111-555-8888) and John  Doe ((111) 555 8888) are equal
+```csharp
+var person1 = new Person
+{
+    PersonId = Guid.NewGuid(),
+    FirstName = "John",
+    LastName = "Doe",
+    MiddleName = "F",
+    PhoneNumber = "111-555-8888"
+};
+var person2 = new Person
+{
+    PersonId = Guid.NewGuid(),
+    FirstName = "John",
+    LastName = "Doe",
+    PhoneNumber = "(111) 555 8888"
+};
 
+IEnumerable<Difference> differences;
+var isEqual = _comparer.Compare(person1, person2, out differences);
+```
+> Objects are equal
 
->Persons Jack F Doe (111-555-8888) and John L Doe (222-555-9999)
+```csharp
+var person1 = new Person
+{
+    PersonId = Guid.NewGuid(),
+    FirstName = "Jack",
+    LastName = "Doe",
+    MiddleName = "F",
+    PhoneNumber = "111-555-8888"
+};
+var person2 = new Person
+{
+    PersonId = Guid.NewGuid(),
+    FirstName = "John",
+    LastName = "Doe",
+    MiddleName = "L",
+    PhoneNumber = "222-555-9999"
+};
 
->Differences:
+IEnumerable<Difference> differences;
+var isEqual = _comparer.Compare(person1, person2, out differences);
+```
+> Difference: DifferenceType=ValueMismatch, MemberPath='FirstName', Value1='Jack', Value2='John'.
 
->Difference: MemberPath='FirstName', Value1='Jack', Value2='John'.
+> Difference: DifferenceType=ValueMismatch, MemberPath='MiddleName', Value1='F', Value2='L'.
 
->Difference: MemberPath='MiddleName', Value1='F', Value2='L'.
+> Difference: DifferenceType=ValueMismatch, MemberPath='PhoneNumber', Value1='111-555-8888', Value2='222-555-9999'.
 
->Difference: MemberPath='PhoneNumber', Value1='111-555-8888', Value2='222-555-9999'.
+### Example 3: Comparing JSON configuration files
+Challenge: There are files with settings with some differences and we should find these differences. If some fields do not exist in configuration file default values will be used. URLs can have and cannot have http prefix. Some fields should be ignored.
+Json.NET is used to deserialize JSON data.
+
+Settings0
+```json
+{
+  "ConnectionString": "USER ID=superuser;PASSWORD=superpassword;DATA SOURCE=localhost:1111",
+  "Email": {
+    "Port": 25,
+    "Host": "MyHost.com",
+    "EmailAddress": "test@MyHost.com"
+  },
+  "Settings": {
+    "DataCompression": "On",
+    "DataSourceType": "MultiDataSource",
+    "SomeUrl": "http://MyHost.com/VeryImportantData",
+    "SomeOtherUrl": "http://MyHost.com/NotSoImportantData/",
+    "CacheMode": "Memory",
+    "MaxCacheSize": "1GB",
+    "SuperModes": {
+      "SmartMode1": "Enabled",
+      "SmartMode2": "Disabled",
+      "SmartMode3": "Enabled"
+    }
+  },
+  "Timeouts": {
+    "TotalProcessTimeout": 500,
+    "ProcessTaskTimeout": 100
+  },
+  "BackupSettings": {
+    "BackupIntervalUnit": "Day",
+    "BackupInterval": 100
+  },
+  "Notifications": [
+    {
+      "Phone": "111-222-3333"
+    },
+    {
+      "Phone": "111-222-4444"
+    },
+    {
+      "EMail": "support@MyHost.com"
+    }
+  ],
+  "Logging": {
+    "Enabled": true,
+    "Pattern": "Logs\\MyApplication.%data{yyyyMMdd}.log",
+    "MaximumFileSize": "20MB",
+    "Level": "ALL"
+  }
+}
+```
+Settings1
+```json
+{
+  "ConnectionString": "USER ID=admin;PASSWORD=*****;DATA SOURCE=localhost:22222",
+  "Email": {
+    "Port": 25,
+    "Host": "MyHost.com",
+    "EmailAddress": "test@MyHost.com"
+  },
+  "Settings": {
+    "DataCompression": "On",
+    "DataSourceType": "MultiDataSource",
+    "SomeUrl": "MyHost.com/VeryImportantData",
+    "SomeOtherUrl": "MyHost.com/NotSoImportantData/",
+    "CacheMode": "Memory",
+    "MaxCacheSize": "1GB",
+    "SuperModes": {
+      "SmartMode1": "enabled",
+      "SmartMode3": "enabled"
+    }
+  },
+  "BackupSettings": {
+    "BackupIntervalUnit": "Day",
+    "BackupInterval": 100
+  },
+  "Notifications": [
+    {
+      "Phone": "111-222-3333"
+    },
+    {
+      "EMail": "support@MyHost.com"
+    }
+  ],
+  "Logging": {
+    "Enabled": true,
+    "Pattern": "Logs\\MyApplication.%data{yyyyMMdd}.log",
+    "MaximumFileSize": "20MB",
+    "Level": "ALL"
+  }
+}
+```
+Settings2
+```json
+{
+  "ConnectionString": "USER ID=superuser;PASSWORD=superpassword;DATA SOURCE=localhost:1111",
+  "Email": {
+    "Port": 25,
+    "Host": "MyHost.com",
+    "EmailAddress": "test@MyHost.com"
+  },
+  "Settings": {
+    "DataSourceType": "MultiDataSource",
+    "SomeUrl": "http://MyHost.com/VeryImportantData",
+    "SomeOtherUrl": "http://MyHost.com/NotSoImportantData/",
+    "CacheMode": "Memory",
+    "MaxCacheSize": "1GB",
+    "SuperModes": {
+      "SmartMode3": "Enabled"
+    }
+  },
+  "Timeouts": {
+    "TotalProcessTimeout": 500,
+    "ProcessTaskTimeout": 200
+  },
+  "BackupSettings": {
+    "BackupIntervalUnit": "Week",
+    "BackupInterval": 2
+  },
+  "Notifications": [
+    {
+      "EMail": "support@MyHost.com"
+    }
+  ],
+  "Logging": {
+    "Enabled": false,
+    "Pattern": "Logs\\MyApplication.%data{yyyyMMdd}.log",
+    "MaximumFileSize": "40MB",
+    "Level": "ERROR"
+  }
+}
+```
+Configuring comparer.
+```csharp
+_comparer = new Comparer(new ComparisonSettings { UseDefaultIfMemberNotExist = true });
+//Some fields should be ignored
+_comparer.AddComparerOverride("ConnectionString", DoNotCompareValueComparer.Instance);
+_comparer.AddComparerOverride("Email", DoNotCompareValueComparer.Instance);
+_comparer.AddComparerOverride("Notifications", DoNotCompareValueComparer.Instance);
+//Smart Modes are disabled by default. These fields are not case sensitive
+var disabledByDefaultComparer = new DefaultValueValueComparer<string>("Disabled", IgnoreCaseStringsValueComparer.Instance);
+_comparer.AddComparerOverride("SmartMode1", disabledByDefaultComparer);
+_comparer.AddComparerOverride("SmartMode2", disabledByDefaultComparer);
+_comparer.AddComparerOverride("SmartMode3", disabledByDefaultComparer);
+//http prefix in URLs should be ignored
+var urlComparer = new DynamicValueComparer<string>(
+    (url1, url2, settings) => url1.Trim('/').Replace(@"http://", string.Empty) == url2.Trim('/').Replace(@"http://", string.Empty));
+_comparer.AddComparerOverride("SomeUrl", urlComparer);
+_comparer.AddComparerOverride("SomeOtherUrl", urlComparer);
+//DataCompression is Off by default.
+_comparer.AddComparerOverride("DataCompression", new DefaultValueValueComparer<string>("Off", NulableStringsValueComparer.Instance));
+//ProcessTaskTimeout and TotalProcessTimeout fields have default values.
+_comparer.AddComparerOverride("ProcessTaskTimeout", new DefaultValueValueComparer<long>(100, DefaultValueComparer.Instance));
+_comparer.AddComparerOverride("TotalProcessTimeout", new DefaultValueValueComparer<long>(500, DefaultValueComparer.Instance));
+```
+
+```csharp
+var settings0Json = LoadJson("Settings0.json");
+var settings0 = JsonConvert.DeserializeObject<ExpandoObject>(settings0Json);
+var settings1Json = LoadJson("Settings1.json");
+var settings1 = JsonConvert.DeserializeObject<ExpandoObject>(settings1Json);
+
+IEnumerable<Difference> differences;
+var isEqual = _comparer.Compare(settings0, settings1, out differences);
+```
+> Objects are equal
+
+```csharp
+var settings0Json = LoadJson("Settings0.json");
+var settings0 = JsonConvert.DeserializeObject<ExpandoObject>(settings0Json);
+var settings2Json = LoadJson("Settings2.json");
+var settings2 = JsonConvert.DeserializeObject<ExpandoObject>(settings2Json);
+
+IEnumerable<Difference> differences;
+var isEqual = _comparer.Compare(settings0, settings2, out differences);
+```
+> Difference: DifferenceType=ValueMismatch, MemberPath='Settings.DataCompression', Value1='On', Value2='Off'.
+
+> Difference: DifferenceType=ValueMismatch, MemberPath='Settings.SuperModes.SmartMode1', Value1='Enabled', Value2='Disabled'.
+
+> Difference: DifferenceType=ValueMismatch, MemberPath='Timeouts.ProcessTaskTimeout', Value1='100', Value2='200'.
+
+> Difference: DifferenceType=ValueMismatch, MemberPath='BackupSettings.BackupIntervalUnit', Value1='Day', Value2='Week'.
+
+> Difference: DifferenceType=ValueMismatch, MemberPath='BackupSettings.BackupInterval', Value1='100', Value2='2'.
+
+> Difference: DifferenceType=ValueMismatch, MemberPath='Logging.Enabled', Value1='True', Value2='False'.
+
+> Difference: DifferenceType=ValueMismatch, MemberPath='Logging.MaximumFileSize', Value1='20MB', Value2='40MB'.
+
+> Difference: DifferenceType=ValueMismatch, MemberPath='Logging.Level', Value1='ALL', Value2='ERROR'.
 
 
 ## Contributing
-Any useful changes are welcomed. 
+Any useful changes are welcomed.
 
 Feel free to report any defects or ideas how this framework can be improved. 
 
