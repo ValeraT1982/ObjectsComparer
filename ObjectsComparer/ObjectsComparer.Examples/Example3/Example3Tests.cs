@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
@@ -8,7 +7,9 @@ using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using static ObjectsComparer.Examples.OutputHelper;
 
+// ReSharper disable PossibleMultipleEnumeration
 namespace ObjectsComparer.Examples.Example3
 {
     [TestFixture]
@@ -21,57 +22,58 @@ namespace ObjectsComparer.Examples.Example3
         public void SetUp()
         {
             _comparer = new Comparer(new ComparisonSettings { UseDefaultIfMemberNotExist = true });
+            //Some fields should be ignored
             _comparer.AddComparerOverride("ConnectionString", DoNotCompareValueComparer.Instance);
             _comparer.AddComparerOverride("Email", DoNotCompareValueComparer.Instance);
             _comparer.AddComparerOverride("Notifications", DoNotCompareValueComparer.Instance);
+            //Smart Modes are disabled by default. These fields are not case sensitive
             var disabledByDefaultComparer = new DefaultValueValueComparer<string>("Disabled", IgnoreCaseStringsValueComparer.Instance);
             _comparer.AddComparerOverride("SmartMode1", disabledByDefaultComparer);
             _comparer.AddComparerOverride("SmartMode2", disabledByDefaultComparer);
             _comparer.AddComparerOverride("SmartMode3", disabledByDefaultComparer);
+            //http prefix in URLs should be ignored
             var urlComparer = new DynamicValueComparer<string>(
                 (url1, url2, settings) => url1.Trim('/').Replace(@"http://", string.Empty) == url2.Trim('/').Replace(@"http://", string.Empty));
             _comparer.AddComparerOverride("SomeUrl", urlComparer);
             _comparer.AddComparerOverride("SomeOtherUrl", urlComparer);
+            //DataCompression is Off by default.
             _comparer.AddComparerOverride("DataCompression", new DefaultValueValueComparer<string>("Off", NulableStringsValueComparer.Instance));
+            //ProcessTaskTimeout and TotalProcessTimeout fields have default values.
             _comparer.AddComparerOverride("ProcessTaskTimeout", new DefaultValueValueComparer<long>(100, DefaultValueComparer.Instance));
             _comparer.AddComparerOverride("TotalProcessTimeout", new DefaultValueValueComparer<long>(500, DefaultValueComparer.Instance));
         }
 
         [Test]
-        public void Customer1Settings()
+        public void Settings1()
         {
-            var mySettingsJson = LoadJson("MySettings.json");
-            var mySettings = JsonConvert.DeserializeObject<ExpandoObject>(mySettingsJson);
-            var customer1SettingsJson = LoadJson("Customer1Settings.json");
-            var customer1Settings = JsonConvert.DeserializeObject<ExpandoObject>(customer1SettingsJson);
+            var settings0Json = LoadJson("Settings0.json");
+            var settings0 = JsonConvert.DeserializeObject<ExpandoObject>(settings0Json);
+            var settings1Json = LoadJson("Settings1.json");
+            var settings1 = JsonConvert.DeserializeObject<ExpandoObject>(settings1Json);
 
-            var isEqual = _comparer.Compare(mySettings, customer1Settings);
+            IEnumerable<Difference> differences;
+            var isEqual = _comparer.Compare(settings0, settings1, out differences);
+
+            ResultToOutput(isEqual, differences);
             
-            Debug.WriteLine("Configurations MySettings.json and Customer1Settings.json are " + (isEqual ? "equal" : "not equal"));
-
             Assert.IsTrue(isEqual);
         }
 
         [Test]
-        public void Customer2Settings()
+        public void Settings2()
         {
-            var mySettingsJson = LoadJson("MySettings.json");
-            var mySettings = JsonConvert.DeserializeObject<ExpandoObject>(mySettingsJson);
-            var customer2SettingsJson = LoadJson("Customer2Settings.json");
-            var customer2Settings = JsonConvert.DeserializeObject<ExpandoObject>(customer2SettingsJson);
+            var settings0Json = LoadJson("Settings0.json");
+            var settings0 = JsonConvert.DeserializeObject<ExpandoObject>(settings0Json);
+            var settings2Json = LoadJson("Settings2.json");
+            var settings2 = JsonConvert.DeserializeObject<ExpandoObject>(settings2Json);
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = _comparer.Compare(mySettings, customer2Settings, out differencesEnum);
-            var differences = differencesEnum.ToList();
+            IEnumerable<Difference> differences;
+            var isEqual = _comparer.Compare(settings0, settings2, out differences);
 
-            Debug.WriteLine("Configurations MySettings.json and Customer2Settings.json are " + (isEqual ? "equal" : "not equal"));
-            foreach (var difference in differences)
-            {
-                Debug.WriteLine(difference.ToString());
-            }
+            ResultToOutput(isEqual, differences);
 
             Assert.IsFalse(isEqual);
-            Assert.AreEqual(8, differences.Count);
+            Assert.AreEqual(8, differences.Count());
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Settings.DataCompression" && d.Value1 == "On" && d.Value2 == "Off"));
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Settings.SuperModes.SmartMode1" && d.Value1 == "Enabled" && d.Value2 == "Disabled"));
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Timeouts.ProcessTaskTimeout" && d.Value1 == "100" && d.Value2 == "200"));
@@ -81,15 +83,6 @@ namespace ObjectsComparer.Examples.Example3
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Logging.MaximumFileSize" && d.Value1 == "20MB" && d.Value2 == "40MB"));
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Logging.Level" && d.Value1 == "ALL" && d.Value2 == "ERROR"));
         }
-        //Configurations MySettings.json and Customer2Settings.json are not equal
-        //Difference: MemberPath= 'Settings.DataCompression', Value1= 'On', Value2= 'Off'.
-        //Difference: MemberPath= 'Settings.SuperModes.SmartMode1', Value1= 'Enabled', Value2= 'Disabled'.
-        //Difference: MemberPath= 'Timeouts.ProcessTaskTimeout', Value1= '100', Value2= '200'.
-        //Difference: MemberPath= 'BackupSettings.BackupIntervalUnit', Value1= 'Day', Value2= 'Week'.
-        //Difference: MemberPath= 'BackupSettings.BackupInterval', Value1= '100', Value2= '2'.
-        //Difference: MemberPath= 'Logging.Enabled', Value1= 'True', Value2= 'False'.
-        //Difference: MemberPath= 'Logging.MaximumFileSize', Value1= '20MB', Value2= '40MB'.
-        //Difference: MemberPath= 'Logging.Level', Value1= 'ALL', Value2= 'ERROR'.
 
         private string LoadJson(string fileName)
         {

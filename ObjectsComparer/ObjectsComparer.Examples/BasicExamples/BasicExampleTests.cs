@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
+using static ObjectsComparer.Examples.OutputHelper;
 
 // ReSharper disable PossibleMultipleEnumeration
-
 namespace ObjectsComparer.Examples.BasicExamples
 {
     [TestFixture]
@@ -420,11 +418,5 @@ namespace ObjectsComparer.Examples.BasicExamples
             //var result = comparer.Compare(a1, a2);//Exception here
         }
         #endregion
-
-
-        private void ResultToOutput(bool isEqual, IEnumerable<Difference> differenses)
-        {
-            Debug.WriteLine(isEqual ? "Objects are equal" : string.Join(Environment.NewLine, differenses));
-        }
     }
 }

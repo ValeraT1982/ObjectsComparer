@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using NUnit.Framework;
+using static ObjectsComparer.Examples.OutputHelper;
 
+// ReSharper disable PossibleMultipleEnumeration
 namespace ObjectsComparer.Examples.Example1
 {
     [TestFixture]
@@ -27,12 +30,13 @@ namespace ObjectsComparer.Examples.Example1
         }
 
         [Test]
-        public void EqualMessagesWithoutErrorsTest()
+        public void EqualMessagesWithoutErrors()
         {
             var expectedMessage = new Message
             {
+                DateCreated = DateTime.Now.AddDays(-1),
                 MessageType = 1,
-                Status = 0,
+                Status = 0
             };
 
             var actualMessage = new Message
@@ -40,16 +44,19 @@ namespace ObjectsComparer.Examples.Example1
                 Id = "M12345",
                 DateCreated = DateTime.Now,
                 MessageType = 1,
-                Status = 0,
+                Status = 0
             };
 
-            var isEqual = _comparer.Compare(expectedMessage, actualMessage);
+            IEnumerable<Difference> differences;
+            var isEqual = _comparer.Compare(expectedMessage, actualMessage, out differences);
+
+            ResultToOutput(isEqual, differences);
 
             Assert.IsTrue(isEqual);
         }
 
         [Test]
-        public void EqualMessagesWithErrorsTest()
+        public void EqualMessagesWithErrors()
         {
             var expectedMessage = new Message
             {
@@ -75,9 +82,50 @@ namespace ObjectsComparer.Examples.Example1
                 }
             };
 
-            var isEqual = _comparer.Compare(expectedMessage, actualMessage);
+            IEnumerable<Difference> differences;
+            var isEqual = _comparer.Compare(expectedMessage, actualMessage, out differences);
+
+            ResultToOutput(isEqual, differences);
 
             Assert.IsTrue(isEqual);
+        }
+
+        [Test]
+        public void UnequalMessages()
+        {
+            var expectedMessage = new Message
+            {
+                MessageType = 1,
+                Status = 1,
+                Errors = new List<Error>
+                {
+                    new Error { Id = 2, Messgae = "Some error #2" },
+                    new Error { Id = 8, Messgae = "Some error #8" }
+                }
+            };
+
+            var actualMessage = new Message
+            {
+                Id = "M12345",
+                DateCreated = DateTime.Now,
+                MessageType = 1,
+                Status = 2,
+                Errors = new List<Error>
+                {
+                    new Error { Id = 2, Messgae = "Some error #2" },
+                    new Error { Id = 7, Messgae = "Some error #7" }
+                }
+            };
+
+            IEnumerable<Difference> differences;
+            var isEqual = _comparer.Compare(expectedMessage, actualMessage, out differences);
+
+            ResultToOutput(isEqual, differences);
+
+            Assert.IsFalse(isEqual);
+            Assert.AreEqual(2, differences.Count());
+            Assert.IsTrue(differences.Any(d => d.MemberPath == "Status" && d.Value1 == "1" && d.Value2 == "2"));
+            Assert.IsTrue(differences.Any(d => d.MemberPath == "Errors[1].Id" && d.Value1 == "8" && d.Value2 == "7"));
         }
     }
 }
