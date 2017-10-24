@@ -393,9 +393,9 @@ namespace ObjectsComparer.Examples.BasicExamples
             //  Member Info
             //Use MyValueComparer to compare StringProperty of ClassA
             comparer.AddComparerOverride(() => new ClassA().StringProperty, new MyValueComparer());
-            comparer.AddComparerOverride(
-                typeof(ClassA).GetTypeInfo().GetMember("StringProperty").First(),
-                new MyValueComparer());
+            //comparer.AddComparerOverride(
+            //    typeof(ClassA).GetTypeInfo().GetMember("StringProperty").First(),
+            //    new MyValueComparer());
             //Compare StringProperty of ClassA by length. If length equal consider that values are equal
             comparer.AddComparerOverride(
                 () => new ClassA().StringProperty,
