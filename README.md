@@ -321,11 +321,11 @@ var result = comparer.Compare(a1, a2);//Exception here
 ```
 
 ## Comparison Settings
-Comparer has an optional settings parameter to configure comparison. 
+Comparer constructor has an optional **settings** parameter to configure some aspects of comparison.
 
 **RecursiveComparison**
 
-True by default. If true, all members which are not primitive types, do not have custom comparison rule and do not implement **ICompareble** will be compared as separate objects using the same rules as current objects.
+True by default. If true, all members which are not primitive types, do not have custom comparison rule and do not implement **ICompareble** will be compared using the same rules as root objects.
 
 **EmptyAndNullEnumerablesEqual**
 
@@ -369,11 +369,11 @@ var isEqual = comparer.Compare(a1, a2);
 This comparer creates generic implementation of comparer for each comparison.
 
 ## Useful Value Comparers
-Framework contains several custom comparers that can be useful.
+Framework contains several custom comparers that can be useful in many cases.
 
 **DoNotCompareValueComparer**
 
-Allows to to skip some fields/types. Has singleton implementation (DoNotCompareValueComparer.Instance).
+Allows to to skip some fields/types. Has singleton implementation (**DoNotCompareValueComparer.Instance**).
 
 **DynamicValueComparer<T>**
 
@@ -381,7 +381,7 @@ Receives comparison rule as a function.
 
 **NulableStringsValueComparer**
 
-Null and empty strings are considered as equal values.
+Null and empty strings are considered as equal values. Has singleton implementation (**NulableStringsValueComparer.Instance**).
 
 **DefaultValueValueComparer**
 
@@ -389,13 +389,23 @@ Allows to consider provided value and default value of specified type as equal v
 
 **IgnoreCaseStringsValueComparer**
 
-Allows to compare string ignoring case.
+Allows to compare string ignoring case. Has singleton implementation (**IgnoreCaseStringsValueComparer.Instance**).
 
 ## Examples
 There are some more complex examples how Objects Comparer can be used.
 
 ### Example 1: Expected Message
-Challenge: Check if received message equal to the expected message.
+#### Challenge
+
+Check if received message equal to the expected message.
+
+#### Problems
+
+* **DateCreated**, **DateSent** and **DateReceived** properties need to be skipped
+* Auto generated **Id** property need to be skipped
+* **Message** property of **Error** class class need to be skipped
+
+#### Solution
 ```csharp
 public class Error
 {
@@ -410,6 +420,10 @@ public class Message
     public string Id { get; set; }
 
     public DateTime DateCreated { get; set; }
+    
+    public DateTime DateSent { get; set; }
+
+    public DateTime DateReceived { get; set; }
 
     public int MessageType { get; set; }
 
@@ -442,7 +456,6 @@ _comparer.AddComparerOverride(() => new Error().Messgae, DoNotCompareValueCompar
 ```csharp
 var expectedMessage = new Message
 {
-    DateCreated = DateTime.Now.AddDays(-1),
     MessageType = 1,
     Status = 0
 };
@@ -451,6 +464,8 @@ var actualMessage = new Message
 {
     Id = "M12345",
     DateCreated = DateTime.Now,
+    DateSent = DateTime.Now,
+    DateReceived = DateTime.Now,
     MessageType = 1,
     Status = 0
 };
@@ -476,6 +491,8 @@ var actualMessage = new Message
 {
     Id = "M12345",
     DateCreated = DateTime.Now,
+    DateSent = DateTime.Now,
+    DateReceived = DateTime.Now,
     MessageType = 1,
     Status = 1,
     Errors = new List<Error>
@@ -506,6 +523,8 @@ var actualMessage = new Message
 {
     Id = "M12345",
     DateCreated = DateTime.Now,
+    DateSent = DateTime.Now,
+    DateReceived = DateTime.Now,
     MessageType = 1,
     Status = 2,
     Errors = new List<Error>
@@ -523,7 +542,16 @@ var isEqual = _comparer.Compare(expectedMessage, actualMessage, out differences)
 > Difference: DifferenceType=ValueMismatch, MemberPath='Errors[1].Id', Value1='8', Value2='7'.
 
 ### Example 2: Persons comparison
-Challenge: Compare persons from different sources.
+#### Challenge
+
+Compare persons from different sources.
+
+#### Problems
+
+* **PhoneNumber** format can be in different. Example: "111-555-8888" and "(111) 555 8888"
+* **MiddleName** can exist in one source but does not exist in another source. It makes a sense to compare **MiddleName** only if it has value in both sources.
+* **PersonId** proterty need to be skipped
+#### Solution
 ```csharp
 public class Person
 {
@@ -644,10 +672,19 @@ var isEqual = _comparer.Compare(person1, person2, out differences);
 > Difference: DifferenceType=ValueMismatch, MemberPath='PhoneNumber', Value1='111-555-8888', Value2='222-555-9999'.
 
 ### Example 3: Comparing JSON configuration files
-Challenge: There are files with settings with some differences and we should find these differences. If some fields don't exist in configuration file default values will be used. URLs can be with or without http prefix. Some fields should be ignored.
-Json.NET is used to deserialize JSON data.
+#### Challenge
 
-Settings0
+There are files with settings with some differences that need to be found. Json.NET is used to deserialize JSON data.
+
+#### Problems
+
+* URLs can be with or without http prefix. 
+* **DataCompression** is Off by default
+* **SmartMode1...3** disabled by default 
+* **ConnectionString**,  **Email** and **Notifications** need to be skipped
+* If **ProcessTaskTimeout** or **TotalProcessTimeout** settings stipped default values will be used, so if in one file setting does not exists and in another file this setting has default value it actually the same.
+#### Files
+##### Settings0
 ```json
 {
   "ConnectionString": "USER ID=superuser;PASSWORD=superpassword;DATA SOURCE=localhost:1111",
@@ -696,7 +733,7 @@ Settings0
   }
 }
 ```
-Settings1
+##### Settings1
 ```json
 {
   "ConnectionString": "USER ID=admin;PASSWORD=*****;DATA SOURCE=localhost:22222",
@@ -737,7 +774,7 @@ Settings1
   }
 }
 ```
-Settings2
+##### Settings2
 ```json
 {
   "ConnectionString": "USER ID=superuser;PASSWORD=superpassword;DATA SOURCE=localhost:1111",
@@ -777,6 +814,7 @@ Settings2
   }
 }
 ```
+#### Solution
 Configuring comparer.
 ```csharp
 _comparer = new Comparer(new ComparisonSettings { UseDefaultIfMemberNotExist = true });
