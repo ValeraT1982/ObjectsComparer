@@ -9,6 +9,10 @@ namespace ObjectsComparer.Examples.Example1
 
         public DateTime DateCreated { get; set; }
 
+        public DateTime DateSent { get; set; }
+
+        public DateTime DateReceived { get; set; }
+
         public int MessageType { get; set; }
 
         public int Status { get; set; }
@@ -17,7 +21,7 @@ namespace ObjectsComparer.Examples.Example1
 
         public override string ToString()
         {
-            return $"Id:{Id}, Date:{DateCreated}, Type:{MessageType}, Status:{Status}";
+            return $"Id:{Id}, Type:{MessageType}, Status:{Status}";
         }
     }
 }

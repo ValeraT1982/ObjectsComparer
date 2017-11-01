@@ -399,7 +399,7 @@ namespace ObjectsComparer.Examples.BasicExamples
             //comparer.AddComparerOverride(
             //    () => new ClassA().StringProperty,
             //    (s1, s2, parentSettings) => s1?.Length == s2?.Length,
-            //    s => s.ToString());
+            //    s => s?.ToString());
             //comparer.AddComparerOverride(
             //    () => new ClassA().StringProperty,
             //    (s1, s2, parentSettings) => s1?.Length == s2?.Length);

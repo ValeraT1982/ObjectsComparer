@@ -21,7 +21,7 @@ namespace ObjectsComparer.Examples.Example1
                     //Null and empty error lists are equal
                     EmptyAndNullEnumerablesEqual = true
                 });
-            //Do not compare DateCreated 
+            //Do not compare Dates 
             _comparer.AddComparerOverride<DateTime>(DoNotCompareValueComparer.Instance);
             //Do not compare Id
             _comparer.AddComparerOverride(() => new Message().Id, DoNotCompareValueComparer.Instance);
@@ -34,7 +34,6 @@ namespace ObjectsComparer.Examples.Example1
         {
             var expectedMessage = new Message
             {
-                DateCreated = DateTime.Now.AddDays(-1),
                 MessageType = 1,
                 Status = 0
             };
@@ -43,6 +42,8 @@ namespace ObjectsComparer.Examples.Example1
             {
                 Id = "M12345",
                 DateCreated = DateTime.Now,
+                DateReceived = DateTime.Now,
+                DateSent = DateTime.Now,
                 MessageType = 1,
                 Status = 0
             };
@@ -73,6 +74,8 @@ namespace ObjectsComparer.Examples.Example1
             {
                 Id = "M12345",
                 DateCreated = DateTime.Now,
+                DateReceived = DateTime.Now,
+                DateSent = DateTime.Now,
                 MessageType = 1,
                 Status = 1,
                 Errors = new List<Error>
@@ -108,6 +111,8 @@ namespace ObjectsComparer.Examples.Example1
             {
                 Id = "M12345",
                 DateCreated = DateTime.Now,
+                DateReceived = DateTime.Now,
+                DateSent = DateTime.Now,
                 MessageType = 1,
                 Status = 2,
                 Errors = new List<Error>
