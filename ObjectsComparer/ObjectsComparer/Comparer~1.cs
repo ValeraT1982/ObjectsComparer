@@ -38,6 +38,7 @@ namespace ObjectsComparer
                 new CompilerGeneratedObjectComparer(Settings, this, Factory),
                 new GenericEnumerablesComparer(Settings, this, Factory),
                 new EnumerablesComparer(Settings, this, Factory),
+                new TypesComparer(Settings, this, Factory)
             };
         }
 

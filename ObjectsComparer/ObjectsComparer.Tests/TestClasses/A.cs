@@ -54,6 +54,8 @@ namespace ObjectsComparer.Tests.TestClasses
 
         public FlagsEnum Flags { get; set; }
 
+        public Type TypeProperty { get; set; }
+
         public int Property3
         {
             set

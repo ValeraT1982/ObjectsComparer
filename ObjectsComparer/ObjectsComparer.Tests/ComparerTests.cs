@@ -387,5 +387,34 @@ namespace ObjectsComparer.Tests
 
             Assert.IsTrue(isEqual);
         }
+
+        [Test]
+        public void TypePropertyEquality()
+        {
+            var a1 = new A { TypeProperty = typeof(string)};
+            var a2 = new A { TypeProperty = typeof(string) };
+            var comparer = new Comparer<A>();
+
+            var isEqual = comparer.Compare(a1, a2);
+            
+            Assert.IsTrue(isEqual);
+        }
+
+        [Test]
+        public void TypePropertyInequality()
+        {
+            var a1 = new A { TypeProperty = typeof(string) };
+            var a2 = new A { TypeProperty = typeof(int) };
+            var comparer = new Comparer<A>();
+
+            IEnumerable<Difference> differencesEnum;
+            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(1, differences.Count);
+            Assert.AreEqual("TypeProperty", differences.First().MemberPath);
+        }
     }
 }
