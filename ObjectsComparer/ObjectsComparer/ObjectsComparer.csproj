@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0;netstandard1.6;net45</TargetFrameworks>
+    <Version>1.2</Version>
+    <Authors>Valerii Tereshchenko</Authors>
+    <Company />
+    <Product>Objects Data Comparer</Product>
+    <Description>Framework provides mechanism to compare classes, allows override comparison rules for specific properties and types.</Description>
+    <Copyright>Copyright © Valerii Tereshchenko 2018</Copyright>
+    <PackageLicenseUrl>https://github.com/ValeraT1982/ObjectsComparer/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/ValeraT1982/ObjectsComparer</PackageProjectUrl>
+    <PackageIconUrl>https://github.com/ValeraT1982/ObjectsComparer/blob/master/ObjectsDataComparer.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/ValeraT1982/ObjectsComparer</RepositoryUrl>
+    <PackageTags>C#, compare, class, reflection, object, comparison</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Dynamic.Runtime" Version="4.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+</Project>
