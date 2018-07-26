@@ -23,18 +23,13 @@ namespace ObjectsComparer.Utils
                 return true;
             }
 
-            if (t1.GetTypeInfo().GetInterfaces().Any(i => (i.GetTypeInfo().IsGenericType && i.GetGenericTypeDefinition() == t2) || i == t2))
+            if (t1.GetTypeInfo().GetInterfaces().Any(i => i.GetTypeInfo().IsGenericType && i.GetGenericTypeDefinition() == t2 || i == t2))
             {
                 return true;
             }
 
-            if (t1.GetTypeInfo().BaseType != null &&
-                InheritsFrom(t1.GetTypeInfo().BaseType, t2))
-            {
-                return true;
-            }
-
-            return false;
+            return t1.GetTypeInfo().BaseType != null &&
+                   InheritsFrom(t1.GetTypeInfo().BaseType, t2);
         }
 
         public static bool IsComparable(this Type type)

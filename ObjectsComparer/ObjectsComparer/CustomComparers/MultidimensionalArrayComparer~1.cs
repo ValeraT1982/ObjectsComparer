@@ -53,6 +53,7 @@ namespace ObjectsComparer
                 var length1 = array1.GetLength(i);
                 var length2 = array2.GetLength(i);
 
+                // ReSharper disable once InvertIf
                 if (length1 != length2)
                 {
                     dimensionsFailure = true;
@@ -65,7 +66,7 @@ namespace ObjectsComparer
                 yield break;
             }
 
-            for (int i = 0; i < array1.Length; i++)
+            for (var i = 0; i < array1.Length; i++)
             {
                 var indecies = IndexToCoordinates(array1, i);
 
@@ -82,9 +83,7 @@ namespace ObjectsComparer
                 .Select(arr.GetLength)
                 .ToArray();
 
-            Func<int, int, int> product = (i1, i2) => i1 * i2;
-
-            return dims.Select((d, n) => (i / dims.Take(n).Aggregate(1, product)) % d).ToArray();
+            return dims.Select((d, n) => i / dims.Take(n).Aggregate(1, (i1, i2) => i1 * i2) % d).ToArray();
         }
     }
 }

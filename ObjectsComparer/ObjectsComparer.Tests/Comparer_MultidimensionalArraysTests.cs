@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 using ObjectsComparer.Tests.TestClasses;
-using System.Collections.Generic;
 
 namespace ObjectsComparer.Tests
 {
@@ -15,8 +14,7 @@ namespace ObjectsComparer.Tests
             var a2 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 3 } } };
             var comparer = new Comparer<MultidimensionalArrays>();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -34,8 +32,7 @@ namespace ObjectsComparer.Tests
             var a2 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 2, 2 }, new[] { 3, 5 } } };
             var comparer = new Comparer<MultidimensionalArrays>();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -56,8 +53,7 @@ namespace ObjectsComparer.Tests
             var a2 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 2, 2 }, new[] { 3, 5 } } };
             var comparer = new Comparer<MultidimensionalArrays>();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -75,8 +71,7 @@ namespace ObjectsComparer.Tests
             var a2 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 2, 2 } } };
             var comparer = new Comparer<MultidimensionalArrays>();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -94,8 +89,7 @@ namespace ObjectsComparer.Tests
             var a2 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 2 }, new[] { 3, 5, 6 } } };
             var comparer = new Comparer<MultidimensionalArrays>();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -113,8 +107,7 @@ namespace ObjectsComparer.Tests
             var a2 = new MultidimensionalArrays();
             var comparer = new Comparer<MultidimensionalArrays>();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -132,8 +125,7 @@ namespace ObjectsComparer.Tests
             var a2 = new MultidimensionalArrays { IntOfInt = new int[0][] };
             var comparer = new Comparer<MultidimensionalArrays>();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -211,8 +203,7 @@ namespace ObjectsComparer.Tests
             var a2 = new MultidimensionalArrays { IntInt = new[,] { { 1, 3 }, { 1, 3 } } };
             var comparer = new Comparer<MultidimensionalArrays>();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -230,8 +221,7 @@ namespace ObjectsComparer.Tests
             var a2 = new MultidimensionalArrays { IntInt = new[,] { { 1, 3, 4 }, { 1, 3, 8 } } };
             var comparer = new Comparer<MultidimensionalArrays>();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -249,8 +239,7 @@ namespace ObjectsComparer.Tests
             var a2 = new MultidimensionalArrays { IntInt = new[,] { { 1, 3 } } };
             var comparer = new Comparer<MultidimensionalArrays>();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -268,8 +257,7 @@ namespace ObjectsComparer.Tests
             var a2 = new MultidimensionalArrays { IntInt = new[,] { { 0, 2 }, { 3, 4 } } };
             var comparer = new Comparer<MultidimensionalArrays>();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -287,8 +275,7 @@ namespace ObjectsComparer.Tests
             var a2 = new MultidimensionalArrays { IntInt = new[,] { { 1, 2 }, { 3, 4 } } };
             var comparer = new Comparer<MultidimensionalArrays>();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -306,8 +293,7 @@ namespace ObjectsComparer.Tests
             var a2 = new MultidimensionalArrays { IntInt = new int[0, 0] };
             var comparer = new Comparer<MultidimensionalArrays>();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -325,8 +311,7 @@ namespace ObjectsComparer.Tests
             var a2 = new MultidimensionalArrays { IntInt = null };
             var comparer = new Comparer<MultidimensionalArrays>();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);

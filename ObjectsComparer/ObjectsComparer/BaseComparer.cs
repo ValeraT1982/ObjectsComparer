@@ -29,6 +29,7 @@ namespace ObjectsComparer
             Factory = factory ?? new ComparersFactory();
             Settings = settings ?? new ComparisonSettings();
             DefaultValueComparer = new DefaultValueComparer();
+            // ReSharper disable once InvertIf
             if (parentComparer != null)
             {
                 DefaultValueComparer = parentComparer.DefaultValueComparer;
@@ -132,12 +133,7 @@ namespace ObjectsComparer
         /// <param name="valueComparer">Value Comparer.</param>
         public void SetDefaultComparer(IValueComparer valueComparer)
         {
-            if (valueComparer == null)
-            {
-                throw new ArgumentNullException(nameof(valueComparer));
-            }
-
-            DefaultValueComparer = valueComparer;
+            DefaultValueComparer = valueComparer ?? throw new ArgumentNullException(nameof(valueComparer));
         }
     }
 }

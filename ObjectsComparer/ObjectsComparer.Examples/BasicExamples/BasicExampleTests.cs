@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
 using static ObjectsComparer.Examples.OutputHelper;
@@ -19,8 +20,7 @@ namespace ObjectsComparer.Examples.BasicExamples
             var a2 = new ClassA { StringProperty = "String", IntProperty = 1 };
             var comparer = new Comparer<ClassA>();
 
-            IEnumerable<Difference> differences;
-            var isEqual = comparer.Compare(a1, a2, out differences);
+            var isEqual = comparer.Compare(a1, a2, out var differences);
 
             ResultToOutput(isEqual, differences);
 
@@ -34,8 +34,7 @@ namespace ObjectsComparer.Examples.BasicExamples
             var a2 = new ClassA { StringProperty = "String", IntProperty = 2 };
             var comparer = new Comparer<ClassA>();
 
-            IEnumerable<Difference> differences;
-            var isEqual = comparer.Compare(a1, a2, out differences);
+            var isEqual = comparer.Compare(a1, a2, out var differences);
 
             ResultToOutput(isEqual, differences);
 
@@ -51,8 +50,7 @@ namespace ObjectsComparer.Examples.BasicExamples
             var a2 = new ClassA { SubClass = new SubClassA { BoolProperty = false } };
             var comparer = new Comparer<ClassA>();
 
-            IEnumerable<Difference> differences;
-            var isEqual = comparer.Compare(a1, a2, out differences);
+            var isEqual = comparer.Compare(a1, a2, out var differences);
 
             ResultToOutput(isEqual, differences);
 
@@ -70,8 +68,7 @@ namespace ObjectsComparer.Examples.BasicExamples
             var a2 = new[] { 1, 2, 3 };
             var comparer = new Comparer<int[]>();
 
-            IEnumerable<Difference> differences;
-            var isEqual = comparer.Compare(a1, a2, out differences);
+            var isEqual = comparer.Compare(a1, a2, out var differences);
 
             ResultToOutput(isEqual, differences);
 
@@ -85,8 +82,7 @@ namespace ObjectsComparer.Examples.BasicExamples
             var a2 = new[] { 1, 2, 3 };
             var comparer = new Comparer<int[]>();
 
-            IEnumerable<Difference> differences;
-            var isEqual = comparer.Compare(a1, a2, out differences);
+            var isEqual = comparer.Compare(a1, a2, out var differences);
 
             ResultToOutput(isEqual, differences);
 
@@ -102,8 +98,7 @@ namespace ObjectsComparer.Examples.BasicExamples
             var a2 = new[] { 1, 4, 3 };
             var comparer = new Comparer<int[]>();
 
-            IEnumerable<Difference> differences;
-            var isEqual = comparer.Compare(a1, a2, out differences);
+            var isEqual = comparer.Compare(a1, a2, out var differences);
 
             ResultToOutput(isEqual, differences);
 
@@ -121,8 +116,7 @@ namespace ObjectsComparer.Examples.BasicExamples
             var a2 = new ArrayList { "Str1", 5 };
             var comparer = new Comparer<ArrayList>();
 
-            IEnumerable<Difference> differences;
-            var isEqual = comparer.Compare(a1, a2, out differences);
+            var isEqual = comparer.Compare(a1, a2, out var differences);
 
             ResultToOutput(isEqual, differences);
 
@@ -142,8 +136,7 @@ namespace ObjectsComparer.Examples.BasicExamples
             var a2 = new[] { new[] { 1, 3 } };
             var comparer = new Comparer<int[][]>();
 
-            IEnumerable<Difference> differences;
-            var isEqual = comparer.Compare(a1, a2, out differences);
+            var isEqual = comparer.Compare(a1, a2, out var differences);
 
             ResultToOutput(isEqual, differences);
 
@@ -161,8 +154,7 @@ namespace ObjectsComparer.Examples.BasicExamples
             var a2 = new[] { new[] { 2, 2 }, new[] { 3, 5 } };
             var comparer = new Comparer<int[][]>();
 
-            IEnumerable<Difference> differences;
-            var isEqual = comparer.Compare(a1, a2, out differences);
+            var isEqual = comparer.Compare(a1, a2, out var differences);
 
             ResultToOutput(isEqual, differences);
 
@@ -181,8 +173,7 @@ namespace ObjectsComparer.Examples.BasicExamples
             var a2 = new[] { new[] { 1, 2 }, new[] { 3, 5, 6 } };
             var comparer = new Comparer<int[][]>();
 
-            IEnumerable<Difference> differences;
-            var isEqual = comparer.Compare(a1, a2, out differences);
+            var isEqual = comparer.Compare(a1, a2, out var differences);
 
             ResultToOutput(isEqual, differences);
 
@@ -201,8 +192,7 @@ namespace ObjectsComparer.Examples.BasicExamples
             var a2 = new[,] { { 1, 3 } };
             var comparer = new Comparer<int[,]>();
 
-            IEnumerable<Difference> differences;
-            var isEqual = comparer.Compare(a1, a2, out differences);
+            var isEqual = comparer.Compare(a1, a2, out var differences);
 
             ResultToOutput(isEqual, differences);
 
@@ -221,8 +211,7 @@ namespace ObjectsComparer.Examples.BasicExamples
             var a2 = new[,] { { 1, 3, 4 }, { 1, 3, 8 } };
             var comparer = new Comparer<int[,]>();
 
-            IEnumerable<Difference> differences;
-            var isEqual = comparer.Compare(a1, a2, out differences);
+            var isEqual = comparer.Compare(a1, a2, out var differences);
 
             ResultToOutput(isEqual, differences);
 
@@ -249,8 +238,7 @@ namespace ObjectsComparer.Examples.BasicExamples
             a2.Field4 = "C";
             var comparer = new Comparer();
 
-            IEnumerable<Difference> differences;
-            var isEqual = comparer.Compare(a1, a2, out differences);
+            var isEqual = comparer.Compare(a1, a2, out IEnumerable<Difference> differences);
 
             ResultToOutput(isEqual, differences);
 
@@ -274,8 +262,7 @@ namespace ObjectsComparer.Examples.BasicExamples
             a2.Field4 = "S";
             var comparer = new Comparer(new ComparisonSettings { UseDefaultIfMemberNotExist = true });
 
-            IEnumerable<Difference> differences;
-            var isEqual = comparer.Compare(a1, a2, out differences);
+            var isEqual = comparer.Compare(a1, a2, out IEnumerable<Difference> differences);
 
             ResultToOutput(isEqual, differences);
 
@@ -326,8 +313,7 @@ namespace ObjectsComparer.Examples.BasicExamples
             a2.Field3 = 1;
             var comparer = new Comparer();
 
-            IEnumerable<Difference> differences;
-            var isEqual = comparer.Compare(a1, a2, out differences);
+            var isEqual = comparer.Compare(a1, a2, out IEnumerable<Difference> differences);
 
             ResultToOutput(isEqual, differences);
 
@@ -356,15 +342,14 @@ namespace ObjectsComparer.Examples.BasicExamples
             };
             var comparer = new Comparer();
 
-            IEnumerable<Difference> differences;
-            var isEqual = comparer.Compare((object)a1, (object)a2, out differences);
+            var isEqual = comparer.Compare((object)a1, (object)a2, out var differences);
 
             ResultToOutput(isEqual, differences);
 
             Assert.IsFalse(isEqual);
             Assert.AreEqual(3, differences.Count());
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Field1" && d.Value1 == "A" && d.Value2 == "B"));
-            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.TypeMismatch && d.MemberPath == "Field2" && d.Value1 == "5" && d.Value2 == 8.0.ToString()));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.TypeMismatch && d.MemberPath == "Field2" && d.Value1 == "5" && d.Value2 == 8.0.ToString(CultureInfo.InvariantCulture)));
             Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject && d.MemberPath == "Field3" && d.Value1 == "True"));
         }
         #endregion
@@ -409,8 +394,6 @@ namespace ObjectsComparer.Examples.BasicExamples
 
 
             //Exception
-            var a1 = new ClassA();
-            var a2 = new ClassA();
             comparer.AddComparerOverride<string>(new MyValueComparer(), member => member.Name.StartsWith("String"));
             comparer.AddComparerOverride<string>(DoNotCompareValueComparer.Instance, member => member.Name.EndsWith("Property"));
 

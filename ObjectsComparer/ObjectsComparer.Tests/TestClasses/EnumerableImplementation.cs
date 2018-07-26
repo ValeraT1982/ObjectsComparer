@@ -2,7 +2,7 @@
 
 namespace ObjectsComparer.Tests.TestClasses
 {
-    class EnumerableImplementation: IEnumerable
+    internal class EnumerableImplementation: IEnumerable
     {
         public string Property1 { get; set; }
 

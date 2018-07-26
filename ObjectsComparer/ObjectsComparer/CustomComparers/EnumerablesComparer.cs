@@ -95,12 +95,7 @@ namespace ObjectsComparer
 
         public bool IsStopComparison(Type type, object obj1, object obj2)
         {
-            if (Settings.EmptyAndNullEnumerablesEqual && obj1 == null || obj2 == null)
-            {
-                return true;
-            }
-
-            return false;
+            return Settings.EmptyAndNullEnumerablesEqual && obj1 == null || obj2 == null;
         }
 
         public bool SkipMember(Type type, MemberInfo member)

@@ -42,16 +42,13 @@ namespace ObjectsComparer
                 return true;
             }
 
-            if (type.IsArray)
+            if (!type.IsArray)
             {
-                Array array = new int[0];
-                if (member.Name == PropertyHelper.GetMemberInfo(() => array.Length).Name)
-                {
-                    return true;
-                }
+                return false;
             }
 
-            return false;
+            Array array = new int[0];
+            return member.Name == PropertyHelper.GetMemberInfo(() => array.Length).Name;
         }
     }
 }

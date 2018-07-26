@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace ObjectsComparer.Tests.TestClasses
 {
-    class CollectionOfB: IProgress<string>, ICollection<B>
+    internal class CollectionOfB: IProgress<string>, ICollection<B>
     {
         public string Property1 { get; set; }
 

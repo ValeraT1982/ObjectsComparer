@@ -56,7 +56,7 @@ namespace ObjectsComparer
                 yield break;
             }
 
-            for (int i = 0; i < list2.Count; i++)
+            for (var i = 0; i < list2.Count; i++)
             {
                 foreach (var failure in _comparer.CalculateDifferences(list1[i], list2[i]))
                 {

@@ -219,8 +219,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A();
             var comparer = new Comparer<A>();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -237,8 +236,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A();
             var comparer = new Comparer<A>(new ComparisonSettings { EmptyAndNullEnumerablesEqual = true });
 
-            IEnumerable<Difference> differences;
-            var isEqual = comparer.Compare(a1, a2, out differences);
+            var isEqual = comparer.Compare(a1, a2, out var differences);
 
             Assert.IsTrue(isEqual);
             CollectionAssert.IsEmpty(differences);
@@ -253,8 +251,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { Flags = flags2 };
             var comparer = new Comparer<A>();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -291,8 +288,7 @@ namespace ObjectsComparer.Tests
             };
             var comparer = new Comparer<A>();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -317,8 +313,7 @@ namespace ObjectsComparer.Tests
             };
             var comparer = new Comparer<A>();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);

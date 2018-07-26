@@ -59,8 +59,7 @@ namespace ObjectsComparer
         {
             var dictionaryKey = new Tuple<Type, string>(typeof(T), key);
 
-            object value;
-            if (_settings.TryGetValue(dictionaryKey, out value))
+            if (_settings.TryGetValue(dictionaryKey, out var value))
             {
                 return (T) value;
             }

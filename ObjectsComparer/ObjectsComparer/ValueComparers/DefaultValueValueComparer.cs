@@ -34,7 +34,7 @@
             var isObj1Default = obj1?.Equals(_defaultValue) != false || obj1.Equals(_typeDefaultValue);
             var isObj2Default = obj2?.Equals(_defaultValue) != false || obj2.Equals(_typeDefaultValue);
 
-            return (isObj1Default && isObj2Default) || _valueComparer.Compare(obj1, obj2, settings);
+            return isObj1Default && isObj2Default || _valueComparer.Compare(obj1, obj2, settings);
         }
 
         /// <summary>

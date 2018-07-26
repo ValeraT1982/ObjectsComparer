@@ -1,6 +1,6 @@
 ﻿namespace ObjectsComparer.Tests.TestClasses
 {
-    interface ITestInterface
+    internal interface ITestInterface
     {
         string Property { get; set; }
     }

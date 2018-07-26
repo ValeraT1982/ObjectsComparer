@@ -31,23 +31,20 @@ namespace ObjectsComparer
 
         protected override IList<string> GetProperties(ExpandoObject obj)
         {
-            if (obj == null)
-            {
-                return new List<string>();
-            }
-
-            return ((IDictionary<string, object>)obj).Keys.ToList();
+            return ((IDictionary<string, object>) obj)?.Keys.ToList() ?? new List<string>();
         }
 
         protected override bool TryGetMemberValue(ExpandoObject obj, string propertyName, out object value)
         {
-            if (obj == null)
+            if (obj != null)
             {
-                value = null;
-                return false;
+                return ((IDictionary<string, object>) obj).TryGetValue(propertyName, out value);
             }
 
-            return ((IDictionary<string, object>)obj).TryGetValue(propertyName, out value);
+            value = null;
+
+            return false;
+
         }
     }
 }

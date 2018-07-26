@@ -48,8 +48,7 @@ namespace ObjectsComparer.Examples.Example1
                 Status = 0
             };
 
-            IEnumerable<Difference> differences;
-            var isEqual = _comparer.Compare(expectedMessage, actualMessage, out differences);
+            var isEqual = _comparer.Compare(expectedMessage, actualMessage, out var differences);
 
             ResultToOutput(isEqual, differences);
 
@@ -81,12 +80,11 @@ namespace ObjectsComparer.Examples.Example1
                 Errors = new List<Error>
                 {
                     new Error { Id = 2, Messgae = "Some error #2" },
-                    new Error { Id = 7, Messgae = "Some error #7" },
+                    new Error { Id = 7, Messgae = "Some error #7" }
                 }
             };
 
-            IEnumerable<Difference> differences;
-            var isEqual = _comparer.Compare(expectedMessage, actualMessage, out differences);
+            var isEqual = _comparer.Compare(expectedMessage, actualMessage, out var differences);
 
             ResultToOutput(isEqual, differences);
 
@@ -122,8 +120,7 @@ namespace ObjectsComparer.Examples.Example1
                 }
             };
 
-            IEnumerable<Difference> differences;
-            var isEqual = _comparer.Compare(expectedMessage, actualMessage, out differences);
+            var isEqual = _comparer.Compare(expectedMessage, actualMessage, out var differences);
 
             ResultToOutput(isEqual, differences);
 

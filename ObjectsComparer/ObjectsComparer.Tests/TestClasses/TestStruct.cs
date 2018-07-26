@@ -1,6 +1,6 @@
 ﻿namespace ObjectsComparer.Tests.TestClasses
 {
-    struct TestStruct
+    internal struct TestStruct
     {
         public string FieldA;
 

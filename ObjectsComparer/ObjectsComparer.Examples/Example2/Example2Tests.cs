@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using static ObjectsComparer.Examples.OutputHelper;
@@ -39,8 +38,7 @@ namespace ObjectsComparer.Examples.Example2
                 PhoneNumber = "(111) 555 8888"
             };
 
-            IEnumerable<Difference> differences;
-            var isEqual = _comparer.Compare(person1, person2, out differences);
+            var isEqual = _comparer.Compare(person1, person2, out var differences);
 
             ResultToOutput(isEqual, differences);
 
@@ -67,8 +65,7 @@ namespace ObjectsComparer.Examples.Example2
                 PhoneNumber = "222-555-9999"
             };
 
-            IEnumerable<Difference> differences;
-            var isEqual = _comparer.Compare(person1, person2, out differences);
+            var isEqual = _comparer.Compare(person1, person2, out var differences);
 
             ResultToOutput(isEqual, differences);
 

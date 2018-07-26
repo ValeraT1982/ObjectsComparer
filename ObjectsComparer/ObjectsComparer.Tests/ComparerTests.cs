@@ -3,7 +3,6 @@ using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
 using ObjectsComparer.Tests.TestClasses;
-using System.Collections.Generic;
 
 namespace ObjectsComparer.Tests
 {
@@ -330,8 +329,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { ClassB = new InheritedFromB { Property1 = "Str2", NewProperty = "SomeValue" } };
             var comparer = new Comparer<A>();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -363,8 +361,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { Flags = flags2 };
             var comparer = new Comparer<A>();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -407,8 +404,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { TypeProperty = typeof(int) };
             var comparer = new Comparer<A>();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);

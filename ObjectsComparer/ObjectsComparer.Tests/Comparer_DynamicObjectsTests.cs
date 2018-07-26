@@ -51,8 +51,7 @@ namespace ObjectsComparer.Tests
 
             var comparer = new Comparer();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out IEnumerable<Difference> differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -73,8 +72,7 @@ namespace ObjectsComparer.Tests
             a2.Field3 = false;
             var comparer = new Comparer();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out IEnumerable<Difference> differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -96,8 +94,7 @@ namespace ObjectsComparer.Tests
             a2.Field4 = "S";
             var comparer = new Comparer(new ComparisonSettings { UseDefaultIfMemberNotExist = true });
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out IEnumerable<Difference> differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -120,8 +117,7 @@ namespace ObjectsComparer.Tests
             a2.FieldSub1 = a2Sub1;
             var comparer = new Comparer();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out IEnumerable<Difference> differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -140,8 +136,7 @@ namespace ObjectsComparer.Tests
             a2.Field2 = "5";
             var comparer = new Comparer();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out IEnumerable<Difference> differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -175,8 +170,7 @@ namespace ObjectsComparer.Tests
             a2.Field2 = null;
             var comparer = new Comparer();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out IEnumerable<Difference> differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -198,8 +192,7 @@ namespace ObjectsComparer.Tests
             a2.Field2 = "B";
             var comparer = new Comparer();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out IEnumerable<Difference> differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -241,8 +234,7 @@ namespace ObjectsComparer.Tests
             var comparer = new Comparer();
             comparer.AddComparerOverride("Field1", stringComparer);
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out IEnumerable<Difference> differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -265,8 +257,7 @@ namespace ObjectsComparer.Tests
             doubleComparer.ToString(5.0).Returns("5.0");
             comparer.AddComparerOverride<double>(doubleComparer);
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out IEnumerable<Difference> differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -283,9 +274,8 @@ namespace ObjectsComparer.Tests
             dynamic a2 = new DynamicDictionary();
             a2.IntProperty = 7;
             var comparer = new Comparer();
-            
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+
+            var isEqual = comparer.Compare(a1, a2, out IEnumerable<Difference> differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);
@@ -321,8 +311,7 @@ namespace ObjectsComparer.Tests
             dynamic a2 = new DynamicDictionary();
             var comparer = new Comparer();
 
-            IEnumerable<Difference> differencesEnum;
-            var isEqual = comparer.Compare(a1, a2, out differencesEnum);
+            var isEqual = comparer.Compare(a1, a2, out IEnumerable<Difference> differencesEnum);
             var differences = differencesEnum.ToList();
 
             Assert.IsFalse(isEqual);

@@ -28,18 +28,8 @@ namespace ObjectsComparer
         /// <param name="toStringFunction">Function to convert objects of type <see cref="T"/> to <see cref="string"/>.</param>
         public DynamicValueComparer(Func<T, T, ComparisonSettings, bool> compareFunction, Func<T, string> toStringFunction)
         {
-            if (compareFunction == null)
-            {
-                throw new ArgumentNullException(nameof(compareFunction));
-            }
-
-            if (toStringFunction == null)
-            {
-                throw new ArgumentNullException(nameof(toStringFunction));
-            }
-
-            _compareFunction = compareFunction;
-            _toStringFunction = toStringFunction;
+            _compareFunction = compareFunction ?? throw new ArgumentNullException(nameof(compareFunction));
+            _toStringFunction = toStringFunction ?? throw new ArgumentNullException(nameof(toStringFunction));
         }
 
         /// <summary>

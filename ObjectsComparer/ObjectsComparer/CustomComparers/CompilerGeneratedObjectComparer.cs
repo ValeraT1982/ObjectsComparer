@@ -48,15 +48,15 @@ namespace ObjectsComparer
             }
 
             var propertyInfo = obj.GetType().GetTypeInfo().GetProperty(propertyName);
-
-            if (propertyInfo != null)
+            if (propertyInfo == null)
             {
-                value = propertyInfo.GetValue(obj);
-
-                return true;
+                return false;
             }
 
-            return false;
+            value = propertyInfo.GetValue(obj);
+
+            return true;
+
         }
     }
 }

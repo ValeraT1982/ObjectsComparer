@@ -1,6 +1,6 @@
 ﻿namespace ObjectsComparer.Tests.TestClasses
 {
-    enum TestEnum
+    internal enum TestEnum
     {
         Value1,
         Value2

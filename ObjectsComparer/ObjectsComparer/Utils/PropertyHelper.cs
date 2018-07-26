@@ -11,27 +11,25 @@ namespace ObjectsComparer.Utils
             MemberExpression exp;
 
             //this line is necessary, because sometimes the expression comes in as Convert(originalexpression)
-            var body = memberLambda.Body as UnaryExpression;
-            if (body != null)
+            switch (memberLambda.Body)
             {
-                var unExp = body;
-                var operand = unExp.Operand as MemberExpression;
-                if (operand != null)
-                {
-                    exp = operand;
-                }
-                else
-                {
+                case UnaryExpression body:
+                    var unExp = body;
+                    if (unExp.Operand is MemberExpression operand)
+                    {
+                        exp = operand;
+                    }
+                    else
+                    {
+                        throw new ArgumentException();
+                    }
+
+                    break;
+                case MemberExpression _:
+                    exp = (MemberExpression)memberLambda.Body;
+                    break;
+                default:
                     throw new ArgumentException();
-                }
-            }
-            else if (memberLambda.Body is MemberExpression)
-            {
-                exp = (MemberExpression)memberLambda.Body;
-            }
-            else
-            {
-                throw new ArgumentException();
             }
 
             return exp.Member;

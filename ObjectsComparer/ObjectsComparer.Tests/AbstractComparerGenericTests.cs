@@ -33,9 +33,8 @@ namespace ObjectsComparer.Tests
         {
             var differences = new List<Difference> { new Difference("", "1", "2") };
             _comparer.CalculateDifferences(1, 2).Returns(differences);
-            IEnumerable<Difference> outDifferences;
 
-            var result = _comparer.Compare(1, 2, out outDifferences);
+            var result = _comparer.Compare(1, 2, out var outDifferences);
 
             Assert.IsFalse(result);
             _comparer.Received().CalculateDifferences(1, 2);
@@ -47,9 +46,8 @@ namespace ObjectsComparer.Tests
         {
             var differences = new List<Difference>();
             _comparer.CalculateDifferences(1, 1).Returns(differences);
-            IEnumerable<Difference> outDifferences;
 
-            var result = _comparer.Compare(1, 1, out outDifferences);
+            var result = _comparer.Compare(1, 1, out var outDifferences);
 
             Assert.IsTrue(result);
             _comparer.Received().CalculateDifferences(1, 1);

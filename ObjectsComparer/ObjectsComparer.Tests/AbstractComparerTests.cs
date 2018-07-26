@@ -33,9 +33,8 @@ namespace ObjectsComparer.Tests
         {
             var differences = new List<Difference> {new Difference("", "string1", "string2")};
             _comparer.CalculateDifferences(typeof(string), "string1", "string2").Returns(differences);
-            IEnumerable<Difference> outDifferences;
 
-            var result = _comparer.Compare("string1", "string2", out outDifferences);
+            var result = _comparer.Compare("string1", "string2", out var outDifferences);
 
             Assert.IsFalse(result);
             _comparer.Received().CalculateDifferences(typeof(string), "string1", "string2");
@@ -47,9 +46,8 @@ namespace ObjectsComparer.Tests
         {
             var differences = new List<Difference>();
             _comparer.CalculateDifferences(typeof(string), "string1", "string1").Returns(differences);
-            IEnumerable<Difference> outDifferences;
 
-            var result = _comparer.Compare("string1", "string1", out outDifferences);
+            var result = _comparer.Compare("string1", "string1", out var outDifferences);
 
             Assert.IsTrue(result);
             _comparer.Received().CalculateDifferences(typeof(string), "string1", "string1");
@@ -84,9 +82,8 @@ namespace ObjectsComparer.Tests
         {
             var differences = new List<Difference> {new Difference("", "string1", "string2")};
             _comparer.CalculateDifferences(typeof(string), "string1", "string2").Returns(differences);
-            IEnumerable<Difference> outDifferences;
 
-            var result = _comparer.Compare(typeof(string), "string1", "string2", out outDifferences);
+            var result = _comparer.Compare(typeof(string), "string1", "string2", out var outDifferences);
 
             Assert.IsFalse(result);
             _comparer.Received().CalculateDifferences(typeof(string), "string1", "string2");
@@ -98,9 +95,8 @@ namespace ObjectsComparer.Tests
         {
             var differences = new List<Difference>();
             _comparer.CalculateDifferences(typeof(string), "string1", "string1").Returns(differences);
-            IEnumerable<Difference> outDifferences;
 
-            var result = _comparer.Compare(typeof(string), "string1", "string1", out outDifferences);
+            var result = _comparer.Compare(typeof(string), "string1", "string1", out var outDifferences);
 
             Assert.IsTrue(result);
             _comparer.Received().CalculateDifferences(typeof(string), "string1", "string1");

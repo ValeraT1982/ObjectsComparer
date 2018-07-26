@@ -33,17 +33,12 @@ namespace ObjectsComparer
                 throw new ArgumentNullException(nameof(memberInfo));
             }
 
-            if (valueComparer == null)
-            {
-                throw new ArgumentNullException(nameof(valueComparer));
-            }
-
             if (_overridesByMember.ContainsKey(memberInfo))
             {
                 throw new ValueComparerExistsException(memberInfo);
             }
 
-            _overridesByMember[memberInfo] = valueComparer;
+            _overridesByMember[memberInfo] = valueComparer ?? throw new ArgumentNullException(nameof(valueComparer));
         }
 
         public void AddComparer(Type type, IValueComparer valueComparer,
@@ -119,22 +114,18 @@ namespace ObjectsComparer
                 throw new ArgumentNullException(nameof(type));
             }
 
-            List<ValueComparerWithFilter> overridesByType;
-            if (_overridesByType.TryGetValue(type, out overridesByType))
+            if (!_overridesByType.TryGetValue(type, out var overridesByType))
             {
-                overridesByType = overridesByType.Where(o => o.Filter == null).ToList();
-                if (overridesByType.Count > 1)
-                {
-                    throw new AmbiguousComparerOverrideResolutionException(type);
-                }
-
-                if (overridesByType.Count == 1)
-                {
-                    return overridesByType[0].ValueComparer;
-                }
+                return null;
             }
 
-            return null;
+            overridesByType = overridesByType.Where(o => o.Filter == null).ToList();
+            if (overridesByType.Count > 1)
+            {
+                throw new AmbiguousComparerOverrideResolutionException(type);
+            }
+
+            return overridesByType.Count == 1 ? overridesByType[0].ValueComparer : null;
         }
 
         public IValueComparer GetComparer(MemberInfo memberInfo)
@@ -144,8 +135,7 @@ namespace ObjectsComparer
                 throw new ArgumentNullException(nameof(memberInfo));
             }
 
-            List<ValueComparerWithFilter> overridesByType;
-            if (_overridesByType.TryGetValue(memberInfo.GetMemberType(), out overridesByType))
+            if (_overridesByType.TryGetValue(memberInfo.GetMemberType(), out var overridesByType))
             {
                 overridesByType = overridesByType.Where(o => o.Filter == null || o.Filter(memberInfo)).ToList();
 
@@ -160,29 +150,24 @@ namespace ObjectsComparer
                 }
             }
 
-            IValueComparer overrideByMemberInfo;
-            if (_overridesByMember.TryGetValue(memberInfo, out overrideByMemberInfo))
+            if (_overridesByMember.TryGetValue(memberInfo, out var overrideByMemberInfo))
             {
                 return overrideByMemberInfo;
             }
 
-            List<ValueComparerWithFilter> overridesByName;
-            if (_overridesByName.TryGetValue(memberInfo.Name, out overridesByName))
+            if (!_overridesByName.TryGetValue(memberInfo.Name, out var overridesByName))
             {
-                overridesByName = overridesByName.Where(o => o.Filter == null || o.Filter(memberInfo)).ToList();
-
-                if (overridesByName.Count > 1)
-                {
-                    throw new AmbiguousComparerOverrideResolutionException(memberInfo);
-                }
-
-                if (overridesByName.Count == 1)
-                {
-                    return overridesByName[0].ValueComparer;
-                }
+                return null;
             }
 
-            return null;
+            overridesByName = overridesByName.Where(o => o.Filter == null || o.Filter(memberInfo)).ToList();
+
+            if (overridesByName.Count > 1)
+            {
+                throw new AmbiguousComparerOverrideResolutionException(memberInfo);
+            }
+
+            return overridesByName.Count == 1 ? overridesByName[0].ValueComparer : null;
         }
 
         public IValueComparer GetComparer(string memberName)
@@ -192,22 +177,18 @@ namespace ObjectsComparer
                 throw new ArgumentNullException(nameof(memberName));
             }
 
-            List<ValueComparerWithFilter> overridesByName;
-            if (_overridesByName.TryGetValue(memberName, out overridesByName))
+            if (!_overridesByName.TryGetValue(memberName, out var overridesByName))
             {
-                overridesByName = overridesByName.Where(o => o.Filter == null).ToList();
-                if (overridesByName.Count > 1)
-                {
-                    throw new AmbiguousComparerOverrideResolutionException(memberName);
-                }
-
-                if (overridesByName.Count == 1)
-                {
-                    return overridesByName[0].ValueComparer;
-                }
+                return null;
             }
 
-            return null;
+            overridesByName = overridesByName.Where(o => o.Filter == null).ToList();
+            if (overridesByName.Count > 1)
+            {
+                throw new AmbiguousComparerOverrideResolutionException(memberName);
+            }
+
+            return overridesByName.Count == 1 ? overridesByName[0].ValueComparer : null;
         }
     }
 }

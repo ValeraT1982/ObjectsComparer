@@ -61,16 +61,13 @@ namespace ObjectsComparer
                 return true;
             }
 
-            if (type.InheritsFrom(typeof(IDictionary<,>)))
+            if (!type.InheritsFrom(typeof(IDictionary<,>)))
             {
-                if (member.Name == PropertyHelper.GetMemberInfo(() => new Dictionary<object, object>().Values).Name ||
-                    member.Name == PropertyHelper.GetMemberInfo(() => new Dictionary<object, object>().Keys).Name)
-                {
-                    return true;
-                }
+                return false;
             }
 
-            return false;
+            return member.Name == PropertyHelper.GetMemberInfo(() => new Dictionary<object, object>().Values).Name ||
+                   member.Name == PropertyHelper.GetMemberInfo(() => new Dictionary<object, object>().Keys).Name;
         }
     }
 }

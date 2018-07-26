@@ -5,7 +5,7 @@ using System.Linq;
 namespace ObjectsComparer
 {
     /// <summary>
-    /// Implementation of <see cref="IComparer"/> which provides implementation of Compare methods.
+    /// Implementation of <see cref="T:ObjectsComparer.IComparer" /> which provides implementation of Compare methods.
     /// </summary>
     public abstract class AbstractComparer: BaseComparer, IComparer
     {

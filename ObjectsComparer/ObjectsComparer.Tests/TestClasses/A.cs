@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace ObjectsComparer.Tests.TestClasses
 {
-    class A
+    internal class A
     {
         public int Field;
 

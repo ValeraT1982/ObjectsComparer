@@ -42,6 +42,7 @@ namespace ObjectsComparer
             var genericType = typeof(IComparer<>).MakeGenericType(type);
             var method = genericType.GetTypeInfo().GetMethod(CalculateDifferencesMethodName, new[] { type, type });
 
+            // ReSharper disable once PossibleNullReferenceException
             return (IEnumerable<Difference>)method.Invoke(comparer, new[] { obj1, obj2 });
         }
     }

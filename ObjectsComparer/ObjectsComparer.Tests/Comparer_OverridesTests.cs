@@ -323,7 +323,7 @@ namespace ObjectsComparer.Tests
 
                 return ExtractDigits(s1) == ExtractDigits(s2);
             });
-            valueComparer.ToString(Arg.Any<object>()).Returns(callInfo => ((string)callInfo.Arg<object>()));
+            valueComparer.ToString(Arg.Any<object>()).Returns(callInfo => (string)callInfo.Arg<object>());
 
             return valueComparer;
         }

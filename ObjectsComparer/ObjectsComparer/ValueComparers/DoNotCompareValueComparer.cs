@@ -13,14 +13,16 @@
         {
             get
             {
-                if (_instance == null)
+                if (_instance != null)
                 {
-                    lock (SyncRoot)
+                    return _instance;
+                }
+
+                lock (SyncRoot)
+                {
+                    if (_instance == null)
                     {
-                        if (_instance == null)
-                        {
-                            _instance = new DoNotCompareValueComparer();
-                        }
+                        _instance = new DoNotCompareValueComparer();
                     }
                 }
 

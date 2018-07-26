@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Dynamic;
 using System.IO;
 using System.Linq;
@@ -51,8 +50,7 @@ namespace ObjectsComparer.Examples.Example3
             var settings1Json = LoadJson("Settings1.json");
             var settings1 = JsonConvert.DeserializeObject<ExpandoObject>(settings1Json);
 
-            IEnumerable<Difference> differences;
-            var isEqual = _comparer.Compare(settings0, settings1, out differences);
+            var isEqual = _comparer.Compare(settings0, settings1, out var differences);
 
             ResultToOutput(isEqual, differences);
             
@@ -67,8 +65,7 @@ namespace ObjectsComparer.Examples.Example3
             var settings2Json = LoadJson("Settings2.json");
             var settings2 = JsonConvert.DeserializeObject<ExpandoObject>(settings2Json);
 
-            IEnumerable<Difference> differences;
-            var isEqual = _comparer.Compare(settings0, settings2, out differences);
+            var isEqual = _comparer.Compare(settings0, settings2, out var differences);
 
             ResultToOutput(isEqual, differences);
 
@@ -89,15 +86,16 @@ namespace ObjectsComparer.Examples.Example3
             var resourceStream = typeof(Example3Tests).GetTypeInfo()
                 .Assembly.GetManifestResourceStream("ObjectsComparer.Examples.Example3." + fileName);
 
-            if (resourceStream != null)
+            if (resourceStream == null)
             {
-                using (var reader = new StreamReader(resourceStream, Encoding.UTF8))
-                {
-                    return reader.ReadToEnd();
-                }
+                throw new Exception($"Resource '{fileName}' not found");
             }
 
-            throw new Exception($"Resource '{fileName}' not found");
+            using (var reader = new StreamReader(resourceStream, Encoding.UTF8))
+            {
+                return reader.ReadToEnd();
+            }
+
         }
     }
 }

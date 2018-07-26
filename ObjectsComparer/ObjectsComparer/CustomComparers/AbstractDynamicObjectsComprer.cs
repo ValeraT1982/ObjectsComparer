@@ -83,8 +83,8 @@ namespace ObjectsComparer
                 }
 
                 //null cannot be casted to ValueType
-                if ((value1 == null && value2 != null && value2.GetType().GetTypeInfo().IsValueType) ||
-                    (value2 == null && value1 != null && value1.GetType().GetTypeInfo().IsValueType))
+                if (value1 == null && value2 != null && value2.GetType().GetTypeInfo().IsValueType ||
+                    value2 == null && value1 != null && value1.GetType().GetTypeInfo().IsValueType)
                 {
                     var valueComparer2 = value2 != null ? 
                         OverridesCollection.GetComparer(value2.GetType()) ?? OverridesCollection.GetComparer(propertyKey) ?? DefaultValueComparer :
