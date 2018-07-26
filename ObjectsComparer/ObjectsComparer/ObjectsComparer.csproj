@@ -10,7 +10,7 @@
     <Copyright>Copyright © Valerii Tereshchenko 2018</Copyright>
     <PackageLicenseUrl>https://github.com/ValeraT1982/ObjectsComparer/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/ValeraT1982/ObjectsComparer</PackageProjectUrl>
-    <PackageIconUrl>https://github.com/ValeraT1982/ObjectsComparer/blob/master/ObjectsDataComparer.png</PackageIconUrl>
+    <PackageIconUrl>https://github.com/ValeraT1982/ObjectsComparer/blob/master/ObjectsDataComparer.png?raw=true</PackageIconUrl>
     <RepositoryUrl>https://github.com/ValeraT1982/ObjectsComparer</RepositoryUrl>
     <PackageTags>C#, compare, class, reflection, object, comparison</PackageTags>
   </PropertyGroup>
