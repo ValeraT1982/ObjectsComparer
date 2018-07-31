@@ -53,7 +53,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void PrimitiveTypeArrayInequalityFirstNullNull()
+        public void PrimitiveTypeArrayInequalityFirstNull()
         {
             var a1 = new A();
             var a2 = new A { IntArray = new int[0] };
@@ -69,7 +69,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void PrimitiveTypeArrayInequalitySecondNullNull()
+        public void PrimitiveTypeArrayInequalitySecondNull()
         {
             var a1 = new A { IntArray = new int[0] };
             var a2 = new A();
@@ -152,6 +152,38 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual("CollectionOfB.Count", differences[0].MemberPath);
             Assert.AreEqual("2", differences[0].Value1);
             Assert.AreEqual("1", differences[0].Value2);
+        }
+
+        [Test]
+        public void CollectionAndNullInequality()
+        {
+            var a1 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
+            var a2 = new A();
+            var comparer = new Comparer<A>();
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(1, differences.Count);
+            Assert.AreEqual("CollectionOfB", differences[0].MemberPath);
+            Assert.AreEqual(a1.CollectionOfB.ToString(), differences[0].Value1);
+            Assert.AreEqual(string.Empty, differences[0].Value2);
+        }
+
+        [Test]
+        public void NullAndCollectionInequality()
+        {
+            var a1 = new A();
+            var a2 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
+            var comparer = new Comparer<A>();
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(1, differences.Count);
+            Assert.AreEqual("CollectionOfB", differences[0].MemberPath);
+            Assert.AreEqual(string.Empty, differences[0].Value1);
+            Assert.AreEqual(a2.CollectionOfB.ToString(), differences[0].Value2);
         }
 
         [Test]
@@ -323,6 +355,83 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences.First().DifferenceType);
             Assert.AreEqual("1", differences.First().Value1);
             Assert.AreEqual("0", differences.First().Value2);
+        }
+
+
+        [Test]
+        public void HashSetEqualitySameOrder()
+        {
+            var a1 = new HashSet<string> { "a", "b" };
+            var a2 = new HashSet<string> { "a", "b" };
+            var comparer = new Comparer<HashSet<string>>();
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsTrue(isEqual);
+        }
+
+        [Test]
+        public void HashSetEqualityDifferentOrder()
+        {
+            var a1 = new HashSet<string> { "a", "b" };
+            var a2 = new HashSet<string> { "b", "a" };
+            var comparer = new Comparer<HashSet<string>>();
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsTrue(isEqual);
+        }
+
+        [Test]
+        public void HashSetInequalityDifferentElements()
+        {
+            var a1 = new HashSet<string> { "a", "b" };
+            var a2 = new HashSet<string> { "a", "c" };
+            var comparer = new Comparer<HashSet<string>>();
+
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(2, differences.Count);
+            Assert.IsTrue(differences.Any(
+                d => d.MemberPath == string.Empty && d.DifferenceType == DifferenceTypes.MissedElementInFirstObject && d.Value2 == "c"));
+            Assert.IsTrue(differences.Any(
+                d => d.MemberPath == string.Empty && d.DifferenceType == DifferenceTypes.MissedElementInSecondObject && d.Value1 == "b"));
+        }
+
+        [Test]
+        public void HashSetInequalityDifferentNumberOfElements()
+        {
+            var a1 = new HashSet<string> { "a", "b" };
+            var a2 = new HashSet<string> { "a", "b", "c" };
+            var comparer = new Comparer<HashSet<string>>();
+            
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(1, differences.Count);
+            Assert.IsTrue(differences.Any(
+                d => d.MemberPath == string.Empty && d.DifferenceType == DifferenceTypes.MissedElementInFirstObject && d.Value2 == "c"));
+        }
+
+        [Test]
+        public void HashSetAndNullInequality()
+        {
+            var a = new HashSet<string> { "a", "b" };
+            var comparer = new Comparer<HashSet<string>>();
+
+            var isEqual = comparer.Compare(a, null, out var differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(1, differences.Count);
+            Assert.IsTrue(differences.Any(
+                d => d.MemberPath == string.Empty && d.DifferenceType == DifferenceTypes.ValueMismatch));
         }
     }
 }

@@ -36,6 +36,7 @@ namespace ObjectsComparer
                 new ExpandoObjectComparer(Settings, this, Factory),
                 new DynamicObjectComparer(Settings, this, Factory),
                 new CompilerGeneratedObjectComparer(Settings, this, Factory),
+                new HashSetsComparer(Settings, this, Factory),
                 new GenericEnumerablesComparer(Settings, this, Factory),
                 new EnumerablesComparer(Settings, this, Factory),
                 new TypesComparer(Settings, this, Factory)

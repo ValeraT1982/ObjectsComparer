@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
@@ -12,8 +13,8 @@ namespace ObjectsComparer.Tests
         [Test]
         public void PropertyEquality()
         {
-            var a1 = new A { IntProperty = 10, DateTimeProperty = new DateTime(2017, 1, 1), Property3 = 5 };
-            var a2 = new A { IntProperty = 10, DateTimeProperty = new DateTime(2017, 1, 1), Property3 = 8 };
+            var a1 = new A {IntProperty = 10, DateTimeProperty = new DateTime(2017, 1, 1), Property3 = 5};
+            var a2 = new A {IntProperty = 10, DateTimeProperty = new DateTime(2017, 1, 1), Property3 = 8};
             var comparer = new Comparer<A>();
 
             var isEqual = comparer.Compare(a1, a2);
@@ -26,8 +27,8 @@ namespace ObjectsComparer.Tests
         {
             var date1 = new DateTime(2017, 1, 1);
             var date2 = new DateTime(2017, 1, 2);
-            var a1 = new A { IntProperty = 10, DateTimeProperty = date1 };
-            var a2 = new A { IntProperty = 8, DateTimeProperty = date2 };
+            var a1 = new A {IntProperty = 10, DateTimeProperty = date1};
+            var a2 = new A {IntProperty = 8, DateTimeProperty = date2};
             var comparer = new Comparer<A>();
 
             var differences = comparer.CalculateDifferences(a1, a2).ToList();
@@ -85,8 +86,8 @@ namespace ObjectsComparer.Tests
         [Test]
         public void FieldEquality()
         {
-            var a1 = new A { Field = 9 };
-            var a2 = new A { Field = 9 };
+            var a1 = new A {Field = 9};
+            var a2 = new A {Field = 9};
             var comparer = new Comparer<A>();
 
             var isEqual = comparer.Compare(a1, a2);
@@ -97,8 +98,8 @@ namespace ObjectsComparer.Tests
         [Test]
         public void FieldInequality()
         {
-            var a1 = new A { Field = 10 };
-            var a2 = new A { Field = 8 };
+            var a1 = new A {Field = 10};
+            var a2 = new A {Field = 8};
             var comparer = new Comparer<A>();
 
             var differences = comparer.CalculateDifferences(a1, a2).ToList();
@@ -151,8 +152,8 @@ namespace ObjectsComparer.Tests
         [Test]
         public void ClassPropertyEquality()
         {
-            var a1 = new A { ClassB = new B { Property1 = "Str1" } };
-            var a2 = new A { ClassB = new B { Property1 = "Str1" } };
+            var a1 = new A {ClassB = new B {Property1 = "Str1"}};
+            var a2 = new A {ClassB = new B {Property1 = "Str1"}};
             var comparer = new Comparer<A>();
 
             var isEqual = comparer.Compare(a1, a2);
@@ -163,8 +164,8 @@ namespace ObjectsComparer.Tests
         [Test]
         public void ClassPropertyInequality()
         {
-            var a1 = new A { ClassB = new B { Property1 = "Str1" } };
-            var a2 = new A { ClassB = new B { Property1 = "Str2" } };
+            var a1 = new A {ClassB = new B {Property1 = "Str1"}};
+            var a2 = new A {ClassB = new B {Property1 = "Str2"}};
             var comparer = new Comparer<A>();
 
             var differences = comparer.CalculateDifferences(a1, a2).ToList();
@@ -179,7 +180,7 @@ namespace ObjectsComparer.Tests
         public void ClassPropertyInequalityFirstNull()
         {
             var a1 = new A();
-            var a2 = new A { ClassB = new B { Property1 = "Str2" } };
+            var a2 = new A {ClassB = new B {Property1 = "Str2"}};
             var comparer = new Comparer<A>();
 
             var differences = comparer.CalculateDifferences(a1, a2).ToList();
@@ -193,7 +194,7 @@ namespace ObjectsComparer.Tests
         [Test]
         public void ClassPropertyInequalitySecondNull()
         {
-            var a1 = new A { ClassB = new B { Property1 = "Str2" } };
+            var a1 = new A {ClassB = new B {Property1 = "Str2"}};
             var a2 = new A();
             var comparer = new Comparer<A>();
 
@@ -208,9 +209,9 @@ namespace ObjectsComparer.Tests
         [Test]
         public void NoRecursiveComparison()
         {
-            var a1 = new A { ClassB = new B { Property1 = "Str1" } };
-            var a2 = new A { ClassB = new B { Property1 = "Str2" } };
-            var comparer = new Comparer<A>(new ComparisonSettings { RecursiveComparison = false });
+            var a1 = new A {ClassB = new B {Property1 = "Str1"}};
+            var a2 = new A {ClassB = new B {Property1 = "Str2"}};
+            var comparer = new Comparer<A>(new ComparisonSettings {RecursiveComparison = false});
 
             var isEqual = comparer.Compare(a1, a2);
 
@@ -220,8 +221,11 @@ namespace ObjectsComparer.Tests
         [Test]
         public void InterfacePropertyEquality()
         {
-            var a1 = new A { IntefaceProperty = new TestInterfaceImplementation1 { Property = "Str1" } };
-            var a2 = new A { IntefaceProperty = new TestInterfaceImplementation2 { Property = "Str1", AnotherProperty = 50 } };
+            var a1 = new A {IntefaceProperty = new TestInterfaceImplementation1 {Property = "Str1"}};
+            var a2 = new A
+            {
+                IntefaceProperty = new TestInterfaceImplementation2 {Property = "Str1", AnotherProperty = 50}
+            };
             var comparer = new Comparer<A>();
 
             var isEqual = comparer.Compare(a1, a2);
@@ -232,8 +236,11 @@ namespace ObjectsComparer.Tests
         [Test]
         public void InterfacePropertyInequality()
         {
-            var a1 = new A { IntefaceProperty = new TestInterfaceImplementation1 { Property = "Str1" } };
-            var a2 = new A { IntefaceProperty = new TestInterfaceImplementation2 { Property = "Str2", AnotherProperty = 50 } };
+            var a1 = new A {IntefaceProperty = new TestInterfaceImplementation1 {Property = "Str1"}};
+            var a2 = new A
+            {
+                IntefaceProperty = new TestInterfaceImplementation2 {Property = "Str2", AnotherProperty = 50}
+            };
             var comparer = new Comparer<A>();
 
             var differences = comparer.CalculateDifferences(a1, a2).ToList();
@@ -247,8 +254,8 @@ namespace ObjectsComparer.Tests
         [Test]
         public void StructPropertyEquality()
         {
-            var a1 = new A { StructProperty = new TestStruct { FieldA = "FA", FieldB = "FB" } };
-            var a2 = new A { StructProperty = new TestStruct { FieldA = "FA", FieldB = "FB" } };
+            var a1 = new A {StructProperty = new TestStruct {FieldA = "FA", FieldB = "FB"}};
+            var a2 = new A {StructProperty = new TestStruct {FieldA = "FA", FieldB = "FB"}};
             var comparer = new Comparer<A>();
 
             var isEqual = comparer.Compare(a1, a2);
@@ -259,8 +266,8 @@ namespace ObjectsComparer.Tests
         [Test]
         public void StructPropertyInequality()
         {
-            var a1 = new A { StructProperty = new TestStruct { FieldA = "FA", FieldB = "FB" } };
-            var a2 = new A { StructProperty = new TestStruct { FieldA = "FA", FieldB = "FBB" } };
+            var a1 = new A {StructProperty = new TestStruct {FieldA = "FA", FieldB = "FB"}};
+            var a2 = new A {StructProperty = new TestStruct {FieldA = "FA", FieldB = "FBB"}};
             var comparer = new Comparer<A>();
 
             var differences = comparer.CalculateDifferences(a1, a2).ToList();
@@ -274,8 +281,8 @@ namespace ObjectsComparer.Tests
         [Test]
         public void EnumPropertyEquality()
         {
-            var a1 = new A { EnumProperty = TestEnum.Value1 };
-            var a2 = new A { EnumProperty = TestEnum.Value1 };
+            var a1 = new A {EnumProperty = TestEnum.Value1};
+            var a2 = new A {EnumProperty = TestEnum.Value1};
             var comparer = new Comparer<A>();
 
             var isEqual = comparer.Compare(a1, a2);
@@ -286,8 +293,8 @@ namespace ObjectsComparer.Tests
         [Test]
         public void EnumPropertyInequality()
         {
-            var a1 = new A { EnumProperty = TestEnum.Value1 };
-            var a2 = new A { EnumProperty = TestEnum.Value2 };
+            var a1 = new A {EnumProperty = TestEnum.Value1};
+            var a2 = new A {EnumProperty = TestEnum.Value2};
             var comparer = new Comparer<A>();
 
             var differences = comparer.CalculateDifferences(a1, a2).ToList();
@@ -301,8 +308,8 @@ namespace ObjectsComparer.Tests
         [Test]
         public void SetDefaultComparer()
         {
-            var a1 = new A { TestProperty1 = "ABC", Field = 5 };
-            var a2 = new A { TestProperty1 = "BCD", Field = 6 };
+            var a1 = new A {TestProperty1 = "ABC", Field = 5};
+            var a2 = new A {TestProperty1 = "BCD", Field = 6};
             var comparer = new Comparer<A>();
             var valueComparer = Substitute.For<IValueComparer>();
             valueComparer.Compare(Arg.Any<object>(), Arg.Any<object>(), Arg.Any<ComparisonSettings>()).Returns(true);
@@ -325,8 +332,8 @@ namespace ObjectsComparer.Tests
         [Test]
         public void InheritedAndBaseClassInequality()
         {
-            var a1 = new A { ClassB = new B { Property1 = "Str1" } };
-            var a2 = new A { ClassB = new InheritedFromB { Property1 = "Str2", NewProperty = "SomeValue" } };
+            var a1 = new A {ClassB = new B {Property1 = "Str1"}};
+            var a2 = new A {ClassB = new InheritedFromB {Property1 = "Str2", NewProperty = "SomeValue"}};
             var comparer = new Comparer<A>();
 
             var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
@@ -343,8 +350,8 @@ namespace ObjectsComparer.Tests
         [Test]
         public void InheritedAndBaseClassEquality()
         {
-            var a1 = new A { ClassB = new B { Property1 = "Str1" } };
-            var a2 = new A { ClassB = new InheritedFromB { Property1 = "Str1", NewProperty = "SomeValue" } };
+            var a1 = new A {ClassB = new B {Property1 = "Str1"}};
+            var a2 = new A {ClassB = new InheritedFromB {Property1 = "Str1", NewProperty = "SomeValue"}};
             var comparer = new Comparer<A>();
 
             var isEqual = comparer.Compare(a1, a2);
@@ -357,8 +364,8 @@ namespace ObjectsComparer.Tests
         [TestCase(FlagsEnum.Flag1, FlagsEnum.Flag1 | FlagsEnum.Flag2)]
         public void FlagsInequality(FlagsEnum flags1, FlagsEnum flags2)
         {
-            var a1 = new A { Flags = flags1 };
-            var a2 = new A { Flags = flags2 };
+            var a1 = new A {Flags = flags1};
+            var a2 = new A {Flags = flags2};
             var comparer = new Comparer<A>();
 
             var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
@@ -376,8 +383,8 @@ namespace ObjectsComparer.Tests
         [TestCase(FlagsEnum.Flag2, FlagsEnum.Flag2)]
         public void FlagsEquality(FlagsEnum flags1, FlagsEnum flags2)
         {
-            var a1 = new A { Flags = flags1 };
-            var a2 = new A { Flags = flags2 };
+            var a1 = new A {Flags = flags1};
+            var a2 = new A {Flags = flags2};
             var comparer = new Comparer<A>();
 
             var isEqual = comparer.Compare(a1, a2);
@@ -388,20 +395,20 @@ namespace ObjectsComparer.Tests
         [Test]
         public void TypePropertyEquality()
         {
-            var a1 = new A { TypeProperty = typeof(string)};
-            var a2 = new A { TypeProperty = typeof(string) };
+            var a1 = new A {TypeProperty = typeof(string)};
+            var a2 = new A {TypeProperty = typeof(string)};
             var comparer = new Comparer<A>();
 
             var isEqual = comparer.Compare(a1, a2);
-            
+
             Assert.IsTrue(isEqual);
         }
 
         [Test]
         public void TypePropertyInequality()
         {
-            var a1 = new A { TypeProperty = typeof(string) };
-            var a2 = new A { TypeProperty = typeof(int) };
+            var a1 = new A {TypeProperty = typeof(string)};
+            var a2 = new A {TypeProperty = typeof(int)};
             var comparer = new Comparer<A>();
 
             var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
@@ -411,6 +418,62 @@ namespace ObjectsComparer.Tests
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual(1, differences.Count);
             Assert.AreEqual("TypeProperty", differences.First().MemberPath);
+        }
+
+        [Test]
+        public void TimeSpanEquality()
+        {
+            var a1 = new TimeSpan(123456789);
+            var a2 = new TimeSpan(123456789);
+            var comparer = new Comparer<TimeSpan>();
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsTrue(isEqual);
+        }
+
+        [Test]
+        public void TimeSpanInequality()
+        {
+            var a1 = new TimeSpan(123456789);
+            var a2 = new TimeSpan(123456788);
+            var comparer = new Comparer<TimeSpan>();
+
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(1, differences.Count);
+            Assert.AreEqual(string.Empty, differences.First().MemberPath);
+        }
+
+        [Test]
+        public void GuidEquality()
+        {
+            var a1 = new Guid("01234567890123456789012345678912");
+            var a2 = new Guid("01234567890123456789012345678912");
+            var comparer = new Comparer<Guid>();
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsTrue(isEqual);
+        }
+
+        [Test]
+        public void GuidInequality()
+        {
+            var a1 = new Guid("01234567890123456789012345678912");
+            var a2 = new Guid("01234567890123456789012345678913");
+            var comparer = new Comparer<Guid>();
+
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(1, differences.Count);
+            Assert.AreEqual(string.Empty, differences.First().MemberPath);
         }
     }
 }

@@ -18,14 +18,24 @@ namespace ObjectsComparer
         TypeMismatch,
 
         /// <summary>
-        /// Member does not exists in the first object.
+        /// Member does not exist in the first object.
         /// </summary>
         MissedMemberInFirstObject,
 
         /// <summary>
-        /// Member does not exists in the second object.
+        /// Member does not exist in the second object.
         /// </summary>
         MissedMemberInSecondObject,
+
+        /// <summary>
+        /// First object does not contain element.
+        /// </summary>
+        MissedElementInFirstObject,
+
+        /// <summary>
+        /// Second object does not contain element.
+        /// </summary>
+        MissedElementInSecondObject,
 
         /// <summary>
         /// <see cref="IEnumerable"/>s have different number of elements.
