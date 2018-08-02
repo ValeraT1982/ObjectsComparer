@@ -28,13 +28,27 @@ namespace ObjectsComparer.Utils
             var propertyInfo = memberInfo as PropertyInfo;
             if (propertyInfo != null)
             {
-                return propertyInfo.GetValue(obj);
+                try
+                {
+                    return propertyInfo.GetValue(obj);
+                }
+                catch
+                {
+                    return $"Unable to get value of property {memberInfo.Name} of type {memberInfo.DeclaringType}";
+                }
             }
 
             var fieldInfo = memberInfo as FieldInfo;
             if (fieldInfo != null)
             {
-                return fieldInfo.GetValue(obj);
+                try
+                {
+                    return fieldInfo.GetValue(obj);
+                }
+                catch
+                {
+                    return $"Unable to get value of field {memberInfo.Name} of type {memberInfo.DeclaringType}";
+                }
             }
 
             throw new Exception("Unsupported Type");
