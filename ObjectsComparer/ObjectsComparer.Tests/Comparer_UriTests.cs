@@ -13,7 +13,6 @@ namespace ObjectsComparer.Tests
             var a1 = new { MyUri = new Uri("https://www.google.com/") };
             var a2 = new { MyUri = new Uri("https://www.google.com/") };
             var comparer = new Comparer();
-            comparer.AddComparerOverride<Uri>(new UriComparer());
 
             var isEqual = comparer.Compare(a1, a2);
 
@@ -26,7 +25,6 @@ namespace ObjectsComparer.Tests
             var a1 = new { MyUri = new Uri("https://www.google.com/") };
             var a2 = new { MyUri = new Uri("https://www.yahoo.com/") };
             var comparer = new Comparer();
-            comparer.AddComparerOverride<Uri>(new UriComparer());
 
             var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
