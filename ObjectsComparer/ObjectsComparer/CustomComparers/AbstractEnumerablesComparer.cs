@@ -22,12 +22,10 @@ namespace ObjectsComparer
         {
             if (type.InheritsFrom(typeof(Array)))
             {
-#if NET45
-                if (member.Name == PropertyHelper.GetMemberInfo(() => new int[0].LongLength).Name)
+                if (member.Name == "LongLength")
                 {
                     return true;
                 }
-#endif
             }
 
             return false;
