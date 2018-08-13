@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.Dynamic;
+using Newtonsoft.Json;
 using NSubstitute;
 
 namespace ObjectsComparer.Tests
@@ -272,6 +273,26 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual(1, differences.Count);
             Assert.IsTrue(differences.Any(
                 d => d.MemberPath == "Field1" && d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject));
+        }
+
+        [Test]
+        public void ExpandoObjectWithCollections()
+        {
+            var comparer = new Comparer(new ComparisonSettings { RecursiveComparison = true });
+
+            dynamic a1 = JsonConvert.DeserializeObject<ExpandoObject>(
+                "{ \"Transaction\": [ { \"Name\": \"abc\", \"No\": 101 } ] }");
+
+            dynamic a2 = JsonConvert.DeserializeObject<ExpandoObject>(
+                "{ \"Transaction\": [ { \"Name\": \"abc\", \"No\": 102 } ] }");
+
+            var isEqual = comparer.Compare(a1, a2, out IEnumerable<Difference> differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            Assert.AreEqual(1, differences.Count);
+            Assert.IsTrue(differences.Any(
+                d => d.MemberPath == "Transaction[0].No" && d.DifferenceType == DifferenceTypes.ValueMismatch));
         }
     }
 }

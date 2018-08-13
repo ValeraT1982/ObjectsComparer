@@ -16,7 +16,8 @@ namespace ObjectsComparer
 
         public override bool IsMatch(Type type, object obj1, object obj2)
         {
-            return type.InheritsFrom(typeof(ExpandoObject));
+            return type.InheritsFrom(typeof(ExpandoObject)) || 
+                   (obj1 != null && obj2 != null && obj1.GetType().InheritsFrom(typeof(ExpandoObject)) && obj2.GetType().InheritsFrom(typeof(ExpandoObject)));
         }
 
         public override bool IsStopComparison(Type type, object obj1, object obj2)
