@@ -7,12 +7,9 @@ namespace ObjectsComparer
 {
     internal class HashSetsComparer<T> : AbstractComparer
     {
-        private readonly Comparer<T> _comparer;
-
         public HashSetsComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory)
             :base(settings, parentComparer, factory)
         {
-            _comparer = new Comparer<T>(Settings, this);
         }
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)

@@ -8,12 +8,12 @@ namespace ObjectsComparer
 {
     internal class EnumerablesComparer<T> : AbstractComparer
     {
-        private readonly Comparer<T> _comparer;
+        private readonly IComparer<T> _comparer;
 
         public EnumerablesComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory)
             :base(settings, parentComparer, factory)
         {
-            _comparer = new Comparer<T>(Settings, this);
+            _comparer = Factory.GetObjectsComparer<T>(Settings, this);
         }
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
