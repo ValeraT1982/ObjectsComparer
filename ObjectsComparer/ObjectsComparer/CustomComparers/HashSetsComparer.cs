@@ -46,12 +46,8 @@ namespace ObjectsComparer
 
         public override bool SkipMember(Type type, MemberInfo member)
         {
-            if (base.SkipMember(type, member))
-            {
-                return true;
-            }
-
-            return member.Name == PropertyHelper.GetMemberInfo(() => new HashSet<string>().Comparer).Name ||
+            return base.SkipMember(type, member) ||
+                   member.Name == PropertyHelper.GetMemberInfo(() => new HashSet<string>().Comparer).Name ||
                    member.Name == PropertyHelper.GetMemberInfo(() => new HashSet<string>().Count).Name;
         }
     }

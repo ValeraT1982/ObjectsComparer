@@ -27,5 +27,15 @@ namespace ObjectsComparer.Tests
 
             Assert.Throws<ArgumentException>(() => comparer.Compare(typeof(List<string>), obj1, obj2));
         }
+
+        [Test]
+        public void TypeNotIEnumerable()
+        {
+            var comparer = new EnumerablesComparer(new ComparisonSettings(), null, null);
+            var obj1 = new List<string>();
+            var obj2 = new List<string>();
+
+            Assert.Throws<ArgumentException>(() => comparer.Compare(typeof(int), obj1, obj2));
+        }
     }
 }
