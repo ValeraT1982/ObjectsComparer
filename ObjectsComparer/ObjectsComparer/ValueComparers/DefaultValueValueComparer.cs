@@ -44,7 +44,7 @@
         /// <returns>A string that represents <see cref="value"/>.</returns>
         public string ToString(object value)
         {
-            return value?.Equals(_typeDefaultValue) != false ? _defaultValue?.ToString() : _valueComparer.ToString(value);
+            return value?.Equals(_typeDefaultValue) != false ? _valueComparer.ToString(_defaultValue) : _valueComparer.ToString(value);
         }
     }
 }

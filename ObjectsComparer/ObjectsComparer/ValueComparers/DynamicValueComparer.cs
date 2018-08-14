@@ -16,7 +16,7 @@ namespace ObjectsComparer
         /// Initializes a new instance of the <see cref="DynamicValueComparer{T}" /> class. 
         /// </summary>
         /// <param name="compareFunction">Function to compare objects of type <see cref="T"/>.</param>
-        public DynamicValueComparer(Func<T, T, ComparisonSettings, bool> compareFunction): this(compareFunction, obj => obj?.ToString())
+        public DynamicValueComparer(Func<T, T, ComparisonSettings, bool> compareFunction): this(compareFunction, obj => obj?.ToString() ?? string.Empty)
         {
             
         }
