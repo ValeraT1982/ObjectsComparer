@@ -41,14 +41,7 @@ namespace ObjectsComparer.Utils
             var fieldInfo = memberInfo as FieldInfo;
             if (fieldInfo != null)
             {
-                try
-                {
-                    return fieldInfo.GetValue(obj);
-                }
-                catch
-                {
-                    return $"Unable to get value of field {memberInfo.Name} of type {memberInfo.DeclaringType}";
-                }
+                return fieldInfo.GetValue(obj);
             }
 
             throw new Exception("Unsupported Type");
