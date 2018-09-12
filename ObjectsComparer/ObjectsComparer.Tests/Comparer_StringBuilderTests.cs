@@ -22,9 +22,9 @@ namespace ObjectsComparer.Tests
         [Test]
         public void StringBuilderInequality()
         {
-            var a1 = new StringBuilder("abc");
-            var a2 = new StringBuilder("abd");
-            var comparer = new Comparer<StringBuilder>();
+                var a1 = new StringBuilder("abc");
+                var a2 = new StringBuilder("abd");
+                var comparer = new Comparer<StringBuilder>();
 
             var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
