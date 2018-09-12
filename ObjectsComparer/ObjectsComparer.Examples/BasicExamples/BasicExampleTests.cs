@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using NUnit.Framework;
 using static ObjectsComparer.Examples.OutputHelper;
 
@@ -105,6 +106,71 @@ namespace ObjectsComparer.Examples.BasicExamples
             Assert.IsFalse(isEqual);
             Assert.AreEqual(1, differences.Count());
             Assert.IsTrue(differences.Any(d => d.MemberPath == "[1]" && d.Value1 == "2" && d.Value2 == "4"));
+        }
+        #endregion
+
+        #region Hash Sets
+        [Test]
+        public void HashSetsEquality()
+        {
+            var a1 = new HashSet<int>{ 1, 2, 3 };
+            var a2 = new HashSet<int> { 1, 2, 3 };
+            var comparer = new Comparer<HashSet<int>>();
+
+            var isEqual = comparer.Compare(a1, a2, out var differences);
+
+            ResultToOutput(isEqual, differences);
+
+            Assert.IsTrue(isEqual);
+        }
+
+        [Test]
+        public void HashSetsInequality()
+        {
+            var a1 = new HashSet<int> { 1, 2, 3 };
+            var a2 = new HashSet<int> { 2, 1, 4 };
+            var comparer = new Comparer<HashSet<int>>();
+
+            var isEqual = comparer.Compare(a1, a2, out var differences);
+
+            ResultToOutput(isEqual, differences);
+
+            Assert.IsFalse(isEqual);
+            Assert.AreEqual(2, differences.Count());
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.MissedElementInFirstObject && d.Value2 == "4"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.MissedElementInSecondObject && d.Value1 == "3"));
+        }
+        #endregion
+
+        #region String Builder
+        [Test]
+        public void StringBuilderEquality()
+        {
+            var a1 = new StringBuilder("abc");
+            var a2 = new StringBuilder("abc");
+            var comparer = new Comparer<StringBuilder>();
+
+            var isEqual = comparer.Compare(a1, a2, out var differences);
+
+            ResultToOutput(isEqual, differences);
+
+            Assert.IsTrue(isEqual);
+        }
+
+        [Test]
+        public void StringBuilderInequality()
+        {
+            var a1 = new StringBuilder("abc");
+            var a2 = new StringBuilder("abd");
+            var comparer = new Comparer<StringBuilder>();
+
+            var isEqual = comparer.Compare(a1, a2, out var differences);
+
+            ResultToOutput(isEqual, differences);
+
+            Assert.IsFalse(isEqual);
+            Assert.AreEqual(1, differences.Count());
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.Value1 == "abc" && d.Value2 == "abd"));
         }
         #endregion
 
