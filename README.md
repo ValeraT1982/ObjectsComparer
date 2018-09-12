@@ -60,6 +60,13 @@ var comparer = new Comparer<ClassA>();
 ```
 >Difference: DifferenceType=ValueMismatch, MemberPath='SubClass.BoolProperty', Value1='True', Value2='False'.
 
+```csharp
+var a1 = new StringBuilder("abc");
+var a2 = new StringBuilder("abd");
+var comparer = new Comparer<StringBuilder>();
+```
+>Difference: DifferenceType=ValueMismatch, MemberPath='', Value1='abc', Value2='abd'.
+
 ## Enumerables (arrays)
 ```csharp
 var a1 = new[] { 1, 2, 3 };
@@ -88,6 +95,23 @@ var a2 = new ArrayList { "Str1", 5 };
 var comparer = new Comparer<ArrayList>();
 ```
 >Difference: DifferenceType=TypeMismatch, MemberPath='[1]', Value1='Str2', Value2='5'.
+
+## Sets
+
+```csharp
+var a1 = new[] { 1, 2, 3 };
+var a2 = new[] { 1, 2, 3 };
+var comparer = new Comparer<int[]>();
+```
+>Objects are equal
+
+```csharp
+var a1 = new HashSet<int> { 1, 2, 3 };
+var a2 = new HashSet<int> { 2, 1, 4 };
+var comparer = new Comparer<HashSet<int>>();
+```
+>Difference: DifferenceType=MissedElementInSecondObject, MemberPath='', Value1='3', Value2=''.
+>Difference: DifferenceType=MissedElementInFirstObject, MemberPath='', Value1='', Value2='4'.
 
 ## Multidimensional arrays
 
@@ -390,6 +414,10 @@ Allows to consider provided value and default value of specified type as equal v
 **IgnoreCaseStringsValueComparer**
 
 Allows to compare string ignoring case. Has singleton implementation (**IgnoreCaseStringsValueComparer.Instance**).
+
+**UriComparer**
+
+Allows to compare Uri objects.
 
 ## Examples
 There are some more complex examples how Objects Comparer can be used.
