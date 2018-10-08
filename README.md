@@ -903,6 +903,195 @@ var isEqual = _comparer.Compare(settings0, settings2, out differences);
 
 > Difference: DifferenceType=ValueMismatch, MemberPath='Logging.Level', Value1='ALL', Value2='ERROR'.
 
+### Example 4: Custom comparer for list
+#### Challenge
+
+This example came from one of the framework users, so it's 100% real life scenario.
+Compare list of items by content even if counts of items in the lists are different. Use Id property as an identifier.
+
+#### Problems
+
+By default if counts of items in the lists are different Comparer consider these lists as different and doesn't compere items.
+
+#### Solution
+Solution for this problem is to implement custom Comparer (it should be inherited from AbstractComparer&lt;TypeOfTheList&gt;) and implement comparison logic of comparing lists inside this Comparer. Then implement ComparersFactory (like in Example 2) to return custom Comparer if type equal to IList and use this factory.
+
+Classes to compare.
+```csharp
+public class FormulaItem
+{
+    public long Id { get; set; }
+    public int Delay { get; set; }
+    public string Name { get; set; }
+    public string Instruction { get; set; }
+}
+```
+```csharp
+public class Formula
+{
+    public long Id { get; set; }
+    public string Name { get; set; }
+    public IList<FormulaItem> Items { get; set; }
+}
+```
+
+Custom Comparer implementation
+```csharp
+public class CustomFormulaItemsComparer: AbstractComparer<IList<FormulaItem>>
+{
+    public CustomFormulaItemsComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory) : base(settings, parentComparer, factory)
+    {
+    }
+
+    public override IEnumerable<Difference> CalculateDifferences(IList<FormulaItem> obj1, IList<FormulaItem> obj2)
+    {
+        if (obj1 == null && obj2 == null)
+        {
+            yield break;
+        }
+
+        if (obj1 == null || obj2 == null)
+        {
+            yield return new Difference("", DefaultValueComparer.ToString(obj1) , DefaultValueComparer.ToString(obj2));
+            yield break;
+        }
+
+        if (obj1.Count != obj2.Count)
+        {
+            yield return new Difference("Count", obj1.Count.ToString(), obj2.Count.ToString(),
+                    DifferenceTypes.NumberOfElementsMismatch);
+        }
+
+        foreach (var formulaItem in obj1)
+        {
+            var formulaItem2 = obj2.FirstOrDefault(fi => fi.Id == formulaItem.Id);
+
+            if (formulaItem2 != null)
+            {
+                var comparer = Factory.GetObjectsComparer<FormulaItem>();
+
+                foreach (var difference in comparer.CalculateDifferences(formulaItem, formulaItem2))
+                {
+                    yield return difference.InsertPath($"[Id={formulaItem.Id}]");
+                }
+            }
+        }
+    }
+}
+```
+Factory
+```csharp
+public class MyComparersFactory : ComparersFactory
+{
+    public override IComparer<T> GetObjectsComparer<T>(ComparisonSettings settings = null,
+        BaseComparer parentComparer = null)
+    {
+        if (typeof(T) != typeof(IList<FormulaItem>))
+        {
+            return base.GetObjectsComparer<T>(settings, parentComparer);
+        }
+
+        var comparer = new CustomFormulaItemsComparer(settings, parentComparer, this);
+
+        return (IComparer<T>) comparer;
+
+    }
+}
+```
+
+Configuring Comparer.
+```csharp
+_factory = new MyComparersFactory();
+_comparer = _factory.GetObjectsComparer<Formula>();
+```
+
+```
+var formula1 = new Formula
+{
+    Id = 1,
+    Name = "Formula 1",
+    Items = new List<FormulaItem>
+    {
+        new FormulaItem
+        {
+            Id = 1,
+            Delay = 60,
+            Name = "Item 1",
+            Instruction = "Instruction 1"
+        }
+    }
+};
+
+var formula2 = new Formula
+{
+    Id = 1,
+    Name = "Formula 1",
+    Items = new List<FormulaItem>
+    {
+        new FormulaItem
+        {
+            Id = 1,
+            Delay = 80,
+            Name = "Item One",
+            Instruction = "Instruction One"
+        }
+    }
+};
+
+var isEqual = _comparer.Compare(formula1, formula2, out var differences);
+```
+
+> Difference: DifferenceType=ValueMismatch, MemberPath='Items[Id=1].Delay', Value1='60', Value2='80'.
+> Difference: DifferenceType=ValueMismatch, MemberPath='Items[Id=1].Name', Value1='Item 1', Value2='Item One'.
+> Difference: DifferenceType=ValueMismatch, MemberPath='Items[Id=1].Instruction', Value1='Instruction 1', Value2='Instruction One'.
+
+```csharp
+var formula1 = new Formula
+{
+    Id = 1,
+    Name = "Formula 1",
+    Items = new List<FormulaItem>
+    {
+        new FormulaItem
+        {
+            Id = 1,
+            Delay = 60,
+            Name = "Item 1",
+            Instruction = "Instruction 1"
+        }
+    }
+};
+
+var formula2 = new Formula
+{
+    Id = 1,
+    Name = "Formula 1",
+    Items = new List<FormulaItem>
+    {
+        new FormulaItem
+        {
+            Id = 1,
+            Delay = 80,
+            Name = "Item One",
+            Instruction = "Instruction One"
+        },
+        new FormulaItem
+        {
+            Id = 2,
+            Delay = 30,
+            Name = "Item Two",
+            Instruction = "Instruction Two"
+        }
+    }
+};
+
+var isEqual = _comparer.Compare(formula1, formula2, out var differences);
+```
+
+> Difference: DifferenceType=NumberOfElementsMismatch, MemberPath='Items.Count', Value1='1', Value2='2'.
+> Difference: DifferenceType=ValueMismatch, MemberPath='Items[Id=1].Delay', Value1='60', Value2='80'.
+> Difference: DifferenceType=ValueMismatch, MemberPath='Items[Id=1].Name', Value1='Item 1', Value2='Item One'.
+> Difference: DifferenceType=ValueMismatch, MemberPath='Items[Id=1].Instruction', Value1='Instruction 1', Value2='Instruction One'.
 
 ## Contributing
 Any useful changes are welcomed.
