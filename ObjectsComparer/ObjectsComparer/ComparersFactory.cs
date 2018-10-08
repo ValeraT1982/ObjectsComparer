@@ -16,7 +16,7 @@ namespace ObjectsComparer
         /// <returns>Instance of <see cref="IComparer{T}"/>.</returns>
         public virtual IComparer<T> GetObjectsComparer<T>(ComparisonSettings settings = null, BaseComparer parentComparer = null)
         {
-            return new Comparer<T>(settings, parentComparer);
+            return new Comparer<T>(settings, parentComparer, this);
         }
 
         /// <summary>
