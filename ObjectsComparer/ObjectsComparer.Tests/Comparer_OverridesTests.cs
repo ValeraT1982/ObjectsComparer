@@ -231,7 +231,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void OverrideTypeHighestPriority()
+        public void OverrideMemberHighestPriority()
         {
             var a1 = new A { ClassB = new B { Property1 = "S1" } };
             var a2 = new A { ClassB = new B { Property1 = "S2" } };
@@ -250,8 +250,8 @@ namespace ObjectsComparer.Tests
             var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             CollectionAssert.IsEmpty(differences);
-            valueComparer1.Received().Compare("S1", "S2", Arg.Any<ComparisonSettings>());
-            valueComparer2.DidNotReceive().Compare("S1", "S2", Arg.Any<ComparisonSettings>());
+            valueComparer2.Received().Compare("S1", "S2", Arg.Any<ComparisonSettings>());
+            valueComparer1.DidNotReceive().Compare("S1", "S2", Arg.Any<ComparisonSettings>());
             valueComparer3.DidNotReceive().Compare("S1", "S2", Arg.Any<ComparisonSettings>());
         }
 

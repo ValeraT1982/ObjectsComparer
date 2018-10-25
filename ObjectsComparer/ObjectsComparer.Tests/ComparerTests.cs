@@ -410,7 +410,7 @@ namespace ObjectsComparer.Tests
             var a1 = new A {TypeProperty = typeof(string)};
             var a2 = new A {TypeProperty = typeof(int)};
             var comparer = new Comparer<A>();
-`
+
             var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
