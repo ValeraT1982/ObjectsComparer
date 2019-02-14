@@ -28,6 +28,14 @@ namespace ObjectsComparer
                 }
             }
 
+            if (type.InheritsFrom(typeof(List<>)))
+            {
+                if (member.Name == PropertyHelper.GetMemberInfo(() => new List<string>().Capacity).Name)
+                {
+                    return true;
+                }
+            }
+
             return false;
         }
 

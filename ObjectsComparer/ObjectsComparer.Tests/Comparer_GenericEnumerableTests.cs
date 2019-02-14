@@ -433,5 +433,27 @@ namespace ObjectsComparer.Tests
             Assert.IsTrue(differences.Any(
                 d => d.MemberPath == string.Empty && d.DifferenceType == DifferenceTypes.ValueMismatch));
         }
+
+        [Test]
+        public void IgnoreCapacityForLists()
+        {
+            var a1 = new A
+            {
+                ListOfB = new List<B> { new B { Property1 = "str2" }, new B { Property1 = "str2" } }
+            };
+
+            var a2 = new A
+            {
+                ListOfB = new List<B> { new B { Property1 = "str2" }, new B { Property1 = "str2" } }
+            };
+
+            a1.ListOfB.TrimExcess();
+
+            var comparer = new Comparer<A>();
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsTrue(isEqual);
+        }
     }
 }
