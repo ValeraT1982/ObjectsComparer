@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;netstandard1.6;net45</TargetFrameworks>
@@ -8,11 +8,13 @@
     <Product>Objects Data Comparer</Product>
     <Description>Framework provides mechanism to compare classes, allows override comparison rules for specific properties and types.</Description>
     <Copyright>Copyright © Valerii Tereshchenko 2019</Copyright>
-    <PackageLicenseUrl>https://github.com/ValeraT1982/ObjectsComparer/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseUrl></PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/ValeraT1982/ObjectsComparer</PackageProjectUrl>
     <PackageIconUrl>https://github.com/ValeraT1982/ObjectsComparer/blob/master/ObjectsDataComparer.png?raw=true</PackageIconUrl>
     <RepositoryUrl>https://github.com/ValeraT1982/ObjectsComparer</RepositoryUrl>
     <PackageTags>C#, compare, class, reflection, object, comparison</PackageTags>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,6 +23,7 @@
 
   <ItemGroup>
     <Folder Include="Properties\" />
+    <None Include="LICENSE" Pack="true" PackagePath="" />
   </ItemGroup>
 
 </Project>
