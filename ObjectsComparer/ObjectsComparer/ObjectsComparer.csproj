@@ -7,7 +7,7 @@
     <Company />
     <Product>Objects Data Comparer</Product>
     <Description>Framework provides mechanism to compare classes, allows override comparison rules for specific properties and types.</Description>
-    <Copyright>Copyright © Valerii Tereshchenko 2018</Copyright>
+    <Copyright>Copyright © Valerii Tereshchenko 2019</Copyright>
     <PackageLicenseUrl>https://github.com/ValeraT1982/ObjectsComparer/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/ValeraT1982/ObjectsComparer</PackageProjectUrl>
     <PackageIconUrl>https://github.com/ValeraT1982/ObjectsComparer/blob/master/ObjectsDataComparer.png?raw=true</PackageIconUrl>
