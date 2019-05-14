@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using ObjectsComparer.Utils;
@@ -57,6 +58,12 @@ namespace ObjectsComparer
         public override bool SkipMember(Type type, MemberInfo member)
         {
             if (base.SkipMember(type, member))
+            {
+                return true;
+            }
+
+            if (type.InheritsFrom(typeof(ICollection<>)) &&
+                member.Name == PropertyHelper.GetMemberInfo(() => new Collection<string>().Count).Name)
             {
                 return true;
             }

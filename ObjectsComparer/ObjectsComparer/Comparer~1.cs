@@ -24,11 +24,7 @@ namespace ObjectsComparer
         public Comparer(ComparisonSettings settings = null, BaseComparer parentComparer = null, IComparersFactory factory = null)
             : base(settings, parentComparer, factory)
         {
-            var properties = typeof(T).GetTypeInfo().GetProperties().Where(p =>
-                p.CanRead
-                && p.GetGetMethod(true).IsPublic
-                && p.GetGetMethod(true).GetParameters().Length == 0
-                && !p.GetGetMethod(true).IsStatic).ToList();
+            var properties = GetProperties(typeof(T), new List<Type>());
             var fields = typeof(T).GetTypeInfo().GetFields().Where(f =>
                 f.IsPublic && !f.IsStatic).ToList();
             _members = properties.Union(fields.Cast<MemberInfo>()).ToList();
@@ -148,6 +144,34 @@ namespace ObjectsComparer
                     yield return new Difference(member.Name, valueComparer.ToString(value1), valueComparer.ToString(value2));
                 }
             }
+        }
+
+        private List<PropertyInfo> GetProperties(Type type, List<Type> processedTypes)
+        {
+            var properties = type.GetTypeInfo().GetProperties().Where(p =>
+                p.CanRead
+                && p.GetGetMethod(true).IsPublic
+                && p.GetGetMethod(true).GetParameters().Length == 0
+                && !p.GetGetMethod(true).IsStatic).ToList();
+            processedTypes.Add(type);
+
+            if (type.GetTypeInfo().IsInterface)
+            {
+                foreach (var parrentInterface in type.GetTypeInfo().GetInterfaces())
+                {
+                    if (processedTypes.Contains(parrentInterface))
+                    {
+                        continue;
+                    }
+
+                    properties = properties
+                        .Union(GetProperties(parrentInterface, processedTypes))
+                        .Distinct()
+                        .ToList();
+                }
+            }
+
+            return properties;
         }
     }
 }

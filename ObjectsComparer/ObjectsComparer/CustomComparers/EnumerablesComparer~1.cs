@@ -47,7 +47,7 @@ namespace ObjectsComparer
 
             if (list1.Count != list2.Count)
             {
-                if (!type.InheritsFrom(typeof(ICollection<>)) && !type.GetTypeInfo().IsArray)
+                if (!type.GetTypeInfo().IsArray)
                 {
                     yield return new Difference("", list1.Count.ToString(), list2.Count.ToString(), 
                         DifferenceTypes.NumberOfElementsMismatch);
