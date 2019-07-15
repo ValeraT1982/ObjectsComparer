@@ -99,5 +99,21 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual(expectedResult, result);
             Assert.AreEqual(str1, toString);
         }
+        
+        [Test]
+        public void NulableType()
+        {
+            DateTime? dt1 = null;
+            DateTime? dt2 = null;
+            var dateComparer = new DynamicValueComparer<DateTime?>
+                ((date1, date2, settings) => date1 == date2 || (date1 != null && date2 != null && date1.Value.Date == date2.Value.Date));
+            
+            var comparer = new Comparer<DateTime?>();
+            comparer.AddComparerOverride<DateTime?>(dateComparer);
+
+            var result = comparer.Compare(dt1, dt2);
+            
+            Assert.IsTrue(result);
+        }
     }
 }
