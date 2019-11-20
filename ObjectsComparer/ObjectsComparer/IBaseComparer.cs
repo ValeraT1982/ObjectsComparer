@@ -85,5 +85,13 @@ namespace ObjectsComparer
         /// <param name="valueComparer">Value Comparer.</param>
         /// <param name="filter">Value Comparer will be used only if filter(memberInfo) == true. Null by default.</param>
         void AddComparerOverride(string memberName, IValueComparer valueComparer, Func<MemberInfo, bool> filter = null);
+
+        /// <summary>
+        /// Adds Comparer Override by a filter. Comparer Overrides by specific MemberInfo, Name
+        /// or MemberType will take precedence over this filter.
+        /// </summary>
+        /// <param name="filter">Value Comparer will be used only if filter(memberInfo) == true.</param>
+        /// <param name="valueComparer">Value Comparer.</param>
+        void AddComparerOverride(Func<MemberInfo, bool> filter, IValueComparer valueComparer);
     }
 }

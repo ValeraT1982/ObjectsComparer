@@ -23,8 +23,6 @@ namespace ObjectsComparer
         protected IComparersFactory Factory { get; }
 
         internal ComparerOverridesCollection OverridesCollection { get; } = new ComparerOverridesCollection();
-
-        internal MemberIgnoreCollection IgnoreCollection { get; } = new MemberIgnoreCollection();
         
         protected BaseComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory)
         {
@@ -36,7 +34,6 @@ namespace ObjectsComparer
             {
                 DefaultValueComparer = parentComparer.DefaultValueComparer;
                 OverridesCollection.Merge(parentComparer.OverridesCollection);
-                IgnoreCollection.Merge(parentComparer.IgnoreCollection);
             }
         }
 
@@ -128,6 +125,17 @@ namespace ObjectsComparer
         public void AddComparerOverride(string memberName, IValueComparer valueComparer, Func<MemberInfo, bool> filter = null)
         {
             OverridesCollection.AddComparer(memberName, valueComparer, filter);
+        }
+
+        /// <summary>
+        /// Adds Comparer Override by a filter. Comparer Overrides by specific MemberInfo, Name
+        /// or MemberType will take precedence over this filter.
+        /// </summary>
+        /// <param name="filter">Value Comparer will be used only if filter(memberInfo) == true.</param>
+        /// <param name="valueComparer">Value Comparer.</param>
+        public void AddComparerOverride(Func<MemberInfo, bool> filter, IValueComparer valueComparer)
+        {
+            OverridesCollection.AddComparer(filter, valueComparer);
         }
 
         /// <summary>

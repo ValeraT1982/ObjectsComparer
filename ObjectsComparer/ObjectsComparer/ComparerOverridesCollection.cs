@@ -25,6 +25,7 @@ namespace ObjectsComparer
         private readonly Dictionary<MemberInfo, IValueComparer> _overridesByMember = new Dictionary<MemberInfo, IValueComparer>();
         private readonly Dictionary<Type, List<ValueComparerWithFilter>> _overridesByType = new Dictionary<Type, List<ValueComparerWithFilter>>();
         private readonly Dictionary<string, List<ValueComparerWithFilter>> _overridesByName = new Dictionary<string, List<ValueComparerWithFilter>>();
+        private readonly List<ValueComparerWithFilter> _overridesByFilter = new List<ValueComparerWithFilter>();
 
         public void AddComparer(MemberInfo memberInfo, IValueComparer valueComparer)
         {
@@ -83,6 +84,16 @@ namespace ObjectsComparer
             _overridesByName[memberName].Add(new ValueComparerWithFilter(valueComparer, filter));
         }
 
+        public void AddComparer(Func<MemberInfo, bool> filter, IValueComparer valueComparer)
+        {
+            if (valueComparer == null)
+            {
+                throw new ArgumentNullException(nameof(valueComparer));
+            }
+
+            _overridesByFilter.Add(new ValueComparerWithFilter(valueComparer, filter));
+        }
+
         public void Merge(ComparerOverridesCollection collection)
         {
             foreach (var overridePair in collection._overridesByMember)
@@ -104,6 +115,11 @@ namespace ObjectsComparer
                 {
                     AddComparer(overrideCollection.Key, overridePair.ValueComparer, overridePair.Filter);
                 }
+            }
+
+            foreach (var overridePair in collection._overridesByFilter)
+            {
+                AddComparer(overridePair.Filter, overridePair.ValueComparer);
             }
         }
 
@@ -168,6 +184,18 @@ namespace ObjectsComparer
                 {
                     return overridesByType[0].ValueComparer;
                 }
+            }
+
+            var overridesByFilter = _overridesByFilter.Where(o => o.Filter == null || o.Filter(memberInfo)).ToList();
+
+            if (overridesByFilter.Count > 1)
+            {
+                throw new AmbiguousComparerOverrideResolutionException(memberInfo);
+            }
+
+            if (overridesByFilter.Count == 1)
+            {
+                return overridesByFilter[0].ValueComparer;
             }
 
             return null;
