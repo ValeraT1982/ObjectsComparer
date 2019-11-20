@@ -22,7 +22,9 @@ namespace ObjectsComparer
 
         protected IComparersFactory Factory { get; }
 
-        internal ComparerOverridesCollection OverridesCollection { get;  } = new ComparerOverridesCollection();
+        internal ComparerOverridesCollection OverridesCollection { get; } = new ComparerOverridesCollection();
+
+        internal MemberIgnoreCollection IgnoreCollection { get; } = new MemberIgnoreCollection();
         
         protected BaseComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory)
         {
@@ -34,6 +36,7 @@ namespace ObjectsComparer
             {
                 DefaultValueComparer = parentComparer.DefaultValueComparer;
                 OverridesCollection.Merge(parentComparer.OverridesCollection);
+                IgnoreCollection.Merge(parentComparer.IgnoreCollection);
             }
         }
 
