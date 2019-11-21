@@ -298,6 +298,48 @@ namespace ObjectsComparer.Tests
             valueComparer2.Received().Compare("S1", "S2", Arg.Any<ComparisonSettings>());
         }
 
+        [Test]
+        public void IgnoreByName()
+        {
+            var a1 = new A { TestProperty1 = "Str1", IntProperty = 5};
+            var a2 = new A { TestProperty1 = "Str2", IntProperty = 5 };
+            var comparer = new Comparer<A>();
+            
+            comparer.IgnoreMember("TestProperty1");
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsTrue(isEqual);
+        }
+
+        [Test]
+        public void IgnoreByType()
+        {
+            var a1 = new A { TestProperty1 = "Str1", IntProperty = 5 };
+            var a2 = new A { TestProperty1 = "Str2", IntProperty = 5 };
+            var comparer = new Comparer<A>();
+
+            comparer.IgnoreMember<string>();
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsTrue(isEqual);
+        }
+
+        [Test]
+        public void IgnoreByMember()
+        {
+            var a1 = new A { TestProperty1 = "Str1", IntProperty = 5 };
+            var a2 = new A { TestProperty1 = "Str2", IntProperty = 5 };
+            var comparer = new Comparer<A>();
+
+            comparer.IgnoreMember(() => new A().TestProperty1);
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsTrue(isEqual);
+        }
+
         private IValueComparer CreateClassBComparerAsPhone()
         {
             var valueComparer = Substitute.For<IValueComparer>();

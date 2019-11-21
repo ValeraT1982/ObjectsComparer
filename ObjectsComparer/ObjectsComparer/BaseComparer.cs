@@ -135,5 +135,34 @@ namespace ObjectsComparer
         {
             DefaultValueComparer = valueComparer ?? throw new ArgumentNullException(nameof(valueComparer));
         }
+
+        /// <summary>
+        /// Ignors comparison for Type.
+        /// </summary>
+        /// <typeparam name="TType">Type.</typeparam>
+        public void IgnoreMember<TType>()
+        {
+            OverridesCollection.AddComparer(typeof(TType), DoNotCompareValueComparer.Instance);
+        }
+
+        /// <summary>
+        /// Ignors comparison for Member.
+        /// </summary>
+        /// <typeparam name="TProp">Type of the member.</typeparam>
+        public void IgnoreMember<TProp>(Expression<Func<TProp>> memberLambda)
+        {
+            OverridesCollection.AddComparer(
+                PropertyHelper.GetMemberInfo(memberLambda),
+                DoNotCompareValueComparer.Instance);
+        }
+
+        /// <summary>
+        /// Ignors comparison for Member by Member name.
+        /// </summary>
+        /// <param name="memberName">Member Name.</param>
+        public void IgnoreMember(string memberName)
+        {
+            OverridesCollection.AddComparer(memberName, DoNotCompareValueComparer.Instance);
+        }
     }
 }
