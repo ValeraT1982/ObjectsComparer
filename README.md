@@ -344,6 +344,23 @@ comparer.AddComparerOverride<string>(valueComparer2, member => member.Name.EndsW
 var result = comparer.Compare(a1, a2);//Exception here
 ```
 
+## Ignoring members
+Ignores members of particular type.
+```csharp
+comparer.IgnoreMember<string>();
+```
+
+Ignores particular member.
+```csharp
+comparer.IgnoreMember(() => new A().TestProperty1);
+```
+
+Ignores particular member by name.
+```csharp
+comparer.IgnoreMember("TestProperty1");
+```
+
+
 ## Comparison Settings
 Comparer constructor has an optional **settings** parameter to configure some aspects of comparison.
 
@@ -398,6 +415,8 @@ Framework contains several custom comparers that can be useful in many cases.
 **DoNotCompareValueComparer**
 
 Allows to skip some fields/types. Has singleton implementation (**DoNotCompareValueComparer.Instance**).
+
+P.S. **IgnoreMember** methods is more convenient way to skip fields/types. This comparer is needed if override require custom filter and for backward compatibility.
 
 **DynamicValueComparer<T>**
 
