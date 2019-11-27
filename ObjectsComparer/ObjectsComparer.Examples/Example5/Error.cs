@@ -2,6 +2,7 @@
 {
     public class Error
     {
+        [Ignore]
         public int Id { get; set; }
 
         public string Messgae { get; set; }

@@ -22,6 +22,7 @@ namespace ObjectsComparer
             }
         }
 
+        private readonly List<Tuple<Func<MemberInfo, bool>, IValueComparer>> _overridesByMemberFilter = new List<Tuple<Func<MemberInfo, bool>, IValueComparer>>();
         private readonly Dictionary<MemberInfo, IValueComparer> _overridesByMember = new Dictionary<MemberInfo, IValueComparer>();
         private readonly Dictionary<Type, List<ValueComparerWithFilter>> _overridesByType = new Dictionary<Type, List<ValueComparerWithFilter>>();
         private readonly Dictionary<string, List<ValueComparerWithFilter>> _overridesByName = new Dictionary<string, List<ValueComparerWithFilter>>();
@@ -39,6 +40,16 @@ namespace ObjectsComparer
             }
 
             _overridesByMember[memberInfo] = valueComparer ?? throw new ArgumentNullException(nameof(valueComparer));
+        }
+
+        public void AddComparer(IValueComparer valueComparer, Func<MemberInfo, bool> filter)
+        {
+            if (filter == null)
+            {
+                throw new ArgumentNullException(nameof(filter));
+            }
+
+            _overridesByMemberFilter.Add(new Tuple<Func<MemberInfo, bool>, IValueComparer>(filter, valueComparer));
         }
 
         public void AddComparer(Type type, IValueComparer valueComparer,
@@ -105,6 +116,11 @@ namespace ObjectsComparer
                     AddComparer(overrideCollection.Key, overridePair.ValueComparer, overridePair.Filter);
                 }
             }
+
+            foreach (var memberFilterOverride in collection._overridesByMemberFilter)
+            {
+                AddComparer(memberFilterOverride.Item2, memberFilterOverride.Item1);
+            }
         }
 
         public IValueComparer GetComparer(Type type)
@@ -138,6 +154,12 @@ namespace ObjectsComparer
             if (_overridesByMember.TryGetValue(memberInfo, out var overrideByMemberInfo))
             {
                 return overrideByMemberInfo;
+            }
+
+            var memberFilterOverride = _overridesByMemberFilter.Find(t => t.Item1(memberInfo))?.Item2;
+            if (memberFilterOverride != null)
+            {
+                return memberFilterOverride;
             }
 
             if (_overridesByName.TryGetValue(memberInfo.Name, out var overridesByName))

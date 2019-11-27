@@ -49,6 +49,16 @@ namespace ObjectsComparer
         }
 
         /// <summary>
+        /// Adds Comparer Override by member filter.
+        /// </summary>
+        /// <param name="valueComparer">Value Comparer.</param>
+        /// <param name="filter">Value Comparer will be used only if filter(memberInfo) == true.</param>
+        public void AddComparerOverride(IValueComparer valueComparer, Func<MemberInfo, bool> filter)
+        {
+            OverridesCollection.AddComparer(valueComparer, filter);
+        }
+
+        /// <summary>
         /// Adds Comparer Override by Type.
         /// </summary>
         /// <typeparam name="TType">Type.</typeparam>
@@ -163,6 +173,15 @@ namespace ObjectsComparer
         public void IgnoreMember(string memberName)
         {
             OverridesCollection.AddComparer(memberName, DoNotCompareValueComparer.Instance);
+        }
+
+        /// <summary>
+        /// Ignors comparison by Member filter.
+        /// </summary>
+        /// <param name="filter">Member will be ignored if filter(memberInfo) == true.</param>
+        public void IgnoreMember(Func<MemberInfo, bool> filter)
+        {
+            OverridesCollection.AddComparer(DoNotCompareValueComparer.Instance, filter);
         }
     }
 }

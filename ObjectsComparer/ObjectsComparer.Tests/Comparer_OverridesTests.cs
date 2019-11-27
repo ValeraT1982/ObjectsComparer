@@ -340,6 +340,35 @@ namespace ObjectsComparer.Tests
             Assert.IsTrue(isEqual);
         }
 
+        [Test]
+        public void OverrideByMemberFilter()
+        {
+            var a1 = new A { TestProperty1 = "ABC" };
+            var a2 = new A { TestProperty1 = "ABC" };
+            var comparer = new Comparer<A>();
+            var valueComparer = Substitute.For<IValueComparer>();
+            valueComparer.Compare(Arg.Any<object>(), Arg.Any<object>(), Arg.Any<ComparisonSettings>()).Returns(true);
+            comparer.AddComparerOverride(valueComparer, member => member.Name == "TestProperty1");
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsTrue(isEqual);
+            valueComparer.Received(1).Compare(Arg.Is("ABC"), Arg.Is("ABC"), Arg.Any<ComparisonSettings>());
+        }
+
+        [Test]
+        public void IgnoreByMemberFilter()
+        {
+            var a1 = new A { TestProperty1 = "ABC" };
+            var a2 = new A { TestProperty1 = "BCD" };
+            var comparer = new Comparer<A>();
+            comparer.IgnoreMember(member => member.Name == "TestProperty1");
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsTrue(isEqual);
+        }
+
         private IValueComparer CreateClassBComparerAsPhone()
         {
             var valueComparer = Substitute.For<IValueComparer>();

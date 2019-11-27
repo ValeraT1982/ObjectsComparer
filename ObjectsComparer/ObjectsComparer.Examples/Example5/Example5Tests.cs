@@ -17,13 +17,13 @@ namespace ObjectsComparer.Examples.Example5
 
             var error2 = new Error
             {
-                Id = 1,
+                Id = 2,
                 Messgae = "Error Message",
                 Details = "Other error details"
             };
 
             var comparer = new Comparer<Error>();
-            comparer.AddComparerOverride<string>(DoNotCompareValueComparer.Instance, m => m.GetCustomAttributes(typeof(IgnoreAttribute), true).Length > 0);
+            comparer.IgnoreMember(m => m.GetCustomAttributes(typeof(IgnoreAttribute), true).Length > 0);
 
             var isEqual = comparer.Compare(error1, error2);
 
