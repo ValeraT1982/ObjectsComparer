@@ -331,7 +331,11 @@ Override comparison rule for particular member(s) (Field or Property) by name.
 //Use MyValueComparer to compare all members with name equal to "StringProperty"
 comparer.AddComparerOverride("StringProperty", new MyValueComparer());
 ```
-Overrides by type have highest priority, then overrides by member and overrides by member name have lowest priority.
+Override comparison rule by member filter.
+```csharp
+comparer.AddComparerOverride(new MyValueComparer(), m => m.Name == "StringProperty");
+``` 
+Overrides by type have highest priority, then overrides by member/member filter and overrides by member name have lowest priority.
 If more than one value comparers of the same type (by type/by name/by member name) could be applied to the same member, exception **AmbiguousComparerOverrideResolutionException** will be thrown during comparison.
 
 Example:
@@ -355,11 +359,15 @@ Ignores particular member.
 comparer.IgnoreMember(() => new A().TestProperty1);
 ```
 
+Ignores by member filter.
+```csharp
+comparer.IgnoreMember(member => member.Name == "TestProperty1");
+```
+
 Ignores particular member by name.
 ```csharp
 comparer.IgnoreMember("TestProperty1");
 ```
-
 
 ## Comparison Settings
 Comparer constructor has an optional **settings** parameter to configure some aspects of comparison.
