@@ -455,6 +455,9 @@ namespace ObjectsComparer.Examples.BasicExamples
             //    () => new ClassA().StringProperty,
             //    (s1, s2, parentSettings) => s1?.Length == s2?.Length);
 
+            //  Member filter
+            //comparer.AddComparerOverride(new MyValueComparer(), m => m.Name == "StringProperty");
+
             //  Member Name
             comparer.AddComparerOverride("StringProperty", new MyValueComparer());
 
