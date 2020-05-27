@@ -1144,7 +1144,7 @@ Can be used to track add, update and delete operations.
 
 Implement IComparableEnumerableItem to define Key for compare.
 
-MemberCustomNameAttribute and GroupNameAttribute can be used to define custom propery names and to split differences in groups (UI sections for example).
+MemberCustomNameAttribute and GroupNameAttribute can be used to define custom names for properties and to split differences in groups (UI sections for example).
 
 ```csharp
 [GroupName("Reservation")]
