@@ -1,8 +1,8 @@
-﻿using System;
+﻿using ObjectsComparer.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
@@ -42,8 +42,18 @@ namespace ObjectsComparer
             var genericType = typeof(IComparer<>).MakeGenericType(type);
             var method = genericType.GetTypeInfo().GetMethod(CalculateDifferencesMethodName, new[] { type, type });
 
-            // ReSharper disable once PossibleNullReferenceException
-            return (IEnumerable<Difference>)method.Invoke(comparer, new[] { obj1, obj2 });
+            var group = type.GetGroupName(Settings);
+            var differences = (IEnumerable<Difference>)method.Invoke(comparer, new[] { obj1, obj2 });
+
+            if (!string.IsNullOrEmpty(group))
+            {
+                foreach (var d in differences.Where(g => string.IsNullOrEmpty(g.Group)))
+                {
+                    if (string.IsNullOrEmpty(d.Group)) d.Group = group;
+                }
+            }
+
+            return differences;
         }
     }
 }

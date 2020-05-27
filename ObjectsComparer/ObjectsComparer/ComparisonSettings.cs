@@ -1,5 +1,7 @@
-﻿using System;
+﻿using ObjectsComparer.Utils;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace ObjectsComparer
 {
@@ -25,6 +27,16 @@ namespace ObjectsComparer
         /// </summary>
         public bool UseDefaultIfMemberNotExist { get; set; }
 
+        /// <summary>
+        /// Attribute type used to specify groups of differences.
+        /// </summary>
+        public Type GroupNameAttribute { get; set; }
+
+        /// <summary>
+        /// Attribute type used to define custom names for members
+        /// </summary>
+        public Type MemberCustomNameAttribute { get; set; }
+
         private readonly Dictionary<Tuple<Type, string>, object> _settings = new Dictionary<Tuple<Type, string>, object>();
 
         /// <summary>
@@ -35,6 +47,8 @@ namespace ObjectsComparer
             RecursiveComparison = true;
             EmptyAndNullEnumerablesEqual = false;
             UseDefaultIfMemberNotExist = false;
+            GroupNameAttribute = typeof(GroupNameAttribute);
+            MemberCustomNameAttribute = typeof(MemberCustomNameAttribute);
         }
 
         /// <summary>
@@ -61,7 +75,7 @@ namespace ObjectsComparer
 
             if (_settings.TryGetValue(dictionaryKey, out var value))
             {
-                return (T) value;
+                return (T)value;
             }
 
             throw new KeyNotFoundException();

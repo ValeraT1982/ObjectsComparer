@@ -31,7 +31,7 @@ namespace ObjectsComparer.Tests
         [Test]
         public void CompareWithOutParameterWhenNotEqual()
         {
-            var differences = new List<Difference> { new Difference("", "1", "2") };
+            var differences = new List<Difference> { new Difference("", "", "1", "2") };
             _comparer.CalculateDifferences(1, 2).Returns(differences);
 
             var result = _comparer.Compare(1, 2, out var outDifferences);
@@ -57,7 +57,7 @@ namespace ObjectsComparer.Tests
         [Test]
         public void CompareWithoutOutParameterWhenNotEqual()
         {
-            var differences = new List<Difference> { new Difference("", "1", "2") };
+            var differences = new List<Difference> { new Difference("", "", "1", "2") };
             _comparer.CalculateDifferences(1, 2).Returns(differences);
 
             var result = _comparer.Compare(1, 2);

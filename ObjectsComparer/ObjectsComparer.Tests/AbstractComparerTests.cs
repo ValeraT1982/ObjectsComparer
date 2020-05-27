@@ -31,7 +31,7 @@ namespace ObjectsComparer.Tests
         [Test]
         public void CompareWithOutParameterWhenNotEqual()
         {
-            var differences = new List<Difference> {new Difference("", "string1", "string2")};
+            var differences = new List<Difference> {new Difference("", "", "string1", "string2")};
             _comparer.CalculateDifferences(typeof(string), "string1", "string2").Returns(differences);
 
             var result = _comparer.Compare("string1", "string2", out var outDifferences);
@@ -57,7 +57,7 @@ namespace ObjectsComparer.Tests
         [Test]
         public void CompareWithoutOutParameterWhenNotEqual()
         {
-            var differences = new List<Difference> {new Difference("", "string1", "string2")};
+            var differences = new List<Difference> {new Difference("", "", "string1", "string2")};
             _comparer.CalculateDifferences(typeof(string), "string1", "string2").Returns(differences);
 
             var result = _comparer.Compare("string1", "string2");
@@ -80,7 +80,7 @@ namespace ObjectsComparer.Tests
         [Test]
         public void NonGenericCompareWithOutParameterWhenNotEqual()
         {
-            var differences = new List<Difference> {new Difference("", "string1", "string2")};
+            var differences = new List<Difference> {new Difference("", "", "string1", "string2")};
             _comparer.CalculateDifferences(typeof(string), "string1", "string2").Returns(differences);
 
             var result = _comparer.Compare(typeof(string), "string1", "string2", out var outDifferences);
@@ -106,7 +106,7 @@ namespace ObjectsComparer.Tests
         [Test]
         public void NonGenericCompareWithoutOutParameterWhenNotEqual()
         {
-            var differences = new List<Difference> {new Difference("", "string1", "string2")};
+            var differences = new List<Difference> {new Difference("", "", "string1", "string2")};
             _comparer.CalculateDifferences(typeof(string), "string1", "string2").Returns(differences);
 
             var result = _comparer.Compare(typeof(string), "string1", "string2");

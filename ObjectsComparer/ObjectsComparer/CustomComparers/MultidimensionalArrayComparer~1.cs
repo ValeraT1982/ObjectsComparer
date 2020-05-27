@@ -17,6 +17,8 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
+            var group = type.GetGroupName(Settings);
+
             if (!type.InheritsFrom(typeof(Array)))
             {
                 throw new ArgumentException("Invalid type");
@@ -43,7 +45,7 @@ namespace ObjectsComparer
 
             if (array1.Rank != array2.Rank)
             {
-                yield return new Difference("Rank", array1.Rank.ToString(), array2.Rank.ToString());
+                yield return new Difference(group, "Rank", array1.Rank.ToString(), array2.Rank.ToString());
                 yield break;
             }
 
@@ -57,7 +59,7 @@ namespace ObjectsComparer
                 if (length1 != length2)
                 {
                     dimensionsFailure = true;
-                    yield return new Difference($"Dimension{i}", length1.ToString(), length2.ToString());
+                    yield return new Difference(group, $"Dimension{i}", length1.ToString(), length2.ToString());
                 }
             }
 

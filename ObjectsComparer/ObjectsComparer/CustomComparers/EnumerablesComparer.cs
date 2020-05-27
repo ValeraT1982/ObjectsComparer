@@ -16,10 +16,12 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
+            var group = type.GetGroupName(Settings);
+
             if (!Settings.EmptyAndNullEnumerablesEqual &&
                 (obj1 == null || obj2 == null) && obj1 != obj2)
             {
-                yield return new Difference("[]", obj1?.ToString() ?? string.Empty, obj2?.ToString() ?? string.Empty);
+                yield return new Difference(group, "[]", obj1?.ToString() ?? string.Empty, obj2?.ToString() ?? string.Empty);
                 yield break;
             }
 
@@ -46,8 +48,7 @@ namespace ObjectsComparer
 
             if (array1.Length != array2.Length)
             {
-                yield return new Difference("", array1.Length.ToString(), array2.Length.ToString(), 
-                    DifferenceTypes.NumberOfElementsMismatch);
+                yield return new Difference(group, "", array1.Length.ToString(), array2.Length.ToString(), DifferenceTypes.NumberOfElementsMismatch);
                 yield break;
             }
 
@@ -64,19 +65,19 @@ namespace ObjectsComparer
 
                 if (array1[i] == null)
                 {
-                    yield return new Difference($"[{i}]", string.Empty, valueComparer2.ToString(array2[i]));
+                    yield return new Difference(group, $"[{i}]", string.Empty, valueComparer2.ToString(array2[i]));
                     continue;
                 }
 
                 if (array2[i] == null)
                 {
-                    yield return new Difference($"[{i}]", valueComparer1.ToString(array1[i]), string.Empty);
+                    yield return new Difference(group, $"[{i}]", valueComparer1.ToString(array1[i]), string.Empty);
                     continue;
                 }
 
                 if (array1[i].GetType() != array2[i].GetType())
                 {
-                    yield return new Difference($"[{i}]", valueComparer1.ToString(array1[i]), valueComparer2.ToString(array2[i]), DifferenceTypes.TypeMismatch);
+                    yield return new Difference(group, $"[{i}]", valueComparer1.ToString(array1[i]), valueComparer2.ToString(array2[i]), DifferenceTypes.TypeMismatch);
                     continue;
                 }
 

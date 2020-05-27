@@ -15,6 +15,8 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
+            var group = type.GetGroupName(Settings);
+
             if (obj1 == null && obj2 == null)
             {
                 yield break;
@@ -35,7 +37,7 @@ namespace ObjectsComparer
 
             if (type1Str != type2Str)
             {
-                yield return new Difference(string.Empty, type1Str, type2Str);
+                yield return new Difference(group, string.Empty, type1Str, type2Str);
             }
         }
 

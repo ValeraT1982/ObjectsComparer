@@ -8,12 +8,14 @@ namespace ObjectsComparer
     internal class HashSetsComparer<T> : AbstractComparer
     {
         public HashSetsComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory)
-            :base(settings, parentComparer, factory)
+            : base(settings, parentComparer, factory)
         {
         }
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
+            var group = type.GetGroupName(Settings);
+
             if (!type.InheritsFrom(typeof(HashSet<>)))
             {
                 throw new ArgumentException("Invalid type");
@@ -46,17 +48,15 @@ namespace ObjectsComparer
             {
                 if (!hashSet2.Contains(element))
                 {
-                    yield return new Difference("", valueComparer.ToString(element), string.Empty,
-                        DifferenceTypes.MissedElementInSecondObject);
+                    yield return new Difference(group, "", valueComparer.ToString(element), string.Empty, DifferenceTypes.MissedElementInSecondObject);
                 }
             }
-            
+
             foreach (var element in hashSet2)
             {
                 if (!hashSet1.Contains(element))
                 {
-                    yield return new Difference("", string.Empty, valueComparer.ToString(element),
-                        DifferenceTypes.MissedElementInFirstObject);
+                    yield return new Difference(group, "", string.Empty, valueComparer.ToString(element), DifferenceTypes.MissedElementInFirstObject);
                 }
             }
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -58,6 +59,8 @@ namespace ObjectsComparer
 
         internal IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo)
         {
+            var group = typeof(T).GetGroupName(Settings);
+
             var comparer = memberInfo != null
                 ? OverridesCollection.GetComparer(memberInfo)
                 : OverridesCollection.GetComparer(typeof(T));
@@ -68,9 +71,7 @@ namespace ObjectsComparer
                 comparer = comparer ?? DefaultValueComparer;
                 if (!comparer.Compare(obj1, obj2, Settings))
                 {
-                    yield return
-                        new Difference(string.Empty, comparer.ToString(obj1),
-                            comparer.ToString(obj2));
+                    yield return new Difference(group, string.Empty, comparer.ToString(obj1), comparer.ToString(obj2));
                 }
 
                 yield break;
@@ -94,7 +95,7 @@ namespace ObjectsComparer
             {
                 if (!DefaultValueComparer.Compare(obj1, obj2, Settings))
                 {
-                    yield return new Difference(string.Empty, DefaultValueComparer.ToString(obj1), DefaultValueComparer.ToString(obj2));
+                    yield return new Difference(group, string.Empty, DefaultValueComparer.ToString(obj1), DefaultValueComparer.ToString(obj2));
                 }
 
                 yield break;
@@ -110,6 +111,7 @@ namespace ObjectsComparer
                 var value1 = member.GetMemberValue(obj1);
                 var value2 = member.GetMemberValue(obj2);
                 var type = member.GetMemberType();
+                var name = member.GetCustomAttribute(Settings.MemberCustomNameAttribute)?.ToString() ?? member.Name;
 
                 if (conditionalComparer != null && conditionalComparer.SkipMember(typeof(T), member))
                 {
@@ -126,14 +128,17 @@ namespace ObjectsComparer
                     hasCustomComparer = true;
                 }
 
-                if (!hasCustomComparer
-                    && !type.IsComparable())
+                if (!hasCustomComparer && !type.IsComparable())
                 {
                     var objectDataComparer = Factory.GetObjectsComparer(type, Settings, this);
 
                     foreach (var failure in objectDataComparer.CalculateDifferences(type, value1, value2))
                     {
-                        yield return failure.InsertPath(member.Name);
+                        if (string.IsNullOrEmpty(failure.Group))
+                        {
+                            failure.Group = group;
+                        }
+                        yield return failure.InsertPath(name);
                     }
 
                     continue;
@@ -141,7 +146,7 @@ namespace ObjectsComparer
 
                 if (!valueComparer.Compare(value1, value2, Settings))
                 {
-                    yield return new Difference(member.Name, valueComparer.ToString(value1), valueComparer.ToString(value2));
+                    yield return new Difference(group, name, valueComparer.ToString(value1), valueComparer.ToString(value2));
                 }
             }
         }

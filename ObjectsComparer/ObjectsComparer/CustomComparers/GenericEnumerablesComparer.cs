@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using ObjectsComparer.CustomComparers;
 using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
@@ -41,7 +42,10 @@ namespace ObjectsComparer
                     .First();
             }
 
-            var enumerablesComparerType = typeof(EnumerablesComparer<>).MakeGenericType(elementType);
+            var enumerablesComparerType = typeof(IComparableEnumerableItem).GetTypeInfo().IsAssignableFrom(elementType)
+                ? typeof(ComparableEnumerablesComparer<>).MakeGenericType(elementType)
+                : typeof(EnumerablesComparer<>).MakeGenericType(elementType);
+
             var comparer = (IComparer)Activator.CreateInstance(enumerablesComparerType, Settings, this, Factory);
 
             foreach (var difference in comparer.CalculateDifferences(type, obj1, obj2))

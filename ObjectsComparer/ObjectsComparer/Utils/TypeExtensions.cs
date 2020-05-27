@@ -49,5 +49,10 @@ namespace ObjectsComparer.Utils
 
             return null;
         }
+
+        public static string GetGroupName(this Type t, ComparisonSettings settings)
+        {
+            return t.GetTypeInfo().GetCustomAttribute(settings.GroupNameAttribute)?.ToString() ?? string.Empty;
+        }
     }
 }

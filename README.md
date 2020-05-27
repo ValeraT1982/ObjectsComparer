@@ -390,6 +390,22 @@ SetCustomSetting<T>(T value, string key = null)
 GetCustomSetting<T>(string key = null)
 ```
 
+GroupNameAttribute
+
+Attribute type used to specify groups of differences.
+```csharp
+// Default
+GroupNameAttribute = typeof(GroupNameAttribute);
+```
+
+MemberCustomNameAttribute
+
+Attribute type used to define custom names for members
+```csharp
+// Default
+MemberCustomNameAttribute = typeof(MemberCustomNameAttribute);
+```
+
 ## Factory
 Factory provides a way to encapsulate comparers creation and configuration. Factory should implement **IComparersFactory** or should be inherited from **ComparersFactory**.
 ```csharp
@@ -1119,6 +1135,77 @@ var isEqual = _comparer.Compare(formula1, formula2, out var differences);
 > Difference: DifferenceType=ValueMismatch, MemberPath='Items[Id=1].Delay', Value1='60', Value2='80'.
 > Difference: DifferenceType=ValueMismatch, MemberPath='Items[Id=1].Name', Value1='Item 1', Value2='Item One'.
 > Difference: DifferenceType=ValueMismatch, MemberPath='Items[Id=1].Instruction', Value1='Instruction 1', Value2='Instruction One'.
+
+### Example 5: Compare variable lists using IComparableEnumerableItem
+
+Compare list of items by content even if counts of items in the lists are different.
+
+Can be used to track add, update and delete operations.
+
+Implement IComparableEnumerableItem to define Key for compare.
+
+MemberCustomNameAttribute and GroupNameAttribute can be used to define custom propery names and to split differences in groups (UI sections for example).
+
+```csharp
+[GroupName("Reservation")]
+public class Element
+{
+    public string Name { get; set; }
+
+    [MemberCustomName("Rooms")]
+    public IList<ElementItem> Items { get; set; }
+}
+
+[GroupName("Room")]
+public class ElementItem : IComparableEnumerableItem
+{
+    public int ElementId { get; set; }
+    public string Description { get; set; }
+    public ElementPrice Price { get; set; }
+
+    public string Key => ElementId.ToString();
+}
+
+[GroupName("RoomPrice")]
+public class ElementPrice
+{
+    public decimal Value { get; set; }
+}
+var e1 = new Element
+{
+    Name = "N1",
+    Items = new List<ElementItem>() {
+        new ElementItem() { ElementId = 101, Description = "D10", Price = new ElementPrice() { Value = 1.1m } },
+        new ElementItem() { ElementId = 102, Description = "D20", Price = new ElementPrice() { Value = 2.2m } }
+    }
+};
+
+var e2 = new Element
+{
+    Name = "N2",
+    Items = new List<ElementItem>() {
+        new ElementItem() { ElementId = 101, Description = "D11", Price = new ElementPrice() { Value = 2.2m } },
+        new ElementItem() { ElementId = 103, Description = "D30", Price = new ElementPrice() { Value = 3.3m } },
+        new ElementItem() { ElementId = 104, Description = "D30", Price = new ElementPrice() { Value = 4.4m } },
+    }
+};
+
+var _comparer = new Comparer<Element>();
+var isEqual = _comparer.Compare(e1, e2, out var differences);
+```
+
+>Difference: DifferenceType=ValueMismatch, Group='Reservation', MemberPath='Name', Value1='N1', Value2='N2'.
+
+>Difference: DifferenceType=ValueMismatch, Group='Room', MemberPath='Rooms[1].Description', Value1='D10', Value2='D11'.
+
+>Difference: DifferenceType=ValueMismatch, Group='RoomPrice', MemberPath='Rooms[1].Price.Value', Value1='1.1', Value2='2.2'.
+
+>Difference: DifferenceType=MissedElementInFirstObject, Group='Room', MemberPath='Rooms[2]', Value1='', Value2='Added'.
+
+>Difference: DifferenceType=MissedElementInFirstObject, Group='Room', MemberPath='Rooms[3]', Value1='', Value2='Added'.
+
+>Difference: DifferenceType=MissedMemberInSecondObject, Group='Room', MemberPath='Rooms[2]', Value1='Deleted', Value2=''.
+
 
 ## Contributing
 Any useful changes are welcomed.
