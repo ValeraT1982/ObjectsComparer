@@ -409,7 +409,7 @@ namespace ObjectsComparer.Tests
             var a1 = new HashSet<string> { "a", "b" };
             var a2 = new HashSet<string> { "a", "b", "c" };
             var comparer = new Comparer<HashSet<string>>();
-            
+
             var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
@@ -472,6 +472,42 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences.First().DifferenceType);
             Assert.AreEqual("2", differences.First().Value1);
             Assert.AreEqual("1", differences.First().Value2);
+        }
+
+        [Test]
+        public void DictionaryEqualitySameOrder()
+        {
+            var a1 = new Dictionary<int, string> { { 1, "One" }, { 2, "Two" } };
+            var a2 = new Dictionary<int, string> { { 1, "One" }, { 2, "Two" } };
+            var comparer = new Comparer<Dictionary<int, string>>();
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsTrue(isEqual);
+        }
+
+        [Test]
+        public void DictionaryInequalityDifferentOrder()
+        {
+            var a1 = new Dictionary<int, string> { { 1, "One" }, { 2, "Two" } };
+            var a2 = new Dictionary<int, string> { { 2, "Two" }, { 1, "One" } };
+            var comparer = new Comparer<Dictionary<int, string>>();
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsFalse(isEqual);
+        }
+
+        [Test]
+        public void DictionaryInequalityDifferentNumberOfElements()
+        {
+            var a1 = new Dictionary<int, string> { { 1, "One" }, { 2, "Two" } };
+            var a2 = new Dictionary<int, string> { { 1, "One" }, { 2, "Two" }, { 3, "Three" } };
+            var comparer = new Comparer<Dictionary<int, string>>();
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsFalse(isEqual);
         }
     }
 }
