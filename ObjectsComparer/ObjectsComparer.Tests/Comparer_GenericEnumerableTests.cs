@@ -505,9 +505,26 @@ namespace ObjectsComparer.Tests
             var a2 = new Dictionary<int, string> { { 1, "One" }, { 2, "Two" }, { 3, "Three" } };
             var comparer = new Comparer<Dictionary<int, string>>();
 
-            var isEqual = comparer.Compare(a1, a2);
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
-            Assert.IsFalse(isEqual);
+            Assert.AreEqual(1, differences.Count);
+            Assert.AreEqual(DifferenceTypes.MissedElementInFirstObject, differences.First().DifferenceType);
+        }
+
+        [Test]
+        public void DictionaryInequalityDifferentValue()
+        {
+            var a1 = new Dictionary<int, string> { { 1, "One" }, { 2, "Two" } };
+            var a2 = new Dictionary<int, string> { { 1, "One" }, { 2, "Two!" } };
+            var comparer = new Comparer<Dictionary<int, string>>();
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            Assert.AreEqual(1, differences.Count);
+            Assert.AreEqual(DifferenceTypes.ValueMismatch, differences.First().DifferenceType);
+            Assert.AreEqual("Two", differences.First().Value1);
+            Assert.AreEqual("Two!", differences.First().Value2);
+            Assert.AreEqual("[1].Value", differences.First().MemberPath);
         }
     }
 }
