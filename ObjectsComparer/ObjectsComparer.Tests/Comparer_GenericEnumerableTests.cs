@@ -458,6 +458,32 @@ namespace ObjectsComparer.Tests
             Assert.IsTrue(isEqual);
         }
 
+        /// <summary>
+        /// Compare items in two generic collections regardless of the fact that count of their items differ.
+        /// </summary>
+        [Test]
+        public void CollectionDifferentSizeInequality()
+        {
+            var a1 = new A
+            {
+                ListOfB = new List<B> { new B { Property1 = "str2" }, new B { Property1 = "str2" } }
+            };
+
+            var a2 = new A
+            {
+                ListOfB = new List<B> { new B { Property1 = "str3" }/*, new B { Property1 = "str2" }*/ }
+            };
+
+            var comparer = new Comparer<A>();
+            var differences = comparer.CalculateDifferences(a1, a2).ToArray();
+
+            Assert.AreEqual(2, differences.Count());
+            Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences.First().DifferenceType);
+            Assert.AreEqual(DifferenceTypes.ValueMismatch, differences.Last().DifferenceType);
+            Assert.AreEqual("str2", differences.Last().Value1);
+            Assert.AreEqual("str3", differences.Last().Value2);
+        }
+
         [Test]
         public void CompareAsIList()
         {
