@@ -47,16 +47,18 @@ namespace ObjectsComparer
 
             if (list1.Count != list2.Count)
             {
+
                 if (!type.GetTypeInfo().IsArray)
                 {
-                    yield return new Difference("", list1.Count.ToString(), list2.Count.ToString(), 
-                        DifferenceTypes.NumberOfElementsMismatch);
+                    yield return new Difference("", list1.Count.ToString(), list2.Count.ToString(), DifferenceTypes.NumberOfElementsMismatch);
                 }
 
-                yield break;
+                //yield break;
             }
 
-            for (var i = 0; i < list2.Count; i++)
+            var list = list1.Count <= list2.Count ? list1 : list2;
+
+            for (var i = 0; i < list.Count; i++)
             {
                 foreach (var failure in _comparer.CalculateDifferences(list1[i], list2[i]))
                 {
