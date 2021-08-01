@@ -131,7 +131,7 @@ namespace ObjectsComparer
                 {
                     var objectDataComparer = Factory.GetObjectsComparer(type, Settings, this);
 
-                    foreach (var failure in objectDataComparer.CalculateDifferences(type, value1, value2))
+                    foreach (var failure in objectDataComparer.CalculateDifferences(type, value1, value2, ComparisionContext.Create(currentMember: member)))
                     {
                         yield return failure.InsertPath(member.Name);
                     }
