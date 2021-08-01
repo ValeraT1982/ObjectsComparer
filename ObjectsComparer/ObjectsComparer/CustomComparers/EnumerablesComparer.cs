@@ -7,7 +7,7 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    internal class EnumerablesComparer : AbstractComparer, IComparerWithCondition
+    internal class EnumerablesComparer : AbstractComparer, IComparerWithCondition, IContextableComparer
     {
         public EnumerablesComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory)
             : base(settings, parentComparer, factory)
@@ -15,6 +15,11 @@ namespace ObjectsComparer
         }
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
+        {
+            return CalculateDifferences(type, obj1, obj2, ComparisionContext.Undefined);
+        }
+
+        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisionContext comparisionContext)
         {
             if (!Settings.EmptyAndNullEnumerablesEqual &&
                 (obj1 == null || obj2 == null) && obj1 != obj2)
@@ -46,7 +51,7 @@ namespace ObjectsComparer
 
             if (array1.Length != array2.Length)
             {
-                yield return new Difference("", array1.Length.ToString(), array2.Length.ToString(), 
+                yield return new Difference("", array1.Length.ToString(), array2.Length.ToString(),
                     DifferenceTypes.NumberOfElementsMismatch);
                 yield break;
             }
@@ -87,6 +92,8 @@ namespace ObjectsComparer
                 }
             }
         }
+
+        
 
         public bool IsMatch(Type type, object obj1, object obj2)
         {

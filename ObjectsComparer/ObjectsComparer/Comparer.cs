@@ -9,7 +9,7 @@ namespace ObjectsComparer
     /// <summary>
     /// Compares objects.
     /// </summary>
-    public class Comparer : AbstractComparer
+    public class Comparer : AbstractComparer, IContextableComparer
     {
         private static string CalculateDifferencesMethodName
         {
@@ -27,23 +27,32 @@ namespace ObjectsComparer
         {
         }
 
-        /// <summary>
-        /// Calculates list of differences between objects.
-        /// </summary>
-        /// <param name="type">Type.</param>
-        /// <param name="obj1">Object 1.</param>
-        /// <param name="obj2">Object 2.</param>
-        /// <returns>List of differences between objects.</returns>
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            var objectsComparerMethod = typeof(IComparersFactory).GetTypeInfo().GetMethods().First(m => m.IsGenericMethod);
-            var objectsComparerGenericMethod = objectsComparerMethod.MakeGenericMethod(type);
-            var comparer = objectsComparerGenericMethod.Invoke(Factory, new object[] { Settings, this });
-            var genericType = typeof(IComparer<>).MakeGenericType(type);
-            var method = genericType.GetTypeInfo().GetMethod(CalculateDifferencesMethodName, new[] { type, type });
+            return CalculateDifferences(type, obj1, obj2, ComparisionContext.Undefined);
+        }
+
+        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisionContext comparisionContext)
+        {
+            if (comparisionContext is null)
+            {
+                throw new ArgumentNullException(nameof(comparisionContext));
+            }
+
+            var getObjectsComparerMethod = typeof(IComparersFactory).GetTypeInfo().GetMethods().First(m => m.IsGenericMethod);
+            var getObjectsComparerGenericMethod = getObjectsComparerMethod.MakeGenericMethod(type);
+            var comparer = getObjectsComparerGenericMethod.Invoke(Factory, new object[] { Settings, this });
+
+            bool comparerIsContextableComparer = comparer.GetType().GetTypeInfo().GetInterfaces()
+                .Any(intft => intft.GetTypeInfo().IsGenericType && intft.GetGenericTypeDefinition() == typeof(IContextableComparer<>));
+
+            var genericType = comparerIsContextableComparer ? typeof(IContextableComparer<>).MakeGenericType(type) : typeof(IComparer<>).MakeGenericType(type);
+            var genericMethodParameterTypes = comparerIsContextableComparer ? new[] { type, type, typeof(ComparisionContext) } : new[] { type, type };
+            var genericMethod = genericType.GetTypeInfo().GetMethod(CalculateDifferencesMethodName, genericMethodParameterTypes);
+            var genericMethodParameters = comparerIsContextableComparer ? new[] { obj1, obj2, comparisionContext } : new[] { obj1, obj2 };
 
             // ReSharper disable once PossibleNullReferenceException
-            return (IEnumerable<Difference>)method.Invoke(comparer, new[] { obj1, obj2 });
+            return (IEnumerable<Difference>)genericMethod.Invoke(comparer, genericMethodParameters);
         }
     }
 }

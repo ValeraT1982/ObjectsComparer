@@ -10,7 +10,7 @@ namespace ObjectsComparer
     /// <summary>
     /// Compares objects of type <see cref="T"/>.
     /// </summary>
-    public class Comparer<T> : AbstractComparer<T>
+    public class Comparer<T> : AbstractComparer<T>, IContextableComparer<T>
     {
         private readonly List<MemberInfo> _members;
         private readonly List<IComparerWithCondition> _conditionalComparers;
@@ -53,7 +53,13 @@ namespace ObjectsComparer
         /// <returns>List of differences between objects.</returns>
         public override IEnumerable<Difference> CalculateDifferences(T obj1, T obj2)
         {
-            return CalculateDifferences(obj1, obj2, null);
+            return CalculateDifferences(obj1, obj2, (MemberInfo)null);
+        }
+
+        public IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, IComparisionContext comparisionContext)
+        {
+            //throw new NotImplementedException();
+            return CalculateDifferences(obj1, obj2, (MemberInfo)null);
         }
 
         internal IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo)
@@ -131,7 +137,7 @@ namespace ObjectsComparer
                 {
                     var objectDataComparer = Factory.GetObjectsComparer(type, Settings, this);
 
-                    foreach (var failure in objectDataComparer.CalculateDifferences(type, value1, value2))
+                    foreach (var failure in objectDataComparer.CalculateDifferences(type, value1, value2, ComparisionContext.Create(currentMember: member)))
                     {
                         yield return failure.InsertPath(member.Name);
                     }
