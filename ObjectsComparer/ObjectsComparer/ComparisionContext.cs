@@ -25,7 +25,7 @@ namespace ObjectsComparer
         public static IComparisionContext Create(MemberInfo currentMember)
         {
             if (currentMember is null)
-            {
+        {
                 throw new ArgumentNullException(nameof(currentMember));
             }
 
