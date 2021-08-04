@@ -6,7 +6,7 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    internal class EnumerablesComparer<T> : AbstractComparer
+    internal class EnumerablesComparer<T> : AbstractComparer, IContextableComparer
     {
         private readonly IComparer<T> _comparer;
 
@@ -18,6 +18,16 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
+            return CalculateDifferences(type, obj1, obj2, ComparisionContext.Undefined);
+        }
+
+        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisionContext comparisionContext)
+        {
+            if (comparisionContext is null)
+            {
+                throw new ArgumentNullException(nameof(comparisionContext));
+            }
+
             if (!type.InheritsFrom(typeof(IEnumerable<>)))
             {
                 throw new ArgumentException("Invalid type");
@@ -49,7 +59,7 @@ namespace ObjectsComparer
             {
                 if (!type.GetTypeInfo().IsArray)
                 {
-                    yield return new Difference("", list1.Count.ToString(), list2.Count.ToString(), 
+                    yield return new Difference("", list1.Count.ToString(), list2.Count.ToString(),
                         DifferenceTypes.NumberOfElementsMismatch);
                 }
 

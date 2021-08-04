@@ -21,13 +21,18 @@ namespace ObjectsComparer
 
         public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisionContext comparisionContext)
         {
+            if (comparisionContext is null)
+            {
+                throw new ArgumentNullException(nameof(comparisionContext));
+            }
+
             if (!Settings.EmptyAndNullEnumerablesEqual &&
                 (obj1 == null || obj2 == null) && obj1 != obj2)
             {
                 yield return new Difference("[]", obj1?.ToString() ?? string.Empty, obj2?.ToString() ?? string.Empty);
                 yield break;
             }
-
+            
             obj1 = obj1 ?? Enumerable.Empty<object>();
             obj2 = obj2 ?? Enumerable.Empty<object>();
 
@@ -92,8 +97,6 @@ namespace ObjectsComparer
                 }
             }
         }
-
-        
 
         public bool IsMatch(Type type, object obj1, object obj2)
         {
