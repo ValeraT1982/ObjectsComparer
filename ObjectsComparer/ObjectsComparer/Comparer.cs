@@ -47,7 +47,7 @@ namespace ObjectsComparer
                 .Any(intft => intft.GetTypeInfo().IsGenericType && intft.GetGenericTypeDefinition() == typeof(IContextableComparer<>));
 
             var genericType = comparerIsContextable ? typeof(IContextableComparer<>).MakeGenericType(type) : typeof(IComparer<>).MakeGenericType(type);
-            var genericMethodParameterTypes = comparerIsContextable ? new[] { type, type, typeof(ComparisionContext) } : new[] { type, type };
+            var genericMethodParameterTypes = comparerIsContextable ? new[] { type, type, typeof(IComparisionContext) } : new[] { type, type };
             var genericMethod = genericType.GetTypeInfo().GetMethod(CalculateDifferencesMethodName, genericMethodParameterTypes);
             var genericMethodParameters = comparerIsContextable ? new[] { obj1, obj2, comparisionContext } : new[] { obj1, obj2 };
 
