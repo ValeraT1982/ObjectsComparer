@@ -22,12 +22,142 @@ namespace ObjectsComparer.Tests
         public string[] Items3 { get; set; }
     }
 
+    class Osoba
+    {
+        public int Id { get; set; }
+
+        public string Jmeno { get; set; }
+
+        public List<Adresa> TrvaleAdresy { get; set; } = new List<Adresa>();
+
+        public List<Adresa> PrechodneAdresy { get; set; } = new List<Adresa>();
+
+        public Osoba Pritel { get; set; }
+    }
+
+    class Adresa
+    {
+        public int Id { get; set; }
+
+        public string Ulice { get; set; }
+
+        public List<Mesto> Mesta { get; set; } = new List<Mesto>();
+    }
+
+    class Mesto
+    {
+        public int Id { get; set; }
+
+        public string Nazev { get; set; }
+    }
+
     [TestFixture]
     public class DaNComparerTests
     {
         [Test]
+        public void TestOsoba()
+        {
+            Tuple<Osoba, Osoba> osoby = LoadOsoby();
+            var comparer = new Comparer<Osoba>();
+            var context = ComparisonContext.Undefined;
+            var diffs = comparer.CalculateDifferences(osoby.Item1, osoby.Item2, context).ToArray();
+        }
+
+        Tuple<Osoba, Osoba> LoadOsoby()
+        {
+            var osoba1 = new Osoba
+            {
+                Id = 1,
+                Jmeno = "Daniel",
+            };
+            var pritel1 = new Osoba
+            {
+                Id = -1,
+                Jmeno = "Pavel"
+            };
+
+            osoba1.Pritel = pritel1;
+            pritel1.Pritel = osoba1;
+
+            var adresaPritele1 = new Adresa
+            {
+                Id = 11,
+                Ulice = "Bílá"
+            };
+            osoba1.Pritel.TrvaleAdresy.Add(adresaPritele1);
+
+            var adresa1 = new Adresa
+            {
+                Id = 2,
+                Ulice = "Májová",
+            };
+            var adresa2 = new Adresa
+            {
+                Id = 3,
+                Ulice = "Bělská"
+            };
+            var adresa3 = new Adresa
+            {
+                Id = 4,
+                Ulice = "Růžová"
+            };
+            var adresaList = new List<Adresa>(new Adresa[] { adresa1, adresa2, adresa3 });
+            osoba1.TrvaleAdresy.AddRange(adresaList);
+
+            var osoba2 = new Osoba
+            {
+                Id = 1,
+                Jmeno = "Jan",
+            };
+
+            var pritel2 = new Osoba
+            {
+                Id = -2,
+                Jmeno = "Petr"
+            };
+
+            osoba2.Pritel = pritel2;
+
+            var adresaPritele2 = new Adresa
+            {
+                Id = 111,
+                Ulice = "Černá"
+            };
+            osoba2.Pritel.TrvaleAdresy.Add(adresaPritele2);
+
+            var adresa4 = new Adresa
+            {
+                Id = 2,
+                Ulice = "Májová"
+            };
+            var adresa5 = new Adresa
+            {
+                Id = 3,
+                Ulice = "Bělská"
+            };
+            var adresa6 = new Adresa
+            {
+                Id = 4,
+                Ulice = "Modrá"
+            };
+            var adresaList2 = new List<Adresa>(new Adresa[] { adresa4, adresa5, adresa6 });
+            osoba2.TrvaleAdresy.AddRange(adresaList2);
+
+            return new Tuple<Osoba, Osoba>(osoba1, osoba2);
+        }
+
+        public void Calc<T>(T obj1, T obj2)
+        {
+            var x = ((object)obj1 ?? obj2).GetType();
+        }
+
+        [Test]
         public void TestEnumerablesComparer()
         {
+            string s1 = null;
+            string s2 = "x";
+            Calc(s2, s1);
+
             var car1 = new Car();
             //car1.Items1 = new int[] { 1, 2, 3 };
             //car1.Items2 = new List<string> { "ahoj", "nazdar", "čau" };

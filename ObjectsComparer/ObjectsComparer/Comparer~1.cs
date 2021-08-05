@@ -56,17 +56,17 @@ namespace ObjectsComparer
             return CalculateDifferences(obj1, obj2, memberInfo: null);
         }
 
-        public IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, IComparisionContext comparisionContext)
+        public IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, IComparisonContext comparisonContext)
         {
-            return CalculateDifferences(obj1, obj2, memberInfo: null, comparisionContext);
+            return CalculateDifferences(obj1, obj2, memberInfo: null, comparisonContext);
         }
 
         internal IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo)
         {
-            return CalculateDifferences(obj1, obj2, memberInfo, ComparisionContext.Undefined);
+            return CalculateDifferences(obj1, obj2, memberInfo, ComparisonContext.Undefined);
         }
 
-        IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo, IComparisionContext comparisionContext)
+        IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo, IComparisonContext comparisonContext)
         {
             var comparer = memberInfo != null
                 ? OverridesCollection.GetComparer(memberInfo)
@@ -89,7 +89,7 @@ namespace ObjectsComparer
             var conditionalComparer = _conditionalComparers.FirstOrDefault(c => c.IsMatch(typeof(T), obj1, obj2));
             if (conditionalComparer != null)
             {
-                foreach (var difference in conditionalComparer.CalculateDifferences(typeof(T), obj1, obj2, comparisionContext))
+                foreach (var difference in conditionalComparer.CalculateDifferences(typeof(T), obj1, obj2, comparisonContext))
                 {
                     yield return difference;
                 }
@@ -116,7 +116,7 @@ namespace ObjectsComparer
             }
 
             foreach (var member in _members)
-            {
+            {                
                 var value1 = member.GetMemberValue(obj1);
                 var value2 = member.GetMemberValue(obj2);
                 var type = member.GetMemberType();
@@ -125,6 +125,8 @@ namespace ObjectsComparer
                 {
                     continue;
                 }
+
+                var context = ComparisonContext.Create(currentMember: member, ancestor: comparisonContext);
 
                 var valueComparer = DefaultValueComparer;
                 var hasCustomComparer = false;
@@ -141,7 +143,7 @@ namespace ObjectsComparer
                 {
                     var objectDataComparer = Factory.GetObjectsComparer(type, Settings, this);
 
-                    foreach (var failure in objectDataComparer.CalculateDifferences(type, value1, value2, ComparisionContext.Create(currentMember: member)))
+                    foreach (var failure in objectDataComparer.CalculateDifferences(type, value1, value2, context))
                     {
                         yield return failure.InsertPath(member.Name);
                     }

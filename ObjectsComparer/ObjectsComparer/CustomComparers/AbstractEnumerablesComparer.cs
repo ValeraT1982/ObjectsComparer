@@ -5,7 +5,7 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    internal abstract class AbstractEnumerablesComparer: AbstractComparer, IComparerWithCondition
+    internal abstract class AbstractEnumerablesComparer: AbstractComparer, IComparerWithCondition, IContextableComparer
     {
         protected AbstractEnumerablesComparer(ComparisonSettings settings, BaseComparer parentComparer,
             IComparersFactory factory)
@@ -42,5 +42,7 @@ namespace ObjectsComparer
         public abstract override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2);
 
         public abstract bool IsMatch(Type type, object obj1, object obj2);
+
+        public abstract IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext);
     }
 }

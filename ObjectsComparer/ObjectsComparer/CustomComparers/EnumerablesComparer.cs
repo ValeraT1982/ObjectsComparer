@@ -16,14 +16,14 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return CalculateDifferences(type, obj1, obj2, ComparisionContext.Undefined);
+            return CalculateDifferences(type, obj1, obj2, ComparisonContext.Undefined);
         }
 
-        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisionContext comparisionContext)
+        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext)
         {
-            if (comparisionContext is null)
+            if (comparisonContext is null)
             {
-                throw new ArgumentNullException(nameof(comparisionContext));
+                throw new ArgumentNullException(nameof(comparisonContext));
             }
 
             if (!Settings.EmptyAndNullEnumerablesEqual &&
@@ -91,7 +91,7 @@ namespace ObjectsComparer
                 }
 
                 var comparer = Factory.GetObjectsComparer(array1[i].GetType(), Settings, this);
-                foreach (var failure in comparer.CalculateDifferences(array1[i].GetType(), array1[i], array2[i]))
+                foreach (var failure in comparer.CalculateDifferences(array1[i].GetType(), array1[i], array2[i], comparisonContext))
                 {
                     yield return failure.InsertPath($"[{i}]");
                 }

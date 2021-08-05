@@ -6,7 +6,7 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    internal class EnumerablesComparer<T> : AbstractComparer, IContextableComparer
+    internal class EnumerablesComparer<T> : AbstractComparer, IContextableComparer, IContextableComparer<T>
     {
         private readonly IComparer<T> _comparer;
 
@@ -18,14 +18,14 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return CalculateDifferences(type, obj1, obj2, ComparisionContext.Undefined);
+            return CalculateDifferences(type, obj1, obj2, ComparisonContext.Undefined);
         }
 
-        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisionContext comparisionContext)
+        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext)
         {
-            if (comparisionContext is null)
+            if (comparisonContext is null)
             {
-                throw new ArgumentNullException(nameof(comparisionContext));
+                throw new ArgumentNullException(nameof(comparisonContext));
             }
 
             if (!type.InheritsFrom(typeof(IEnumerable<>)))
@@ -68,11 +68,19 @@ namespace ObjectsComparer
 
             for (var i = 0; i < list2.Count; i++)
             {
-                foreach (var failure in _comparer.CalculateDifferences(list1[i], list2[i]))
+                //List item has not got its MemberInfo, but has got its ancestor - list.
+                var context = ComparisonContext.Create(currentMember: null, ancestor: comparisonContext);
+
+                foreach (var failure in _comparer.CalculateDifferences(list1[i], list2[i], context))
                 {
                     yield return failure.InsertPath($"[{i}]");
                 }
             }
+        }
+
+        public IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, IComparisonContext comparisonContext)
+        {
+            return CalculateDifferences(((object)obj1 ?? obj2).GetType(), obj1, obj2, comparisonContext);
         }
     }
 }

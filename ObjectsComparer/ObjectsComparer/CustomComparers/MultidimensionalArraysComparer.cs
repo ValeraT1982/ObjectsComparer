@@ -15,6 +15,11 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
+            return CalculateDifferences(type, obj1, obj2, ComparisonContext.Undefined);
+        }
+
+        public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext)
+        {
             if (obj1 == null && obj2 == null)
             {
                 yield break;
@@ -24,7 +29,7 @@ namespace ObjectsComparer
             var enumerablesComparerType = typeof(MultidimensionalArrayComparer<>).MakeGenericType(typeInfo.GetElementType());
             var comparer = (IComparer)Activator.CreateInstance(enumerablesComparerType, Settings, this, Factory);
 
-            foreach (var difference in comparer.CalculateDifferences(type, obj1, obj2))
+            foreach (var difference in comparer.CalculateDifferences(type, obj1, obj2, comparisonContext))
             {
                 yield return difference;
             }
