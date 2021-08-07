@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using ObjectsComparer.Utils;
@@ -7,6 +8,20 @@ namespace ObjectsComparer
 {
     internal abstract class AbstractEnumerablesComparer: AbstractComparer, IComparerWithCondition, IContextableComparer
     {
+        /// <summary>
+        /// <see cref="Array"/> member names that will be skipped from comaprison.
+        /// </summary>
+        static readonly string[] SkipArrayMemberNameList = new string[] 
+        {
+            nameof(Array.Length),
+            "LongLength", 
+            nameof(Array.Rank),
+            "SyncRoot",
+            "IsReadOnly",
+            "IsFixedSize",
+            "IsSynchronized"
+        };
+
         protected AbstractEnumerablesComparer(ComparisonSettings settings, BaseComparer parentComparer,
             IComparersFactory factory)
             : base(settings, parentComparer, factory)
@@ -22,7 +37,7 @@ namespace ObjectsComparer
         {
             if (type.InheritsFrom(typeof(Array)))
             {
-                if (member.Name == "LongLength")
+                if (SkipArrayMemberNameList.Any(skipMemberName => skipMemberName == member.Name))
                 {
                     return true;
                 }

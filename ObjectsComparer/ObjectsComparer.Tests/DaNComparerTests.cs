@@ -33,6 +33,8 @@ namespace ObjectsComparer.Tests
         public List<Adresa> PrechodneAdresy { get; set; } = new List<Adresa>();
 
         public Osoba Pritel { get; set; }
+
+        public string[] ShortNames { get; set; }
     }
 
     class Adresa
@@ -59,8 +61,8 @@ namespace ObjectsComparer.Tests
         {
             Tuple<Osoba, Osoba> osoby = LoadOsoby();
             var comparer = new Comparer<Osoba>();
-            var context = ComparisonContext.Undefined;
-            var diffs = comparer.CalculateDifferences(osoby.Item1, osoby.Item2, context).ToArray();
+            var rootContext = ComparisonContext.Create();
+            var diffs = comparer.CalculateDifferences(osoby.Item1, osoby.Item2, rootContext).ToArray();
         }
 
         Tuple<Osoba, Osoba> LoadOsoby()
@@ -69,6 +71,7 @@ namespace ObjectsComparer.Tests
             {
                 Id = 1,
                 Jmeno = "Daniel",
+                ShortNames = new string[] { "shn1", "shn2", "shn3" }
             };
             var pritel1 = new Osoba
             {
@@ -108,6 +111,7 @@ namespace ObjectsComparer.Tests
             {
                 Id = 1,
                 Jmeno = "Jan",
+                ShortNames = new string[] { "shn1", "shn2", "shn3" }
             };
 
             var pritel2 = new Osoba
