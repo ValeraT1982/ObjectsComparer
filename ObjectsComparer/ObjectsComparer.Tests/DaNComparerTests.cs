@@ -34,6 +34,8 @@ namespace ObjectsComparer.Tests
         public Person BestFriend { get; set; }
 
         public string[] ShortNames { get; set; }
+
+        public IEnumerable LongNames { get; set; }
     }
 
     class Address
@@ -70,7 +72,8 @@ namespace ObjectsComparer.Tests
             {
                 Id = 1,
                 PersonName = "Daniel",
-                ShortNames = new string[] { "shn1", "shn2", "shn3" }
+                ShortNames = new string[] { "shn1", "shn2", "shn3" },
+                LongNames = new string[] { "ln1", "ln2", "ln3" }
             };
             var pritel1 = new Person
             {
@@ -109,7 +112,8 @@ namespace ObjectsComparer.Tests
             {
                 Id = 1,
                 PersonName = "John",
-                ShortNames = new string[] { "shn1", "shn2", "shn3" }
+                ShortNames = new string[] { "shn1", "shn2", "shn3" },
+                LongNames = new string[] { "ln1", "ln2", "ln3" }
             };
 
             var pritel2 = new Person

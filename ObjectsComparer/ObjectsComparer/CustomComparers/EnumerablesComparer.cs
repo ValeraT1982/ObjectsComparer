@@ -64,6 +64,9 @@ namespace ObjectsComparer
             //ToDo Extract type
             for (var i = 0; i < array2.Length; i++)
             {
+                //List item has not got its MemberInfo, but has got its ancestor - list.
+                var context = ComparisonContext.Create(currentMember: null, ancestor: comparisonContext);
+
                 if (array1[i] == null && array2[i] == null)
                 {
                     continue;
