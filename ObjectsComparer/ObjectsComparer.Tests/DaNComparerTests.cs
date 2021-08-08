@@ -10,7 +10,6 @@ namespace ObjectsComparer.Tests
 {
     public class Driver
     {
-
     }
 
     public class Car
@@ -22,35 +21,35 @@ namespace ObjectsComparer.Tests
         public string[] Items3 { get; set; }
     }
 
-    class Osoba
+    class Person
     {
         public int Id { get; set; }
 
-        public string Jmeno { get; set; }
+        public string PersonName { get; set; }
 
-        public List<Adresa> TrvaleAdresy { get; set; } = new List<Adresa>();
+        public List<Address> AddressList1 { get; set; } = new List<Address>();
 
-        public List<Adresa> PrechodneAdresy { get; set; } = new List<Adresa>();
+        public List<Address> AddressList2 { get; set; } = new List<Address>();
 
-        public Osoba Pritel { get; set; }
+        public Person BestFriend { get; set; }
 
         public string[] ShortNames { get; set; }
     }
 
-    class Adresa
+    class Address
     {
         public int Id { get; set; }
 
-        public string Ulice { get; set; }
+        public string Street { get; set; }
 
-        public List<Mesto> Mesta { get; set; } = new List<Mesto>();
+        public List<City> CityList { get; set; } = new List<City>();
     }
 
-    class Mesto
+    class City
     {
         public int Id { get; set; }
 
-        public string Nazev { get; set; }
+        public string CityName { get; set; }
     }
 
     [TestFixture]
@@ -59,122 +58,99 @@ namespace ObjectsComparer.Tests
         [Test]
         public void TestOsoba()
         {
-            Tuple<Osoba, Osoba> osoby = LoadOsoby();
-            var comparer = new Comparer<Osoba>();
+            Tuple<Person, Person> osoby = LoadOsoby();
+            var comparer = new Comparer<Person>();
             var rootContext = ComparisonContext.Create();
             var diffs = comparer.CalculateDifferences(osoby.Item1, osoby.Item2, rootContext).ToArray();
         }
 
-        Tuple<Osoba, Osoba> LoadOsoby()
+        Tuple<Person, Person> LoadOsoby()
         {
-            var osoba1 = new Osoba
+            var person1 = new Person
             {
                 Id = 1,
-                Jmeno = "Daniel",
+                PersonName = "Daniel",
                 ShortNames = new string[] { "shn1", "shn2", "shn3" }
             };
-            var pritel1 = new Osoba
+            var pritel1 = new Person
             {
                 Id = -1,
-                Jmeno = "Pavel"
+                PersonName = "Paul"
             };
 
-            osoba1.Pritel = pritel1;
-            pritel1.Pritel = osoba1;
+            person1.BestFriend = pritel1;
 
-            var adresaPritele1 = new Adresa
+            var friend1Address = new Address
             {
                 Id = 11,
-                Ulice = "Bílá"
+                Street = "White"
             };
-            osoba1.Pritel.TrvaleAdresy.Add(adresaPritele1);
+            person1.BestFriend.AddressList1.Add(friend1Address);
 
-            var adresa1 = new Adresa
+            var adr1 = new Address
             {
                 Id = 2,
-                Ulice = "Májová",
+                Street = "Red",
             };
-            var adresa2 = new Adresa
+            var adr2 = new Address
             {
                 Id = 3,
-                Ulice = "Bělská"
+                Street = "Yellow"
             };
-            var adresa3 = new Adresa
+            var adr3 = new Address
             {
                 Id = 4,
-                Ulice = "Růžová"
+                Street = "Rose"
             };
-            var adresaList = new List<Adresa>(new Adresa[] { adresa1, adresa2, adresa3 });
-            osoba1.TrvaleAdresy.AddRange(adresaList);
+            var addressList = new List<Address>(new Address[] { adr1, adr2, adr3 });
+            person1.AddressList1.AddRange(addressList);
 
-            var osoba2 = new Osoba
+            var person2 = new Person
             {
                 Id = 1,
-                Jmeno = "Jan",
+                PersonName = "John",
                 ShortNames = new string[] { "shn1", "shn2", "shn3" }
             };
 
-            var pritel2 = new Osoba
+            var pritel2 = new Person
             {
                 Id = -2,
-                Jmeno = "Petr"
+                PersonName = "Peter"
             };
 
-            osoba2.Pritel = pritel2;
+            person2.BestFriend = pritel2;
 
-            var adresaPritele2 = new Adresa
+            var adresaPritele2 = new Address
             {
                 Id = 111,
-                Ulice = "Černá"
+                Street = "Black"
             };
-            osoba2.Pritel.TrvaleAdresy.Add(adresaPritele2);
+            person2.BestFriend.AddressList1.Add(adresaPritele2);
 
-            var adresa4 = new Adresa
+            var adr4 = new Address
             {
                 Id = 2,
-                Ulice = "Májová"
+                Street = "Red"
             };
-            var adresa5 = new Adresa
+            var adr5 = new Address
             {
                 Id = 3,
-                Ulice = "Bělská"
+                Street = "Yellow"
             };
-            var adresa6 = new Adresa
+            var adr6 = new Address
             {
                 Id = 4,
-                Ulice = "Modrá"
+                Street = "Blue"
             };
-            var adresaList2 = new List<Adresa>(new Adresa[] { adresa4, adresa5, adresa6 });
-            osoba2.TrvaleAdresy.AddRange(adresaList2);
+            var addressList2 = new List<Address>(new Address[] { adr4, adr5, adr6 });
+            person2.AddressList1.AddRange(addressList2);
 
-            return new Tuple<Osoba, Osoba>(osoba1, osoba2);
+            return new Tuple<Person, Person>(person1, person2);
         }
 
         public void Calc<T>(T obj1, T obj2)
         {
             var x = ((object)obj1 ?? obj2).GetType();
-        }
-
-        [Test]
-        public void TestEnumerablesComparer()
-        {
-            string s1 = null;
-            string s2 = "x";
-            Calc(s2, s1);
-
-            var car1 = new Car();
-            //car1.Items1 = new int[] { 1, 2, 3 };
-            //car1.Items2 = new List<string> { "ahoj", "nazdar", "čau" };
-            car1.Items3 = new string[] { "ahoj", "nazdar", "čau" };
-            var car2 = new Car();
-            //car2.Items1 = new int[] { -1, 2, 3 };
-            //car2.Items2 = new List<string> { "ahoj", "hello", "čau" };
-            car2.Items3 = new string[] { "hi", "nazdar", "čau" };
-            //var comparer = new Comparer<Car>();
-            var comparer = new Comparer();
-            //var diffs = comparer.CalculateDifferences(typeof(Car), car1, car2).ToArray();
-            var diffs = comparer.CalculateDifferences(car1, car2).ToArray();
-            //var member = car1.GetType().GetMember(nameof(car1.Items1)).Single();
         }
 
         public class SubClassA
