@@ -21,7 +21,7 @@ namespace ObjectsComparer
             return CalculateDifferences(type, obj1, obj2, ComparisonContext.Undefined);
         }
 
-        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext)
+        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, ComparisonContext comparisonContext)
         {
             if (comparisonContext is null)
             {
@@ -78,7 +78,7 @@ namespace ObjectsComparer
             }
         }
 
-        public IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, IComparisonContext comparisonContext)
+        public IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, ComparisonContext comparisonContext)
         {
             return CalculateDifferences(((object)obj1 ?? obj2).GetType(), obj1, obj2, comparisonContext);
         }

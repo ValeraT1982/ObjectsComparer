@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace ObjectsComparer
 {
-    public static class IComparableExtensions
+    public static class IComparerExtensions
     {
-        public static IEnumerable<Difference> CalculateDifferences(this IComparer comparer, Type type, object obj1, object obj2, IComparisonContext comparisonContext)
+        public static IEnumerable<Difference> CalculateDifferences(this IComparer comparer, Type type, object obj1, object obj2, ComparisonContext comparisonContext)
         {
             if (comparer is IContextableComparer contextableComparer)
             {
@@ -15,7 +15,7 @@ namespace ObjectsComparer
             return comparer.CalculateDifferences(type, obj1, obj2);
         }
 
-        public static IEnumerable<Difference> CalculateDifferences<T>(this IComparer<T> comparer, T obj1, T obj2, IComparisonContext comparisonContext)
+        public static IEnumerable<Difference> CalculateDifferences<T>(this IComparer<T> comparer, T obj1, T obj2, ComparisonContext comparisonContext)
         {
             if (comparer is IContextableComparer<T> contextableComparer)
             {

@@ -56,7 +56,7 @@ namespace ObjectsComparer
             return CalculateDifferences(obj1, obj2, memberInfo: null);
         }
 
-        public IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, IComparisonContext comparisonContext)
+        public IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, ComparisonContext comparisonContext)
         {
             return CalculateDifferences(obj1, obj2, memberInfo: null, comparisonContext);
         }
@@ -66,7 +66,7 @@ namespace ObjectsComparer
             return CalculateDifferences(obj1, obj2, memberInfo, ComparisonContext.Undefined);
         }
 
-        IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo, IComparisonContext comparisonContext)
+        IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo, ComparisonContext comparisonContext)
         {
             var comparer = memberInfo != null
                 ? OverridesCollection.GetComparer(memberInfo)

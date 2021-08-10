@@ -32,7 +32,7 @@ namespace ObjectsComparer
             return CalculateDifferences(type, obj1, obj2, ComparisonContext.Undefined);
         }
 
-        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext)
+        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, ComparisonContext comparisonContext)
         {
             if (comparisonContext is null)
             {
@@ -47,7 +47,7 @@ namespace ObjectsComparer
                 .Any(intft => intft.GetTypeInfo().IsGenericType && intft.GetGenericTypeDefinition() == typeof(IContextableComparer<>));
 
             var genericType = comparerIsContextable ? typeof(IContextableComparer<>).MakeGenericType(type) : typeof(IComparer<>).MakeGenericType(type);
-            var genericMethodParameterTypes = comparerIsContextable ? new[] { type, type, typeof(IComparisonContext) } : new[] { type, type };
+            var genericMethodParameterTypes = comparerIsContextable ? new[] { type, type, typeof(ComparisonContext) } : new[] { type, type };
             var genericMethod = genericType.GetTypeInfo().GetMethod(CalculateDifferencesMethodName, genericMethodParameterTypes);
             var genericMethodParameters = comparerIsContextable ? new[] { obj1, obj2, comparisonContext } : new[] { obj1, obj2 };
 

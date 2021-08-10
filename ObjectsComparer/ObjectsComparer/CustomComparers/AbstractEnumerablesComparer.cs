@@ -58,6 +58,6 @@ namespace ObjectsComparer
 
         public abstract bool IsMatch(Type type, object obj1, object obj2);
 
-        public abstract IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext);
+        public abstract IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, ComparisonContext comparisonContext);
     }
 }

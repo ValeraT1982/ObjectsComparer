@@ -5,11 +5,11 @@ using System.Reflection;
 
 namespace ObjectsComparer
 {
-    public sealed class ComparisonContext : IComparisonContext
+    public sealed class ComparisonContext
     {
-        public static readonly IComparisonContext Undefined = new ComparisonContext();
+        public static readonly ComparisonContext Undefined = new ComparisonContext();
 
-        readonly List<IComparisonContext> _descendants = new List<IComparisonContext>();
+        readonly List<ComparisonContext> _descendants = new List<ComparisonContext>();
 
         private ComparisonContext()
         {
@@ -17,33 +17,28 @@ namespace ObjectsComparer
 
         private ComparisonContext(MemberInfo currentMember)
         {
-            //Member = currentMember ?? throw new ArgumentNullException(nameof(currentMember));
             Member = currentMember;
         }
 
         /// <summary>
-        /// 
+        /// It is always null for root context (start point of the comparison) and always null for list item. List item never has got its member. It only has got the ancestor context - list and that list has got its member.
         /// </summary>
         public MemberInfo Member { get; }
 
-        public IComparisonContext Ancestor { get; set; }
+        /// <summary>
+        /// Ancestor context. For example if current context is "Person.Name" property, ancestor is Person.
+        /// </summary>
+        public ComparisonContext Ancestor { get; set; }
 
-        public ReadOnlyCollection<IComparisonContext> Descendants => _descendants.AsReadOnly();
+        /// <summary>
+        /// Children contexts. For example, if Person class has got properties Name and Birthday, person context has got one child context Name a and one child context Birthday.
+        /// </summary>
+        public ReadOnlyCollection<ComparisonContext> Descendants => _descendants.AsReadOnly();
 
-        internal static IComparisonContext Create(MemberInfo currentMember = null, IComparisonContext ancestor = null)
+        internal static ComparisonContext Create(MemberInfo currentMember = null, ComparisonContext ancestor = null)
         {
-            //if (currentMember is null)
-            //{
-            //    throw new ArgumentNullException(nameof(currentMember));
-            //}
-
             var context = new ComparisonContext(currentMember);
-
-            if (ancestor != null)
-            {
-                ((ComparisonContext)ancestor).AddDescendant(context);
-            }
-
+            ancestor.AddDescendant(context);
             return context;
         }
 
@@ -52,5 +47,11 @@ namespace ObjectsComparer
             _descendants.Add(descendant);
             descendant.Ancestor = this;
         }
+
+        //A list of differences directly related to this context.
+
+        //Whether the object has any properties (bool recursive).
+
+        //HasDifferences(bool recursive)
     }
 }

@@ -8,6 +8,6 @@ namespace ObjectsComparer
     /// </summary>
     public interface IContextableComparer
     {
-        IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext);
+        IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, ComparisonContext comparisonContext);
     }
 }
