@@ -48,5 +48,38 @@ namespace ObjectsComparer.Tests
 
             Assert.Throws<KeyNotFoundException>(() => settings.GetCustomSetting<double>("setting1"));
         }
+
+        /// <summary>
+        /// Whether list comparison by key is correctly set.
+        /// </summary>
+        [Test]
+        public void CompareListElementsByKeyIsCorrectlySet()
+        {
+            //Client side.
+            var settings = new ComparisonSettings();
+            settings.List.Configure((comparisonContext, configurationOptions) =>
+            {
+                configurationOptions.CompareElementsByKey();
+            });
+
+            //Component side.
+            var options = new ListConfigurationOptions();
+            var ctx = ComparisonContext.Create();
+            settings.List.ConfigureOptions(ctx, options);
+
+            Assert.AreEqual(true, options.KeyProvider != null);
+        }
+
+        /// <summary>
+        /// Whether backward compatibility is ensured.
+        /// </summary>
+        [Test]
+        public void ListComparisonConfigurationBackwardCompatibilityEnsured()
+        {
+            var options = ListConfigurationOptions.Default;
+
+            Assert.AreEqual(false, options.CompareUnequalLists);
+            Assert.AreEqual(true, options.KeyProvider == null);
+        }
     }
 }

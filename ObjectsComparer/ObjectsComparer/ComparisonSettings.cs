@@ -28,6 +28,11 @@ namespace ObjectsComparer
         private readonly Dictionary<Tuple<Type, string>, object> _settings = new Dictionary<Tuple<Type, string>, object>();
 
         /// <summary>
+        /// List comparison settings.
+        /// </summary>
+        public ListComparisonSettings List { get; } = new ListComparisonSettings();
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ComparisonSettings" /> class. 
         /// </summary>
         public ComparisonSettings()
