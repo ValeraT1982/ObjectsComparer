@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using ObjectsComparer.Exceptions;
 using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
@@ -54,18 +55,58 @@ namespace ObjectsComparer
             var array1 = ((IEnumerable)obj1).Cast<object>().ToArray();
             var array2 = ((IEnumerable)obj2).Cast<object>().ToArray();
 
+            var listConfigurationOptions = ListConfigurationOptions.Default;
+            Settings.List.ConfigureOptions?.Invoke(comparisonContext, listConfigurationOptions);
+
             if (array1.Length != array2.Length)
             {
                 yield return new Difference("", array1.Length.ToString(), array2.Length.ToString(),
                     DifferenceTypes.NumberOfElementsMismatch);
-                yield break;
+
+                if (listConfigurationOptions.CompareUnequalLists == false)
+                {
+                    yield break;
+                }
             }
 
+            var smallerArray = array1.Length <= array2.Length ? array1 : array2;
+            var largerArray = smallerArray == array1 ? array2 : array1;
+
             //ToDo Extract type
-            for (var i = 0; i < array2.Length; i++)
+            for (var i = 0; i < smallerArray.Length; i++)
             {
                 //List item has not got its MemberInfo, but has got its ancestor - list.
                 var context = ComparisonContext.Create(currentMember: null, ancestor: comparisonContext);
+
+                object element1 = smallerArray[i];
+                object element2 = null;
+
+                if (listConfigurationOptions.KeyProvider == null)
+                {
+                    element2 = largerArray[i];
+                }
+                else
+                {
+                    if (element1 == null)
+                    {
+                        if (largerArray.Any(li => li == null))
+                        {
+                            element2 = null;
+                        }
+                        else
+                        {
+
+                        }
+                    }
+                    else
+                    {
+                        object element1Key = listConfigurationOptions.KeyProvider(element1);
+                        if (element1Key == null)
+                        {
+                            throw new ElementNotFoundByKeyException();
+                        }
+                    }
+                }
 
                 if (array1[i] == null && array2[i] == null)
                 {

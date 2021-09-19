@@ -9,7 +9,7 @@ namespace ObjectsComparer
     public class ListConfigurationOptions
     {
         /// <summary>
-        /// Whether to compare elements of the lists even if their number differs (<see cref="DifferenceTypes.NumberOfElementsMismatch"/> always will be logged). Default value = false.
+        /// Whether to compare elements of the lists even if their number differs (<see cref="DifferenceTypes.NumberOfElementsMismatch"/> will always be logged). Default value = false.
         /// </summary>
         public bool CompareUnequalLists { get; set; } = false;
 
@@ -37,7 +37,7 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// Compares list elements by key. It will try to find one of the public properties specified by argument <paramref name="keys"/>. In that order.
+        /// Compares list elements by key. It will try to find one of the public properties specified by argument <paramref name="keys"/>, in that order.
         /// </summary>
         public void CompareElementsByKey(bool caseSensitive = true, params string[] keys)
         {
