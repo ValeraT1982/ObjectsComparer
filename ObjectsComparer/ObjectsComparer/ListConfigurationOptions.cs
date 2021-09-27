@@ -73,7 +73,7 @@ namespace ObjectsComparer
         /// <summary>
         /// It will try to find one of the public properties specified by <paramref name="keys"/>, then it returns its value.
         /// </summary>
-        /// <returns>Null if no property matches the specified key, or the corresponding property returns null, or <paramref name = "instance" /> is null itself.</returns>
+        /// <returns>Returns the value of the property that corresponds to the specified key. If no property matches the specified key, it returns the <paramref name="instance"/> itself.</returns>
         static object GetKeyValue(object instance, bool caseSensitive, params string[] keys)
         {
             if (instance != null)

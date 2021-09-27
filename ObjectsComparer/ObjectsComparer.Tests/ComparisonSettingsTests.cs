@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Linq;
+using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace ObjectsComparer.Tests
@@ -71,7 +73,7 @@ namespace ObjectsComparer.Tests
         }
 
         /// <summary>
-        /// Whether backward compatibility is ensured.
+        /// Whether backward compatibility is ensured i.e. sequential comparing of equal lists.
         /// </summary>
         [Test]
         public void ListComparisonConfigurationBackwardCompatibilityEnsured()
@@ -80,6 +82,16 @@ namespace ObjectsComparer.Tests
 
             Assert.AreEqual(false, options.CompareUnequalLists);
             Assert.AreEqual(true, options.KeyProvider == null);
+        }
+
+        [Test]
+        public void PrubeznyTest()
+        {
+            var a1 = new ArrayList() { 1, 2, 3 };
+            var a2 = new ArrayList() { 1, 2, 3, 4 };
+            var comparer = new Comparer();
+
+            var result = comparer.CalculateDifferences(a1, a2).ToArray();
         }
     }
 }
