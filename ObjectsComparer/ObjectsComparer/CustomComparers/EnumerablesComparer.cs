@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using ObjectsComparer.Exceptions;
@@ -69,17 +70,15 @@ namespace ObjectsComparer
                 }
             }
 
-            var smallerArray = array1.Length <= array2.Length ? array1 : array2;
-            var largerArray = smallerArray == array1 ? array2 : array1;
             IEnumerable<Difference> failrues;
 
             if (listConfigurationOptions.KeyProvider != null)
             {
-                failrues = CalculateDifferencesByKey(smallerArray, largerArray, comparisonContext, listConfigurationOptions);
+                failrues = CalculateDifferencesByKey(array1, array2, comparisonContext, listConfigurationOptions);
             }
             else
             {
-                failrues = CalculateDifferencesByIndex(smallerArray, largerArray, comparisonContext);
+                failrues = CalculateDifferencesByIndex(array1, array2, comparisonContext);
             }
 
             foreach (var failrue in failrues)
@@ -88,49 +87,74 @@ namespace ObjectsComparer
             }
         }
 
-        private IEnumerable<Difference> CalculateDifferencesByKey(object[] smallerArray, object[] largerArray, ComparisonContext comparisonContext, ListConfigurationOptions listConfigurationOptions)
+        private IEnumerable<Difference> CalculateDifferencesByKey(object[] array1, object[] array2, ComparisonContext comparisonContext, ListConfigurationOptions listConfigurationOptions)
         {
+            Debug.WriteLine(nameof(CalculateDifferencesByKey));
             throw new NotImplementedException();
         }
 
-        private IEnumerable<Difference> CalculateDifferencesByIndex(object[] smallerArray, object[] largerArray, ComparisonContext comparisonContext)
+        private IEnumerable<Difference> CalculateDifferencesByIndex(object[] array1, object[] array2, ComparisonContext comparisonContext)
         {
+            Debug.WriteLine(nameof(CalculateDifferencesByIndex));
+
+            int array1Count = array1.Count();
+            int array2Count = array2.Count();
+            int smallerCount = array1Count <= array2Count ? array1Count : array2Count;
+
             //ToDo Extract type
-            for (var i = 0; i < smallerArray.Length; i++)
+            for (var i = 0; i < smallerCount; i++)
             {
                 //List item has not got its MemberInfo, but has got its ancestor - list.
                 var context = ComparisonContext.Create(currentMember: null, ancestor: comparisonContext);
 
-                if (smallerArray[i] == null && largerArray[i] == null)
+                if (array1[i] == null && array2[i] == null)
                 {
                     continue;
                 }
 
-                var valueComparer1 = smallerArray[i] != null ? OverridesCollection.GetComparer(smallerArray[i].GetType()) ?? DefaultValueComparer : DefaultValueComparer;
-                var valueComparer2 = largerArray[i] != null ? OverridesCollection.GetComparer(largerArray[i].GetType()) ?? DefaultValueComparer : DefaultValueComparer;
+                var valueComparer1 = array1[i] != null ? OverridesCollection.GetComparer(array1[i].GetType()) ?? DefaultValueComparer : DefaultValueComparer;
+                var valueComparer2 = array2[i] != null ? OverridesCollection.GetComparer(array2[i].GetType()) ?? DefaultValueComparer : DefaultValueComparer;
 
-                if (smallerArray[i] == null)
+                if (array1[i] == null)
                 {
-                    yield return new Difference($"[{i}]", string.Empty, valueComparer2.ToString(largerArray[i]));
+                    yield return new Difference($"[{i}]", string.Empty, valueComparer2.ToString(array2[i]));
                     continue;
                 }
 
-                if (largerArray[i] == null)
+                if (array2[i] == null)
                 {
-                    yield return new Difference($"[{i}]", valueComparer1.ToString(smallerArray[i]), string.Empty);
+                    yield return new Difference($"[{i}]", valueComparer1.ToString(array1[i]), string.Empty);
                     continue;
                 }
 
-                if (smallerArray[i].GetType() != largerArray[i].GetType())
+                if (array1[i].GetType() != array2[i].GetType())
                 {
-                    yield return new Difference($"[{i}]", valueComparer1.ToString(smallerArray[i]), valueComparer2.ToString(largerArray[i]), DifferenceTypes.TypeMismatch);
+                    yield return new Difference($"[{i}]", valueComparer1.ToString(array1[i]), valueComparer2.ToString(array2[i]), DifferenceTypes.TypeMismatch);
                     continue;
                 }
 
-                var comparer = Factory.GetObjectsComparer(smallerArray[i].GetType(), Settings, this);
-                foreach (var failure in comparer.CalculateDifferences(smallerArray[i].GetType(), smallerArray[i], largerArray[i], comparisonContext))
+                var comparer = Factory.GetObjectsComparer(array1[i].GetType(), Settings, this);
+
+                foreach (var failure in comparer.CalculateDifferences(array1[i].GetType(), array1[i], array2[i], comparisonContext))
                 {
                     yield return failure.InsertPath($"[{i}]");
+                }
+            }
+
+            //Add a difference for each element that is in array1 and not in array2, or vice versa. The positions of value1 and value2 are respected in Difference instance.
+            if (array1Count != array2Count)
+            {
+                var largerArray = array1Count > array2Count ? array1 : array2;
+
+                for (int i = smallerCount; i < largerArray.Length; i++)
+                {
+                    var valueComparer = largerArray[i] != null ? OverridesCollection.GetComparer(largerArray[i].GetType()) ?? DefaultValueComparer : DefaultValueComparer;
+
+                    yield return new Difference(
+                        memberPath: $"[{i}]",
+                        value1: array1Count > array2Count ? valueComparer.ToString(largerArray[i]) : string.Empty,
+                        value2: array2Count > array1Count ? valueComparer.ToString(largerArray[i]) : string.Empty,
+                        differenceType: array1Count > array2Count ? DifferenceTypes.MissedElementInSecondObject : DifferenceTypes.MissedElementInFirstObject);
                 }
             }
         }
