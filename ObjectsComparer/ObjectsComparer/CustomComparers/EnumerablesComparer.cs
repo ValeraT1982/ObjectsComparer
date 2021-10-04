@@ -135,13 +135,13 @@ namespace ObjectsComparer
 
                 var comparer = Factory.GetObjectsComparer(array1[i].GetType(), Settings, this);
 
-                foreach (var failure in comparer.CalculateDifferences(array1[i].GetType(), array1[i], array2[i], comparisonContext))
+                foreach (var failure in comparer.CalculateDifferences(array1[i].GetType(), array1[i], array2[i], context))
                 {
                     yield return failure.InsertPath($"[{i}]");
                 }
             }
 
-            //Add a difference for each element that is in array1 and not in array2, or vice versa. The positions of value1 and value2 are respected in Difference instance.
+            //Add a missed element difference for each element that is in array1 and not in array2, or vice versa. The positions of value1 and value2 are respected in Difference instance.
             if (array1Count != array2Count)
             {
                 var largerArray = array1Count > array2Count ? array1 : array2;

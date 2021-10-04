@@ -54,23 +54,39 @@ namespace ObjectsComparer.Tests
         [Test]
         public void InequalityCountAndInequalityProperty()
         {
-            var a1 = new A { NonGenericEnumerable = new ArrayList { new B { Property1 = "Str2" }, new B { Property1 = "Str1" } } };
-            var a2 = new A { NonGenericEnumerable = new ArrayList { new B { Property1 = "Str1" } } };
+            var a1 = new A
+            {
+                NonGenericEnumerable = new ArrayList
+                {
+                    new B { Property1 = "Str2" },
+                    new B { Property1 = "Str1" } ,
+                    null
+                }
+            };
+
+            var a2 = new A 
+            {
+                NonGenericEnumerable = new ArrayList 
+                {
+                    new B { Property1 = "Str1" } 
+                } 
+            };
 
             var settings = new ComparisonSettings();
+
             settings.List.Configure((ctx, options) =>
             {
                 options.CompareUnequalLists = true;
             });
 
             var comparer = new Comparer<A>(settings);
-
-            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+            var rootCtx = ComparisonContext.Create();
+            var differences = comparer.CalculateDifferences(a1, a2, rootCtx).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("NonGenericEnumerable", differences.First().MemberPath);
             Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences.First().DifferenceType);
-            Assert.AreEqual("2", differences.First().Value1);
+            Assert.AreEqual("3", differences.First().Value1);
             Assert.AreEqual("1", differences.First().Value2);
             Assert.AreEqual(DifferenceTypes.ValueMismatch, differences[1].DifferenceType);
             Assert.AreEqual("NonGenericEnumerable[0].Property1", differences[1].MemberPath);
