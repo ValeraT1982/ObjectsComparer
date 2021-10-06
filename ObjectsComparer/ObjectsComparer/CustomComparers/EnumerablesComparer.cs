@@ -87,13 +87,14 @@ namespace ObjectsComparer
             }
         }
 
-        private IEnumerable<Difference> CalculateDifferencesByKey(object[] array1, object[] array2, ComparisonContext comparisonContext, ListConfigurationOptions listConfigurationOptions)
+        private IEnumerable<Difference> CalculateDifferencesByKey(object[] array1, object[] array2, ComparisonContext listComparisonContext, ListConfigurationOptions listConfigurationOptions)
         {
             Debug.WriteLine(nameof(CalculateDifferencesByKey));
-            throw new NotImplementedException();
+
+            return null;
         }
 
-        private IEnumerable<Difference> CalculateDifferencesByIndex(object[] array1, object[] array2, ComparisonContext comparisonContext)
+        private IEnumerable<Difference> CalculateDifferencesByIndex(object[] array1, object[] array2, ComparisonContext listComparisonContext)
         {
             Debug.WriteLine(nameof(CalculateDifferencesByIndex));
 
@@ -104,8 +105,8 @@ namespace ObjectsComparer
             //ToDo Extract type
             for (var i = 0; i < smallerCount; i++)
             {
-                //List item has not got its MemberInfo, but has got its ancestor - list.
-                var context = ComparisonContext.Create(currentMember: null, ancestor: comparisonContext);
+                //Context representing the element has no MemberInfo. Its ancestor is the context representing the list.
+                var elementComparisonContext = ComparisonContext.Create(currentMember: null, ancestor: listComparisonContext);
 
                 if (array1[i] == null && array2[i] == null)
                 {
@@ -135,13 +136,13 @@ namespace ObjectsComparer
 
                 var comparer = Factory.GetObjectsComparer(array1[i].GetType(), Settings, this);
 
-                foreach (var failure in comparer.CalculateDifferences(array1[i].GetType(), array1[i], array2[i], context))
+                foreach (var failure in comparer.CalculateDifferences(array1[i].GetType(), array1[i], array2[i], elementComparisonContext))
                 {
                     yield return failure.InsertPath($"[{i}]");
                 }
             }
 
-            //Add a missed element difference for each element that is in array1 and not in array2, or vice versa. The positions of value1 and value2 are respected in Difference instance.
+            //Add a "missed element" difference for each element that is in array1 and is not in array2, or vice versa. The positions of value1 and value2 are respected in Difference instance.
             if (array1Count != array2Count)
             {
                 var largerArray = array1Count > array2Count ? array1 : array2;
