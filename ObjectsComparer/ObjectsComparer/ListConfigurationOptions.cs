@@ -8,93 +8,42 @@ namespace ObjectsComparer
 {
     public class ListConfigurationOptions
     {
+        ListConfigurationOptions()
+        {
+        }
+
         /// <summary>
         /// Whether to compare elements of the lists even if their number differs (<see cref="DifferenceTypes.NumberOfElementsMismatch"/> will always be logged). Default value = false.
         /// </summary>
         public bool CompareUnequalLists { get; set; } = false;
 
-        /// <summary>
-        /// If null, the elements will be compared by their index, otherwise by key. Default value = null.
-        /// </summary>
-        internal Func<object, object> KeyProvider { get; private set;} = null;
-
-        internal static ListConfigurationOptions Default = new ListConfigurationOptions();
+        internal static ListConfigurationOptions Default() => new ListConfigurationOptions();
 
         /// <summary>
         /// Compares list elements by index. Default behavior.
         /// </summary>
         public void CompareElementsByIndex()
         {
-            KeyProvider = null;
+            KeyOptionsAction = null;
         }
 
-        /// <summary>
-        /// Compares list elements by key. It will try to find one of the public properties named "Id" or "Name", in that order. Case sensitive.
-        /// </summary>
+        internal Action<CompareElementsByKeyOptions> KeyOptionsAction { get; private set; }
+
         public void CompareElementsByKey()
         {
-            CompareElementsByKey(caseSensitive: true, "Id", "Name");
+            CompareElementsByKey(options => { });
         }
 
-        /// <summary>
-        /// Compares list elements by key. It will try to find one of the public properties specified by argument <paramref name="keys"/>, in that order.
-        /// </summary>
-        public void CompareElementsByKey(bool caseSensitive = true, params string[] keys)
+        public void CompareElementsByKey(Action<CompareElementsByKeyOptions> keyOptions)
         {
-            if (keys is null)
+            if (keyOptions is null)
             {
-                throw new ArgumentNullException(nameof(keys));
+                throw new ArgumentNullException(nameof(keyOptions));
             }
 
-            if (keys.Any() == false)
-            {
-                throw new ArgumentException("At least one key is required.", nameof(keys));
-            }
-
-            CompareElementsByKey(element => 
-            {
-                return GetKeyValue(element, caseSensitive, keys);
-            });
+            KeyOptionsAction = keyOptions;
         }
 
-        /// <summary>
-        /// Compares list elements by key using <paramref name="keyProvider"/>.
-        /// </summary>
-        public void CompareElementsByKey(Func<object, object> keyProvider)
-        {
-            if (keyProvider is null)
-            {
-                throw new ArgumentNullException(nameof(keyProvider));
-            }
-
-            KeyProvider = keyProvider;
-        }
-
-        /// <summary>
-        /// It will try to find one of the public properties specified by <paramref name="keys"/>, then it returns its value.
-        /// </summary>
-        /// <returns>Returns the value of the property that corresponds to the specified key. If no property matches the specified key, it returns the <paramref name="instance"/> itself.</returns>
-        static object GetKeyValue(object instance, bool caseSensitive, params string[] keys)
-        {
-            if (instance != null)
-            {
-                BindingFlags bindingAttr = BindingFlags.Public;
-                if (caseSensitive == false)
-                {
-                    bindingAttr |= BindingFlags.IgnoreCase;
-                }
-
-                foreach (var key in keys)
-                {
-                    var property = instance.GetType().GetTypeInfo().GetProperty(key, bindingAttr);
-                    if (property != null)
-                    {
-                        return property.GetValue(instance);
-                    }
-                }
-            }
-
-            return instance;
-        }
+        internal ListElementComparisonMode ComparisonMode => KeyOptionsAction == null ? ListElementComparisonMode.Index : ListElementComparisonMode.Key;
     }
 }

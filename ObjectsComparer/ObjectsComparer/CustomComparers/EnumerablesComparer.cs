@@ -56,8 +56,8 @@ namespace ObjectsComparer
             var array1 = ((IEnumerable)obj1).Cast<object>().ToArray();
             var array2 = ((IEnumerable)obj2).Cast<object>().ToArray();
 
-            var listConfigurationOptions = ListConfigurationOptions.Default;
-            Settings.List.ConfigureOptions?.Invoke(comparisonContext, listConfigurationOptions);
+            var listConfigurationOptions = ListConfigurationOptions.Default();
+            Settings.List.ConfigureOptionsAction?.Invoke(comparisonContext, listConfigurationOptions);
 
             if (array1.Length != array2.Length)
             {
@@ -72,7 +72,7 @@ namespace ObjectsComparer
 
             IEnumerable<Difference> failrues;
 
-            if (listConfigurationOptions.KeyProvider != null)
+            if (listConfigurationOptions.ComparisonMode == ListElementComparisonMode.Key)
             {
                 failrues = CalculateDifferencesByKey(array1, array2, comparisonContext, listConfigurationOptions);
             }
@@ -89,6 +89,8 @@ namespace ObjectsComparer
 
         private IEnumerable<Difference> CalculateDifferencesByKey(object[] array1, object[] array2, ComparisonContext listComparisonContext, ListConfigurationOptions listConfigurationOptions)
         {
+            var keyOptions = CompareElementsByKeyOptions.Default();
+            listConfigurationOptions.KeyOptionsAction?.Invoke(keyOptions);
             Debug.WriteLine(nameof(CalculateDifferencesByKey));
 
             return null;

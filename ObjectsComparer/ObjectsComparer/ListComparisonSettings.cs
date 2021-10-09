@@ -4,10 +4,17 @@ using System.Text;
 
 namespace ObjectsComparer
 {
+    /// <summary>
+    /// List comparison settings.
+    /// </summary>
     public class ListComparisonSettings
     {
-        internal Action<ComparisonContext, ListConfigurationOptions> ConfigureOptions { get; private set; } = null;
+        internal Action<ComparisonContext, ListConfigurationOptions> ConfigureOptionsAction { get; private set; } = null;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="configureOptions"></param>
         public void Configure(Action<ComparisonContext, ListConfigurationOptions> configureOptions)
         {
             if (configureOptions is null)
@@ -15,7 +22,7 @@ namespace ObjectsComparer
                 throw new ArgumentNullException(nameof(configureOptions));
             }
 
-            ConfigureOptions = configureOptions;
+            ConfigureOptionsAction = configureOptions;
         }
     }
 }

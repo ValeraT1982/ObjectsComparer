@@ -38,6 +38,7 @@ namespace ObjectsComparer
         internal static ComparisonContext Create(MemberInfo currentMember = null, ComparisonContext ancestor = null)
         {
             var context = new ComparisonContext(currentMember);
+
             if (ancestor != null)
             {
                 ancestor.AddDescendant(context);

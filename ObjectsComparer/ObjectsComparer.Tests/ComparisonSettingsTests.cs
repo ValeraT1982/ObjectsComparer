@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
 using NUnit.Framework;
@@ -59,17 +60,28 @@ namespace ObjectsComparer.Tests
         {
             //Client side.
             var settings = new ComparisonSettings();
-            settings.List.Configure((comparisonContext, configurationOptions) =>
+
+            settings.List.Configure((comparisonContext, listOptions) =>
             {
-                configurationOptions.CompareElementsByKey();
+                listOptions.CompareUnequalLists = true;
+
+                listOptions.CompareElementsByKey(keyOptions =>
+                {
+                    keyOptions.UseKey("Key");
+                    keyOptions.ThrowKeyNotFound = false;
+                });
             });
 
             //Component side.
-            var options = new ListConfigurationOptions();
+            var listConfigurationOptions = ListConfigurationOptions.Default();
             var ctx = ComparisonContext.Create();
-            settings.List.ConfigureOptions(ctx, options);
+            settings.List.ConfigureOptionsAction(ctx, listConfigurationOptions);
+            var compareElementsByKeyOptions = CompareElementsByKeyOptions.Default();
+            listConfigurationOptions.KeyOptionsAction(compareElementsByKeyOptions);
 
-            Assert.AreEqual(true, options.KeyProvider != null);
+            Assert.AreEqual(true, listConfigurationOptions.CompareUnequalLists);
+            Assert.AreEqual(true, listConfigurationOptions.ComparisonMode == ListElementComparisonMode.Key);
+            Assert.AreEqual(true, compareElementsByKeyOptions.ThrowKeyNotFound);
         }
 
         /// <summary>
@@ -78,10 +90,10 @@ namespace ObjectsComparer.Tests
         [Test]
         public void ListComparisonConfigurationBackwardCompatibilityEnsured()
         {
-            var options = ListConfigurationOptions.Default;
+            var options = ListConfigurationOptions.Default();
 
             Assert.AreEqual(false, options.CompareUnequalLists);
-            Assert.AreEqual(true, options.KeyProvider == null);
+            Assert.AreEqual(true, options.ComparisonMode == ListElementComparisonMode.Index);
         }
 
         [Test]
