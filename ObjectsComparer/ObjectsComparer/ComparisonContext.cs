@@ -5,9 +5,17 @@ using System.Reflection;
 
 namespace ObjectsComparer
 {
+    /// <summary>
+    /// Information about the <see cref="Member"/>, which is typically a property or field, in comparison process. It has its ancestor and descendant contexts in the same way as its member has its ancestor and descendant members in an object graph. It contains all possible member differences.
+    /// It is possible to traverse entire compared object graph and see differences at particular members.
+    /// </summary>
     public sealed class ComparisonContext
     {
-        public static readonly ComparisonContext Undefined = new ComparisonContext();
+        /// <summary>
+        /// Creates comparison context root.
+        /// </summary>
+        /// <returns></returns>
+        public static ComparisonContext CreateRoot() => new ComparisonContext();
 
         readonly List<ComparisonContext> _descendants = new List<ComparisonContext>();
 
@@ -21,17 +29,18 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// It is always null for root context (start point of the comparison) and always null for list item. List item never has got its member. It only has got the ancestor context - list and that list has got its member.
+        /// Typically a property or field in comparison process.
+        /// It is always null for the root context (the starting point of the comparison) and always null for the list element. A list element never has a member, but it has an ancestor context which is the list and that list has its member.
         /// </summary>
         public MemberInfo Member { get; }
 
         /// <summary>
-        /// Ancestor context. For example if current context is "Person.Name" property, ancestor is Person.
+        /// Ancestor context.
         /// </summary>
         public ComparisonContext Ancestor { get; set; }
 
         /// <summary>
-        /// Children contexts. For example, if Person class has got properties Name and Birthday, person context has got one child context Name a and one child context Birthday.
+        /// Children contexts.
         /// </summary>
         public ReadOnlyCollection<ComparisonContext> Descendants => _descendants.AsReadOnly();
 

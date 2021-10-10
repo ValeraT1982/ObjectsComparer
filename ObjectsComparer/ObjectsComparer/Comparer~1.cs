@@ -63,7 +63,7 @@ namespace ObjectsComparer
 
         internal IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo)
         {
-            return CalculateDifferences(obj1, obj2, memberInfo, ComparisonContext.Undefined);
+            return CalculateDifferences(obj1, obj2, memberInfo, ComparisonContext.CreateRoot());
         }
 
         IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo, ComparisonContext comparisonContext)
