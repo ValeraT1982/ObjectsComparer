@@ -13,6 +13,9 @@ namespace ObjectsComparer
 
         internal static CompareElementsByKeyOptions Default() => new CompareElementsByKeyOptions();
 
+        /// <summary>
+        /// If value = false and element key will not be found, entire element will excluded from comparison. If value = true and element key will not be found, an exception of type <see cref="ElementNotFoundByKeyException"/> will be raised.
+        /// </summary>
         public bool ThrowKeyNotFound { get; set; } = true;
 
         /// <summary>

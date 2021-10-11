@@ -76,9 +76,13 @@ namespace ObjectsComparer
             {
                 failrues = CalculateDifferencesByKey(array1, array2, comparisonContext, listConfigurationOptions);
             }
-            else
+            else if (listConfigurationOptions.ComparisonMode == ListElementComparisonMode.Index)
             {
                 failrues = CalculateDifferencesByIndex(array1, array2, comparisonContext);
+            }
+            else
+            {
+                throw new NotImplementedException($"ListElementComparisonMode is not implemented {listConfigurationOptions.ComparisonMode}.");
             }
 
             foreach (var failrue in failrues)
@@ -91,9 +95,33 @@ namespace ObjectsComparer
         {
             var keyOptions = CompareElementsByKeyOptions.Default();
             listConfigurationOptions.KeyOptionsAction?.Invoke(keyOptions);
-            Debug.WriteLine(nameof(CalculateDifferencesByKey));
 
-            return null;
+            foreach (var element1 in array1)
+            {
+                if (element1 == null)
+                {
+                    if (array2.Any(elm2 => elm2 == null))
+                    {
+                        continue;
+                    }
+
+                    yield return new Difference("[Key = NULL]", string.Empty, string.Empty, DifferenceTypes.MissedElementInSecondObject);
+                    continue;
+                }
+
+                var element1Key = keyOptions.KeyProvider(element1);
+
+                if (element1Key == null)
+                {
+                    if (keyOptions.ThrowKeyNotFound)
+                    {
+                        throw new ElementNotFoundByKeyException();
+                    }
+                    continue;
+                }
+            }
+
+            Debug.WriteLine(nameof(CalculateDifferencesByKey));
         }
 
         private IEnumerable<Difference> CalculateDifferencesByIndex(object[] array1, object[] array2, ComparisonContext listComparisonContext)
