@@ -13,7 +13,7 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// Whether to compare elements of the lists even if their number differs (<see cref="DifferenceTypes.NumberOfElementsMismatch"/> will always be logged). Default value = false.
+        /// Whether to compare elements of the lists even if their number differs. Regardless of the value, respective difference of type <see cref="DifferenceTypes.NumberOfElementsMismatch"/> will always be logged. Default value = false.
         /// </summary>
         public bool CompareUnequalLists { get; set; } = false;
 

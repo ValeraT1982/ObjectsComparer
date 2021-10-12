@@ -98,6 +98,9 @@ namespace ObjectsComparer
 
             foreach (var element1 in array1)
             {
+                //Comparison context representing the list element never has a Member. Its ancestor is the context representing the list.
+                var elementComparisonContext = ComparisonContext.Create(member: null, ancestor: listComparisonContext);
+
                 if (element1 == null)
                 {
                     if (array2.Any(elm2 => elm2 == null))
@@ -105,7 +108,7 @@ namespace ObjectsComparer
                         continue;
                     }
 
-                    yield return new Difference("[Key = NULL]", string.Empty, string.Empty, DifferenceTypes.MissedElementInSecondObject);
+                    yield return new Difference("[NULL]", string.Empty, string.Empty, DifferenceTypes.MissedElementInSecondObject);
                     continue;
                 }
 
@@ -115,9 +118,58 @@ namespace ObjectsComparer
                 {
                     if (keyOptions.ThrowKeyNotFound)
                     {
-                        throw new ElementNotFoundByKeyException();
+                        throw new ElementKeyNotFoundException(element1);
                     }
+
                     continue;
+                }
+
+                if (array2.Any(elm2 => object.Equals(element1Key, keyOptions.KeyProvider(elm2)))) 
+                {
+                    var element2 = array2.First(elm2 => object.Equals(element1Key, keyOptions.KeyProvider(elm2)));
+                    var comparer = Factory.GetObjectsComparer(element1.GetType(), Settings, this);
+
+                    foreach (var failure in comparer.CalculateDifferences(element1.GetType(), element1, element2, elementComparisonContext))
+                    {
+                        yield return failure.InsertPath($"[{element1Key}]");
+                    }
+                }
+                else
+                {
+                    var valueComparer1 = OverridesCollection.GetComparer(element1.GetType()) ?? DefaultValueComparer;
+                    yield return new Difference($"[{element1Key}]", valueComparer1.ToString(element1), string.Empty, DifferenceTypes.MissedElementInSecondObject);
+                }
+            }
+
+            foreach (var element2 in array2)
+            {
+                if (element2 == null)
+                {
+                    if (array1.Any(elm1 => elm1 == null))
+                    {
+                        continue;
+                    }
+
+                    yield return new Difference("[NULL]", string.Empty, string.Empty, DifferenceTypes.MissedElementInFirstObject);
+                    continue;
+                }
+
+                var element2Key = keyOptions.KeyProvider(element2);
+
+                if (element2Key == null)
+                {
+                    if (keyOptions.ThrowKeyNotFound)
+                    {
+                        throw new ElementKeyNotFoundException(element2);
+                    }
+
+                    continue;
+                }
+
+                if (array1.Any(elm1 => object.Equals(element2Key, keyOptions.KeyProvider(elm1))) == false) 
+                {
+                    var valueComparer2 = OverridesCollection.GetComparer(element2.GetType()) ?? DefaultValueComparer;
+                    yield return new Difference($"[{element2Key}]", valueComparer2.ToString(element2), string.Empty, DifferenceTypes.MissedElementInFirstObject);
                 }
             }
 
@@ -135,8 +187,8 @@ namespace ObjectsComparer
             //ToDo Extract type
             for (var i = 0; i < smallerCount; i++)
             {
-                //Context representing the element has no member. Its ancestor is the context representing the list.
-                var elementComparisonContext = ComparisonContext.Create(currentMember: null, ancestor: listComparisonContext);
+                //Context representing the list element never has a Member. Its ancestor is the context representing the list.
+                var elementComparisonContext = ComparisonContext.Create(member: null, ancestor: listComparisonContext);
 
                 if (array1[i] == null && array2[i] == null)
                 {
@@ -172,7 +224,7 @@ namespace ObjectsComparer
                 }
             }
 
-            //Add a "missed element" difference for each element that is in array1 and is not in array2, or vice versa. The positions of value1 and value2 are respected in Difference instance.
+            //Add a "missed element" difference for each element that is in array1 and is not in array2 or vice versa. The positions of value1 and value2 are preserved in the Difference instance.
             if (array1Count != array2Count)
             {
                 var largerArray = array1Count > array2Count ? array1 : array2;

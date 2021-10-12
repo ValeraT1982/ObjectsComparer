@@ -44,9 +44,15 @@ namespace ObjectsComparer
         /// </summary>
         public ReadOnlyCollection<ComparisonContext> Descendants => _descendants.AsReadOnly();
 
-        internal static ComparisonContext Create(MemberInfo currentMember = null, ComparisonContext ancestor = null)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="member">See <see cref="Member"/>.</param>
+        /// <param name="ancestor">See <see cref="Ancestor"/>.</param>
+        /// <returns></returns>
+        internal static ComparisonContext Create(MemberInfo member = null, ComparisonContext ancestor = null)
         {
-            var context = new ComparisonContext(currentMember);
+            var context = new ComparisonContext(member);
 
             if (ancestor != null)
             {

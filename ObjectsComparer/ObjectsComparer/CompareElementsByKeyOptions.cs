@@ -19,7 +19,7 @@ namespace ObjectsComparer
         public bool ThrowKeyNotFound { get; set; } = true;
 
         /// <summary>
-        /// If null, the elements will be compared by their index, otherwise by key. Default value = null.
+        /// If null, the elements should be compared by their index, otherwise by key. Default value = null.
         /// </summary>
         internal Func<object, object> KeyProvider { get; private set; } = null;
 
@@ -44,7 +44,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Compares list elements by key. It will try to find one of the public properties specified by argument <paramref name="keys"/>, in that order.
         /// </summary>
-        public void UseKey(string[] keys, bool caseSensitive = true)
+        public void UseKey(string[] keys, bool caseSensitive = false)
         {
             if (keys is null)
             {
@@ -88,7 +88,7 @@ namespace ObjectsComparer
         {
             if (instance != null)
             {
-                BindingFlags bindingAttr = BindingFlags.Public;
+                BindingFlags bindingAttr = BindingFlags.Public | BindingFlags.Instance;
                 if (caseSensitive == false)
                 {
                     bindingAttr |= BindingFlags.IgnoreCase;
