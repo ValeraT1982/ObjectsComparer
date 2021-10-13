@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using ObjectsComparer.Exceptions;
 
 namespace ObjectsComparer
 {
@@ -14,7 +15,8 @@ namespace ObjectsComparer
         internal static CompareElementsByKeyOptions Default() => new CompareElementsByKeyOptions();
 
         /// <summary>
-        /// If value = false and element key will not be found, entire element will excluded from comparison. If value = true and element key will not be found, an exception of type <see cref="ElementNotFoundByKeyException"/> will be raised.
+        /// If value = false and element key will not be found, the element will be excluded from comparison and no difference will be logged. If value = true and element key will not be found, an exception of type <see cref="ElementKeyNotFoundException"/> will be thrown.
+        /// Default value = true.
         /// </summary>
         public bool ThrowKeyNotFound { get; set; } = true;
 
