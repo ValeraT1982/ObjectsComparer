@@ -169,7 +169,7 @@ namespace ObjectsComparer
                 if (array1.Any(elm1 => object.Equals(element2Key, keyOptions.KeyProvider(elm1))) == false) 
                 {
                     var valueComparer2 = OverridesCollection.GetComparer(element2.GetType()) ?? DefaultValueComparer;
-                    yield return new Difference($"[{element2Key}]", valueComparer2.ToString(element2), string.Empty, DifferenceTypes.MissedElementInFirstObject);
+                    yield return new Difference($"[{element2Key}]", string.Empty, valueComparer2.ToString(element2), DifferenceTypes.MissedElementInFirstObject);
                 }
             }
 
