@@ -98,8 +98,7 @@ namespace ObjectsComparer
 
             foreach (var element1 in array1)
             {
-                //Comparison context representing the list element never has a Member. Its ancestor is the context representing the list.
-                var elementComparisonContext = ComparisonContext.Create(member: null, ancestor: listComparisonContext);
+                var elementContext = ComparisonContext.Create(member: null, ancestor: listComparisonContext);
 
                 if (element1 == null)
                 {
@@ -129,7 +128,7 @@ namespace ObjectsComparer
                     var element2 = array2.First(elm2 => object.Equals(element1Key, keyOptions.KeyProvider(elm2)));
                     var comparer = Factory.GetObjectsComparer(element1.GetType(), Settings, this);
 
-                    foreach (var failure in comparer.CalculateDifferences(element1.GetType(), element1, element2, elementComparisonContext))
+                    foreach (var failure in comparer.CalculateDifferences(element1.GetType(), element1, element2, elementContext))
                     {
                         yield return failure.InsertPath($"[{element1Key}]");
                     }
@@ -150,6 +149,8 @@ namespace ObjectsComparer
                         continue;
                     }
 
+                    var elementContext = ComparisonContext.Create(member: null, ancestor: listComparisonContext);
+
                     yield return new Difference("[NULL]", string.Empty, string.Empty, DifferenceTypes.MissedElementInFirstObject);
                     continue;
                 }
@@ -168,6 +169,8 @@ namespace ObjectsComparer
 
                 if (array1.Any(elm1 => object.Equals(element2Key, keyOptions.KeyProvider(elm1))) == false) 
                 {
+                    var elementContext = ComparisonContext.Create(member: null, ancestor: listComparisonContext);
+
                     var valueComparer2 = OverridesCollection.GetComparer(element2.GetType()) ?? DefaultValueComparer;
                     yield return new Difference($"[{element2Key}]", string.Empty, valueComparer2.ToString(element2), DifferenceTypes.MissedElementInFirstObject);
                 }
@@ -187,8 +190,7 @@ namespace ObjectsComparer
             //ToDo Extract type
             for (var i = 0; i < smallerCount; i++)
             {
-                //Context representing the list element never has a Member. Its ancestor is the context representing the list.
-                var elementComparisonContext = ComparisonContext.Create(member: null, ancestor: listComparisonContext);
+                var elementContext = ComparisonContext.Create(member: null, ancestor: listComparisonContext);
 
                 if (array1[i] == null && array2[i] == null)
                 {
@@ -218,19 +220,21 @@ namespace ObjectsComparer
 
                 var comparer = Factory.GetObjectsComparer(array1[i].GetType(), Settings, this);
 
-                foreach (var failure in comparer.CalculateDifferences(array1[i].GetType(), array1[i], array2[i], elementComparisonContext))
+                foreach (var failure in comparer.CalculateDifferences(array1[i].GetType(), array1[i], array2[i], elementContext))
                 {
                     yield return failure.InsertPath($"[{i}]");
                 }
             }
 
-            //Add a "missed element" difference for each element that is in array1 and is not in array2 or vice versa. The positions of value1 and value2 are preserved in the Difference instance.
+            //Add a "missed element" difference for each element that is in array1 that and is not in array2 or vice versa. The positions of value1 and value2 are preserved in the Difference instance.
             if (array1Count != array2Count)
             {
                 var largerArray = array1Count > array2Count ? array1 : array2;
 
                 for (int i = smallerCount; i < largerArray.Length; i++)
                 {
+                    var elementContext = ComparisonContext.Create(member: null, ancestor: listComparisonContext);
+
                     var valueComparer = largerArray[i] != null ? OverridesCollection.GetComparer(largerArray[i].GetType()) ?? DefaultValueComparer : DefaultValueComparer;
 
                     yield return new Difference(
