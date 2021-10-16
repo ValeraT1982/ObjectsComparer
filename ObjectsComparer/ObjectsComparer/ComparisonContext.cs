@@ -19,6 +19,8 @@ namespace ObjectsComparer
 
         readonly List<ComparisonContext> _descendants = new List<ComparisonContext>();
 
+        readonly List<Difference> _differences = new List<Difference>();
+
         private ComparisonContext()
         {
         }
@@ -44,6 +46,8 @@ namespace ObjectsComparer
         /// </summary>
         public ReadOnlyCollection<ComparisonContext> Descendants => _descendants.AsReadOnly();
 
+        public ReadOnlyCollection<Difference> Differences => _differences.AsReadOnly();
+
         /// <summary>
         /// 
         /// </summary>
@@ -66,6 +70,16 @@ namespace ObjectsComparer
         {
             _descendants.Add(descendant);
             descendant.Ancestor = this;
+        }
+
+        internal void AddDifference(Difference difference)
+        {
+            if (difference is null)
+            {
+                throw new ArgumentNullException(nameof(difference));
+            }
+
+            _differences.Add(difference);
         }
 
         //A list of differences directly related to this context.
