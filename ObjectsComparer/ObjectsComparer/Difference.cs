@@ -8,7 +8,7 @@
         /// <summary>
         /// Path to the member.
         /// </summary>
-        public string MemberPath { get; }
+        public string MemberPath { get; private set; }
 
         /// <summary>
         /// Value in the first object, converted to string.
@@ -52,11 +52,15 @@
                 ? path + MemberPath
                 : path + "." + MemberPath;
 
-            return new Difference(
-                newPath,
-                Value1,
-                Value2,
-                DifferenceType);
+            //return new Difference(
+            //    newPath,
+            //    Value1,
+            //    Value2,
+            //    DifferenceType);
+
+            MemberPath = newPath;
+
+            return this;
         }
 
         /// <summary>Returns a string that represents the current object.</summary>

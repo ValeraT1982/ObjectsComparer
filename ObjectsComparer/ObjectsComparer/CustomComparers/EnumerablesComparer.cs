@@ -90,22 +90,6 @@ namespace ObjectsComparer
             }
         }
 
-        Difference AddDifferenceToComparisonContext(Difference difference, ComparisonContext comparisonContext)
-        {
-            if (difference is null)
-            {
-                throw new ArgumentNullException(nameof(difference));
-            }
-
-            if (comparisonContext is null)
-            {
-                throw new ArgumentNullException(nameof(comparisonContext));
-            }
-
-            comparisonContext.AddDifference(difference);
-            return difference;
-        }
-
         private IEnumerable<Difference> CalculateDifferencesByKey(object[] array1, object[] array2, ComparisonContext listComparisonContext, ListConfigurationOptions listConfigurationOptions)
         {
             var keyOptions = CompareElementsByKeyOptions.Default();
@@ -217,19 +201,19 @@ namespace ObjectsComparer
 
                 if (array1[i] == null)
                 {
-                    yield return new Difference($"[{i}]", string.Empty, valueComparer2.ToString(array2[i]));
+                    yield return AddDifferenceToComparisonContext(new Difference($"[{i}]", string.Empty, valueComparer2.ToString(array2[i])), elementContext);
                     continue;
                 }
 
                 if (array2[i] == null)
                 {
-                    yield return new Difference($"[{i}]", valueComparer1.ToString(array1[i]), string.Empty);
+                    yield return AddDifferenceToComparisonContext(new Difference($"[{i}]", valueComparer1.ToString(array1[i]), string.Empty), elementContext);
                     continue;
                 }
 
                 if (array1[i].GetType() != array2[i].GetType())
                 {
-                    yield return new Difference($"[{i}]", valueComparer1.ToString(array1[i]), valueComparer2.ToString(array2[i]), DifferenceTypes.TypeMismatch);
+                    yield return AddDifferenceToComparisonContext(new Difference($"[{i}]", valueComparer1.ToString(array1[i]), valueComparer2.ToString(array2[i]), DifferenceTypes.TypeMismatch), elementContext);
                     continue;
                 }
 
@@ -241,22 +225,22 @@ namespace ObjectsComparer
                 }
             }
 
-            //Add a "missed element" difference for each element that is in array1 that and is not in array2 or vice versa. The positions of value1 and value2 are preserved in the Difference instance.
+            //Add a "missed element" difference for each element that is in array1 and that is not in array2 or vice versa.
             if (array1Count != array2Count)
             {
                 var largerArray = array1Count > array2Count ? array1 : array2;
 
                 for (int i = smallerCount; i < largerArray.Length; i++)
                 {
-                    var elementContext = ComparisonContext.Create(member: null, ancestor: listComparisonContext);
-
                     var valueComparer = largerArray[i] != null ? OverridesCollection.GetComparer(largerArray[i].GetType()) ?? DefaultValueComparer : DefaultValueComparer;
 
-                    yield return new Difference(
+                    var difference = new Difference(
                         memberPath: $"[{i}]",
                         value1: array1Count > array2Count ? valueComparer.ToString(largerArray[i]) : string.Empty,
                         value2: array2Count > array1Count ? valueComparer.ToString(largerArray[i]) : string.Empty,
                         differenceType: array1Count > array2Count ? DifferenceTypes.MissedElementInSecondObject : DifferenceTypes.MissedElementInFirstObject);
+
+                    yield return AddDifferenceToComparisonContext(difference, ComparisonContext.Create(member: null, ancestor: listComparisonContext));
                 }
             }
         }

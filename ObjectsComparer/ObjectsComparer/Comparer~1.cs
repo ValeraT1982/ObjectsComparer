@@ -78,9 +78,7 @@ namespace ObjectsComparer
                 comparer = comparer ?? DefaultValueComparer;
                 if (!comparer.Compare(obj1, obj2, Settings))
                 {
-                    yield return
-                        new Difference(string.Empty, comparer.ToString(obj1),
-                            comparer.ToString(obj2));
+                    yield return AddDifferenceToComparisonContext(new Difference(string.Empty, comparer.ToString(obj1), comparer.ToString(obj2)), comparisonContext);
                 }
 
                 yield break;
@@ -91,7 +89,7 @@ namespace ObjectsComparer
             {
                 foreach (var difference in conditionalComparer.CalculateDifferences(typeof(T), obj1, obj2, comparisonContext))
                 {
-                    yield return difference;
+                    yield return AddDifferenceToComparisonContext(difference, comparisonContext);
                 }
 
                 if (conditionalComparer.IsStopComparison(typeof(T), obj1, obj2))
@@ -104,7 +102,7 @@ namespace ObjectsComparer
             {
                 if (!DefaultValueComparer.Compare(obj1, obj2, Settings))
                 {
-                    yield return new Difference(string.Empty, DefaultValueComparer.ToString(obj1), DefaultValueComparer.ToString(obj2));
+                    yield return AddDifferenceToComparisonContext(new Difference(string.Empty, DefaultValueComparer.ToString(obj1), DefaultValueComparer.ToString(obj2)), comparisonContext);
                 }
 
                 yield break;
@@ -126,7 +124,7 @@ namespace ObjectsComparer
                     continue;
                 }
 
-                var context = ComparisonContext.Create(member: member, ancestor: comparisonContext);
+                var memberContext = ComparisonContext.Create(member: member, ancestor: comparisonContext);
 
                 var valueComparer = DefaultValueComparer;
                 var hasCustomComparer = false;
@@ -143,9 +141,9 @@ namespace ObjectsComparer
                 {
                     var objectDataComparer = Factory.GetObjectsComparer(type, Settings, this);
 
-                    foreach (var failure in objectDataComparer.CalculateDifferences(type, value1, value2, context))
+                    foreach (var failure in objectDataComparer.CalculateDifferences(type, value1, value2, memberContext))
                     {
-                        yield return failure.InsertPath(member.Name);
+                        yield return AddDifferenceToComparisonContext(failure.InsertPath(member.Name), memberContext);
                     }
 
                     continue;
@@ -153,7 +151,7 @@ namespace ObjectsComparer
 
                 if (!valueComparer.Compare(value1, value2, Settings))
                 {
-                    yield return new Difference(member.Name, valueComparer.ToString(value1), valueComparer.ToString(value2));
+                    yield return AddDifferenceToComparisonContext(new Difference(member.Name, valueComparer.ToString(value1), valueComparer.ToString(value2)), memberContext);
                 }
             }
         }

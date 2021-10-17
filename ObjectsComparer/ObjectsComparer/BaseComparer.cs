@@ -139,9 +139,9 @@ namespace ObjectsComparer
 
         /// <summary>
         /// Sets <see cref="IBaseComparer.DefaultValueComparer"/>.
+        public void SetDefaultComparer(IValueComparer valueComparer)
         /// </summary>
         /// <param name="valueComparer">Value Comparer.</param>
-        public void SetDefaultComparer(IValueComparer valueComparer)
         {
             DefaultValueComparer = valueComparer ?? throw new ArgumentNullException(nameof(valueComparer));
         }
@@ -182,6 +182,26 @@ namespace ObjectsComparer
         public void IgnoreMember(Func<MemberInfo, bool> filter)
         {
             OverridesCollection.AddComparer(DoNotCompareValueComparer.Instance, filter);
+        }
+
+        /// <summary>
+        /// Adds an <paramref name="difference"/> to the end of the <paramref name="comparisonContext"/>'s <see cref="ComparisonContext.Differences"/>.
+        /// </summary>
+        /// <returns>The <paramref name="difference"/> argument.</returns>
+        protected virtual Difference AddDifferenceToComparisonContext(Difference difference, ComparisonContext comparisonContext)
+        {
+            if (difference is null)
+            {
+                throw new ArgumentNullException(nameof(difference));
+            }
+
+            if (comparisonContext is null)
+            {
+                throw new ArgumentNullException(nameof(comparisonContext));
+            }
+
+            comparisonContext.AddDifference(difference);
+            return difference;
         }
     }
 }
