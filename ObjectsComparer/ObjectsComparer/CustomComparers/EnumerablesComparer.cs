@@ -31,7 +31,7 @@ namespace ObjectsComparer
             if (!Settings.EmptyAndNullEnumerablesEqual &&
                 (obj1 == null || obj2 == null) && obj1 != obj2)
             {
-                yield return new Difference("[]", obj1?.ToString() ?? string.Empty, obj2?.ToString() ?? string.Empty);
+                yield return AddDifferenceToComparisonContext(new Difference("[]", obj1?.ToString() ?? string.Empty, obj2?.ToString() ?? string.Empty), comparisonContext);
                 yield break;
             }
             

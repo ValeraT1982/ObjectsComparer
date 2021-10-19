@@ -89,7 +89,7 @@ namespace ObjectsComparer
             {
                 foreach (var difference in conditionalComparer.CalculateDifferences(typeof(T), obj1, obj2, comparisonContext))
                 {
-                    yield return AddDifferenceToComparisonContext(difference, comparisonContext);
+                    yield return difference;
                 }
 
                 if (conditionalComparer.IsStopComparison(typeof(T), obj1, obj2))
@@ -143,7 +143,7 @@ namespace ObjectsComparer
 
                     foreach (var failure in objectDataComparer.CalculateDifferences(type, value1, value2, memberContext))
                     {
-                        yield return AddDifferenceToComparisonContext(failure.InsertPath(member.Name), memberContext);
+                        yield return failure.InsertPath(member.Name);
                     }
 
                     continue;

@@ -156,17 +156,31 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void RighComparisonContextGraph()
+        public void RightComparisonContextGraph()
         {
             var p1 = new Person
             {
                 FirstName = "F1",
-                LastName = "L1"
+                LastName = "L1",
+                NonGenericAddresses = new ArrayList()
+                {
+                    new Address
+                    {
+                        City = "City1"
+                    }
+                }
             };
             var p2 = new Person
             {
                 FirstName = "F2",
-                LastName = "L2"
+                LastName = "L2",
+                NonGenericAddresses = new ArrayList()
+                {
+                    new Address
+                    {
+                        City = "City2"
+                    }
+                }
             };
 
             var settings = new ComparisonSettings();
