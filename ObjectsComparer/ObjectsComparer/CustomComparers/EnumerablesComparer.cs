@@ -192,7 +192,7 @@ namespace ObjectsComparer
 
             //ToDo Extract type
             for (var i = 0; i < smallerCount; i++)
-            {
+            {                
                 var elementContext = ComparisonContext.Create(member: null, ancestor: listComparisonContext);
 
                 if (array1[i] == null && array2[i] == null)

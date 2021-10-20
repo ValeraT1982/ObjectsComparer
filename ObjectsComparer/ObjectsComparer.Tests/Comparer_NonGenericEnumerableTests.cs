@@ -191,7 +191,10 @@ namespace ObjectsComparer.Tests
             settings.List.Configure((_, options) => 
             {
                 options.CompareUnequalLists = true;
-                //options.CompareElementsByKey();
+                options.CompareElementsByKey(keyOptions=> 
+                {
+                    keyOptions.IntKeyPrefix
+                });
             });
             var comparer = new Comparer<Person>(settings);
             var rootContext = ComparisonContext.Create();

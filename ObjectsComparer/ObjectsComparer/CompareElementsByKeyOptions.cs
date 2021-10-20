@@ -2,11 +2,26 @@
 using System.Linq;
 using System.Reflection;
 using ObjectsComparer.Exceptions;
+using ObjectsComparer;
 
 namespace ObjectsComparer
 {
+    /// <summary>
+    /// Configures list element behavior for comparison by key.
+    /// </summary>
     public class CompareElementsByKeyOptions
     {
+        /// <summary>
+        /// Default key prefix for integer key. It will be used for formating <see cref="Difference.MemberPath"/> property, for example "Addresses[KEY=123]".
+        /// </summary>
+        /// <example>Addresses</example>
+        public const string DefaultIntKeyPrefix = "KEY=";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public const string DefaultNullElementSymbol = "NULLREF";
+
         CompareElementsByKeyOptions()
         {
             Initialize();
@@ -24,6 +39,14 @@ namespace ObjectsComparer
         /// If null, the elements should be compared by their index, otherwise by key. Default value = null.
         /// </summary>
         internal Func<object, object> KeyProvider { get; private set; } = null;
+
+        /// <summary>
+        /// Key prefix for integer key. It will be used as part of <see cref="Difference.MemberPath"/> property, for example "Addresses[KEY=123]". Default value = <see cref="DefaultIntKeyPrefix"/>.
+        /// If you do not want the integer key to be prefixed, set this value to null.
+        /// </summary>
+        public string IntKeyPrefix { get; set; } = null;
+
+        public string NullElementSymbol { get; set; } = DefaultNullElementSymbol;   
 
         void Initialize()
         {
