@@ -52,8 +52,6 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual("Str3", differences.First().Value2);
         }
 
-        static string GetMyString() => "xxx";
-
         [Test]
         public void InequalityCount_InequalityProperty_CompareByKey()
         {
@@ -160,30 +158,41 @@ namespace ObjectsComparer.Tests
         {
             var p1 = new Person
             {
-                FirstName = "F1",
-                LastName = "L1",
+                FirstName = "FirstName1",
+                LastName = "LastName1",
                 NonGenericAddresses = new ArrayList()
                 {
                     new Address
                     {
+                        Id = 1,
                         City = "City1"
-                    }
+                    },
+
+                    new Address{}
                 }
             };
             var p2 = new Person
             {
-                FirstName = "F2",
-                LastName = "L2",
+                FirstName = "FirstName2",
+                LastName = "LastName2",
                 NonGenericAddresses = new ArrayList()
                 {
+                    null,
+
                     new Address
                     {
+                        Id = 1,
                         City = "City2"
                     }
                 }
             };
 
             var settings = new ComparisonSettings();
+            settings.List.Configure((_, options) => 
+            {
+                options.CompareUnequalLists = true;
+                //options.CompareElementsByKey();
+            });
             var comparer = new Comparer<Person>(settings);
             var rootContext = ComparisonContext.Create();
             var differences = comparer.CalculateDifferences(p1, p2, rootContext).ToList();

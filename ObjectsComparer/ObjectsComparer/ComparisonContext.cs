@@ -6,8 +6,8 @@ using System.Reflection;
 namespace ObjectsComparer
 {
     /// <summary>
-    /// Information about the <see cref="Member"/>, which is typically a property or field, in comparison process. It has its ancestor and descendant contexts in the same way as its member has its ancestor and descendant members in an object graph. It contains all possible member differences.
-    /// It is possible to traverse entire compared object graph and see differences at particular members.
+    /// Information about the <see cref="Member"/>, which is typically a property or field, in comparison process. It has its ancestor and descendant <see cref="ComparisonContext"/> objects in the same way as its <see cref="Member"/> has its ancestor and descendant members in an object graph. <see cref="ComparisonContext"/> contains all possible member differences.
+    /// Once the comparison is completed, it is possible to traverse the object graph and see differences at particular members.
     /// </summary>
     public sealed class ComparisonContext
     {
@@ -39,7 +39,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Ancestor context.
         /// </summary>
-        public ComparisonContext Ancestor { get; set; }
+        public ComparisonContext Ancestor { get; private set; }
 
         /// <summary>
         /// Children contexts.

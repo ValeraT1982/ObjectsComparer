@@ -81,7 +81,7 @@ namespace ObjectsComparer
             }
             else
             {
-                throw new NotImplementedException($"ListElementComparisonMode is not implemented {listConfigurationOptions.ComparisonMode}.");
+                throw new NotImplementedException($"{listConfigurationOptions.ComparisonMode} is not implemented yet.");
             }
 
             foreach (var failrue in failrues)
@@ -92,8 +92,14 @@ namespace ObjectsComparer
 
         private IEnumerable<Difference> CalculateDifferencesByKey(object[] array1, object[] array2, ComparisonContext listComparisonContext, ListConfigurationOptions listConfigurationOptions)
         {
+            Debug.WriteLine(nameof(CalculateDifferencesByKey));
+
             var keyOptions = CompareElementsByKeyOptions.Default();
             listConfigurationOptions.KeyOptionsAction?.Invoke(keyOptions);
+
+            //TODO: keyPrefix from configuration.
+            var keyPrefix = "KEY=";
+            var nullElementPrefix = "NULLREF";
 
             foreach (var element1 in array1)
             {
@@ -106,7 +112,7 @@ namespace ObjectsComparer
                         continue;
                     }
 
-                    yield return AddDifferenceToComparisonContext(new Difference("[NULL]", string.Empty, string.Empty, DifferenceTypes.MissedElementInSecondObject), elementContext);
+                    yield return AddDifferenceToComparisonContext(new Difference($"[{nullElementPrefix}]", string.Empty, string.Empty, DifferenceTypes.MissedElementInSecondObject), elementContext);
                     continue;
                 }
 
@@ -129,13 +135,13 @@ namespace ObjectsComparer
 
                     foreach (var failure in comparer.CalculateDifferences(element1.GetType(), element1, element2, elementContext))
                     {
-                        yield return failure.InsertPath($"[{element1Key}]");
+                        yield return failure.InsertPath($"[{keyPrefix}{element1Key}]");
                     }
                 }
                 else
                 {
-                    var valueComparer1 = OverridesCollection.GetComparer(element1.GetType()) ?? DefaultValueComparer;
-                    yield return AddDifferenceToComparisonContext(new Difference($"[{element1Key}]", valueComparer1.ToString(element1), string.Empty, DifferenceTypes.MissedElementInSecondObject), elementContext);
+                    var valueComparer1 = OverridesCollection.GetComparer(element1.GetType()) ?? DefaultValueComparer;                    
+                    yield return AddDifferenceToComparisonContext(new Difference($"[{keyPrefix}{element1Key}]", valueComparer1.ToString(element1), string.Empty, DifferenceTypes.MissedElementInSecondObject), elementContext);
                 }
             }
 
@@ -150,7 +156,7 @@ namespace ObjectsComparer
 
                     var elementContext = ComparisonContext.Create(member: null, ancestor: listComparisonContext);
 
-                    yield return AddDifferenceToComparisonContext(new Difference("[NULL]", string.Empty, string.Empty, DifferenceTypes.MissedElementInFirstObject), elementContext);
+                    yield return AddDifferenceToComparisonContext(new Difference($"[{nullElementPrefix}]", string.Empty, string.Empty, DifferenceTypes.MissedElementInFirstObject), elementContext);
                     continue;
                 }
 
@@ -171,11 +177,9 @@ namespace ObjectsComparer
                     var elementContext = ComparisonContext.Create(member: null, ancestor: listComparisonContext);
 
                     var valueComparer2 = OverridesCollection.GetComparer(element2.GetType()) ?? DefaultValueComparer;
-                    yield return AddDifferenceToComparisonContext(new Difference($"[{element2Key}]", string.Empty, valueComparer2.ToString(element2), DifferenceTypes.MissedElementInFirstObject), elementContext);
+                    yield return AddDifferenceToComparisonContext(new Difference($"[{keyPrefix}{element2Key}]", string.Empty, valueComparer2.ToString(element2), DifferenceTypes.MissedElementInFirstObject), elementContext);
                 }
             }
-
-            Debug.WriteLine(nameof(CalculateDifferencesByKey));
         }
 
         private IEnumerable<Difference> CalculateDifferencesByIndex(object[] array1, object[] array2, ComparisonContext listComparisonContext)

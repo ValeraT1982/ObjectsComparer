@@ -12,7 +12,7 @@ namespace ObjectsComparer
         internal Action<ComparisonContext, ListConfigurationOptions> ConfigureOptionsAction { get; private set; } = null;
 
         /// <summary>
-        /// 
+        /// Configures list comparison behavior.
         /// </summary>
         /// <param name="configureOptions"></param>
         public void Configure(Action<ComparisonContext, ListConfigurationOptions> configureOptions)
