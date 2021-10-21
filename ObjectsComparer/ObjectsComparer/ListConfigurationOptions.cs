@@ -47,6 +47,9 @@ namespace ObjectsComparer
             KeyOptionsAction = keyOptions;
         }
 
-        internal ListElementComparisonMode ComparisonMode => KeyOptionsAction == null ? ListElementComparisonMode.Index : ListElementComparisonMode.Key;
+        /// <summary>
+        /// See <see cref="ListElementSearchMode"/>.
+        /// </summary>
+        internal ListElementSearchMode ElementSearchMode => KeyOptionsAction == null ? ListElementSearchMode.Index : ListElementSearchMode.Key;
     }
 }

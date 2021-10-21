@@ -183,19 +183,24 @@ namespace ObjectsComparer.Tests
                     {
                         Id = 1,
                         City = "City2"
-                    }
+                    },
+
+                    null
                 }
             };
 
             var settings = new ComparisonSettings();
+
             settings.List.Configure((_, options) => 
             {
                 options.CompareUnequalLists = true;
-                options.CompareElementsByKey(keyOptions=> 
+                options.CompareElementsByKey(keyOptions =>
                 {
-                    keyOptions.IntKeyPrefix
+                    keyOptions.KeyPrefix = "Key: ";
+                    keyOptions.NullElementIdentifier = "Null-ref";
                 });
             });
+
             var comparer = new Comparer<Person>(settings);
             var rootContext = ComparisonContext.Create();
             var differences = comparer.CalculateDifferences(p1, p2, rootContext).ToList();

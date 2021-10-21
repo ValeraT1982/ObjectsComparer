@@ -80,7 +80,7 @@ namespace ObjectsComparer.Tests
             listConfigurationOptions.KeyOptionsAction(compareElementsByKeyOptions);
 
             Assert.AreEqual(true, listConfigurationOptions.CompareUnequalLists);
-            Assert.AreEqual(true, listConfigurationOptions.ComparisonMode == ListElementComparisonMode.Key);
+            Assert.AreEqual(true, listConfigurationOptions.ElementSearchMode == ListElementSearchMode.Key);
             Assert.AreEqual(true, compareElementsByKeyOptions.ThrowKeyNotFound);
         }
 
@@ -93,7 +93,7 @@ namespace ObjectsComparer.Tests
             var options = ListConfigurationOptions.Default();
 
             Assert.AreEqual(false, options.CompareUnequalLists);
-            Assert.AreEqual(true, options.ComparisonMode == ListElementComparisonMode.Index);
+            Assert.AreEqual(true, options.ElementSearchMode == ListElementSearchMode.Index);
         }
 
         [Test]

@@ -3,24 +3,27 @@ using System.Linq;
 using System.Reflection;
 using ObjectsComparer.Exceptions;
 using ObjectsComparer;
+using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
     /// <summary>
-    /// Configures list element behavior for comparison by key.
+    /// Configures list element behavior if <see cref="ListElementSearchMode.Key"/> mode is used.
     /// </summary>
     public class CompareElementsByKeyOptions
     {
         /// <summary>
-        /// Default key prefix for integer key. It will be used for formating <see cref="Difference.MemberPath"/> property, for example "Addresses[KEY=123]".
+        /// Default key prefix for an integer key. It will be used for formatting <see cref="Difference.MemberPath"/> property, for example: "Addresses[KEY=123]".
+        /// See <see cref="KeyPrefix"/> for more info.
         /// </summary>
         /// <example>Addresses</example>
         public const string DefaultIntKeyPrefix = "KEY=";
 
         /// <summary>
-        /// 
+        /// Default element identifier for element that refers to null. It will be used for formatting <see cref="Difference.MemberPath"/> property, for example: "Addresses[NULLREF]". 
+        /// See <see cref="NullElementIdentifier"/> for more info.        
         /// </summary>
-        public const string DefaultNullElementSymbol = "NULLREF";
+        public const string DefaultNullElementIdentifier = "NULLREF";
 
         CompareElementsByKeyOptions()
         {
@@ -41,12 +44,17 @@ namespace ObjectsComparer
         internal Func<object, object> KeyProvider { get; private set; } = null;
 
         /// <summary>
-        /// Key prefix for integer key. It will be used as part of <see cref="Difference.MemberPath"/> property, for example "Addresses[KEY=123]". Default value = <see cref="DefaultIntKeyPrefix"/>.
-        /// If you do not want the integer key to be prefixed, set this value to null.
+        /// To avoid confusion with the index, an optional key element prefix can be used. If value = null, which is the default value, <see cref="DefaultIntKeyPrefix"/> will be used for integer key type and no prefix will be used for other types.
+        /// If you don't want to use prefix at all, set this property to <see cref="string.Empty"/>.
         /// </summary>
-        public string IntKeyPrefix { get; set; } = null;
+        public string KeyPrefix { get; set; } = null;
 
-        public string NullElementSymbol { get; set; } = DefaultNullElementSymbol;   
+        /// <summary>
+        /// If the list element refers to a null value, this symbol will eventually be used as list element identifier in the <see cref="Difference.MemberPath"/> property.
+        /// Default value = <see cref="DefaultNullElementIdentifier"/>.
+        /// If you don't want to use it at all, set this property to <see cref="string.Empty"/>.
+        /// </summary>
+        public string NullElementIdentifier { get; set; } = DefaultNullElementIdentifier;
 
         void Initialize()
         {
@@ -130,6 +138,52 @@ namespace ObjectsComparer
             }
 
             return instance;
+        }
+
+        /// <summary>
+        /// See <see cref="KeyPrefix"/>.
+        /// </summary>
+        internal static string ResolveKeyPrefix(object elementKey, CompareElementsByKeyOptions options)
+        {
+            if (elementKey is null)
+            {
+                throw new ArgumentNullException(nameof(elementKey));
+            }
+
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            if (options.KeyPrefix == string.Empty)
+            {
+                return string.Empty;
+            }
+
+            if (options.KeyPrefix == null)
+            {
+                if (elementKey is byte || elementKey is short || elementKey is int || elementKey is long)
+                {
+                    return DefaultIntKeyPrefix;
+                }
+            }
+
+            return options.KeyPrefix.Left(10);
+        }
+
+        internal static string ResolveNullElementIdentifier(CompareElementsByKeyOptions options)
+        {
+            if (options is null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
+            if (options.NullElementIdentifier == null) 
+            {
+                return string.Empty;
+            }
+
+            return options.NullElementIdentifier.Left(10);
         }
     }
 }
