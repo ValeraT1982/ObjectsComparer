@@ -1,5 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Linq;
+using System.Reflection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using NUnit.Framework;
 using ObjectsComparer.Tests.TestClasses;
 using ObjectsComparer.Utils;
@@ -213,6 +218,22 @@ namespace ObjectsComparer.Tests
             var comparer = new Comparer<Person>(settings);
             var rootContext = ComparisonContext.Create();
             var differences = comparer.CalculateDifferences(p1, p2, rootContext).ToList();
+            var hasDiffs = rootContext.HasDifferences(false);
+            var scontextBeforeShrink = SerializeComparisonContext(rootContext);
+            rootContext.Shrink();
+            var scontextAfterShrink = SerializeComparisonContext(rootContext);
+        }
+
+        string SerializeComparisonContext(ComparisonContext context)
+        {
+            var settings = new JsonSerializerSettings()
+            {
+                ContractResolver = ShouldSerializeContractResolver.Instance,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+            };
+            settings.Converters.Add(new StringEnumConverter { CamelCaseText = true });
+
+            return JsonConvert.SerializeObject(context, Formatting.None, settings);
         }
 
         [Test]
@@ -358,6 +379,66 @@ namespace ObjectsComparer.Tests
             var isEqual = comparer.Compare(a1, a2);
 
             Assert.IsTrue(isEqual);
+        }
+    }
+
+    class ShouldSerializeContractResolver : DefaultContractResolver
+    {
+        /*
+         * https://stackoverflow.com/questions/46977905/overriding-a-property-value-in-custom-json-net-contract-resolver
+         * https://dotnetfiddle.net/PAZULK
+         * https://stackoverflow.com/questions/2441290/javascriptserializer-json-serialization-of-enum-as-string
+         * 
+         */
+        public static readonly ShouldSerializeContractResolver Instance = new ShouldSerializeContractResolver();
+
+        protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+        {
+            JsonProperty property = base.CreateProperty(member, memberSerialization);
+
+            if (property.DeclaringType == typeof(ComparisonContext) && property.PropertyName == nameof(ComparisonContext.Member))
+            {
+                property.ShouldSerialize =
+                    instance =>
+                    {
+                        //ComparisonContext ctx = (ComparisonContext)instance;
+                        return false;
+                    };
+            }
+
+            //if (property.DeclaringType == typeof(Difference) && property.PropertyName == nameof(Difference.DifferenceType))
+            //{
+            //    property.ValueProvider = new ValueProvider(differenceObj =>
+            //    {
+            //        var difference = (Difference)differenceObj;
+            //        return difference.DifferenceType.ToString();
+            //    });
+            //}
+
+            return property;
+        }
+    }
+
+    class ValueProvider : IValueProvider
+    {
+        readonly Func<object, object> _getValueProviderImpl;
+
+        public ValueProvider(Func<object, object> valueProviderImpl)
+        {
+            _getValueProviderImpl = valueProviderImpl;
+        }
+
+
+        //Ser
+        public object GetValue(object target)
+        {
+            return _getValueProviderImpl(target);
+        }
+
+        //Deser
+        public void SetValue(object target, object value)
+        {
+            throw new NotImplementedException();
         }
     }
 }

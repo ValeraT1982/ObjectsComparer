@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reflection;
 
 namespace ObjectsComparer
@@ -11,6 +12,8 @@ namespace ObjectsComparer
     /// </summary>
     public sealed class ComparisonContext
     {
+        object _shrinkLock = new object();
+
         /// <summary>
         /// Creates comparison context root.
         /// </summary>
@@ -36,6 +39,8 @@ namespace ObjectsComparer
         /// </summary>
         public MemberInfo Member { get; }
 
+        public string MemberName => Member?.Name;
+
         /// <summary>
         /// Ancestor context.
         /// </summary>
@@ -46,6 +51,9 @@ namespace ObjectsComparer
         /// </summary>
         public ReadOnlyCollection<ComparisonContext> Descendants => _descendants.AsReadOnly();
 
+        /// <summary>
+        /// A list of differences directly related to this context.
+        /// </summary>
         public ReadOnlyCollection<Difference> Differences => _differences.AsReadOnly();
 
         /// <summary>
@@ -82,10 +90,49 @@ namespace ObjectsComparer
             _differences.Add(difference);
         }
 
-        //A list of differences directly related to this context.
+        /// <summary>
+        /// Whether there are differences directly or indirectly related to this context.
+        /// </summary>
+        /// <param name="recursive">If value is true, it also looks for <see cref="Differences"/> in <see cref="Descendants"/>.</param>
+        public bool HasDifferences(bool recursive)
+        {
+            if (_differences.Any())
+            {
+                return true;
+            }
 
-        //Whether the object has any properties (bool recursive).
+            if (recursive)
+            {
+                return _descendants.Any(d => d.HasDifferences(true));
+            }
 
-        //HasDifferences(bool recursive)
+            return false;
+        }
+
+        public void Shrink()
+        {
+            lock (_shrinkLock)
+            {
+                List<ComparisonContext> removeDescendants = new List<ComparisonContext>();
+
+                _descendants.ForEach(d =>
+                {
+                    d.Shrink();
+
+                    if (d.HasDifferences(true) == false)
+                    {
+                        removeDescendants.Add(d);
+                    }
+                });
+
+                removeDescendants.ForEach(d => _descendants.Remove(d));
+            }
+            
+        }
+
+        //public bool ShouldSerializeMember()
+        //{
+        //    return false;
+        //}
     }
 }
