@@ -8,7 +8,7 @@ using ObjectsComparer.Utils;
 namespace ObjectsComparer
 {
     /// <summary>
-    /// Configures list element behavior if <see cref="ListElementSearchMode.Key"/> mode is used.
+    /// Configures the behavior of list elements if elements are to be compared by key.
     /// </summary>
     public class CompareElementsByKeyOptions
     {

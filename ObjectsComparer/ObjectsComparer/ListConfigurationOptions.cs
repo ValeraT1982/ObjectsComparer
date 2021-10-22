@@ -32,11 +32,17 @@ namespace ObjectsComparer
 
         internal Action<CompareElementsByKeyOptions> KeyOptionsAction { get; private set; }
 
+        /// <summary>
+        /// Compares list elements by key.
+        /// </summary>
         public void CompareElementsByKey()
         {
             CompareElementsByKey(options => { });
         }
 
+        /// <summary>
+        /// Compares list elements by key.
+        /// </summary>
         public void CompareElementsByKey(Action<CompareElementsByKeyOptions> keyOptions)
         {
             if (keyOptions is null)

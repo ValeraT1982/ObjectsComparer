@@ -160,7 +160,7 @@ namespace ObjectsComparer.Tests
             {
                 FirstName = "FirstName1",
                 LastName = "LastName1",
-                NonGenericAddresses = new ArrayList()
+                NonGenericLiveAddresses = new ArrayList
                 {
                     new Address
                     {
@@ -169,13 +169,22 @@ namespace ObjectsComparer.Tests
                     },
 
                     new Address{}
+                },
+                NonGenericStayAddresses = new ArrayList
+                {
+                    new Address
+                    {
+                        Id = 2,
+                        City = "City3"
+                    },
                 }
             };
+
             var p2 = new Person
             {
                 FirstName = "FirstName2",
                 LastName = "LastName2",
-                NonGenericAddresses = new ArrayList()
+                NonGenericLiveAddresses = new ArrayList
                 {
                     null,
 

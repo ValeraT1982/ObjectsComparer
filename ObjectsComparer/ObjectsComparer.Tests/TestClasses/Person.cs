@@ -12,6 +12,8 @@ namespace ObjectsComparer.Tests.TestClasses
 
         public string PhoneNumber { get; set; }
 
-        public IEnumerable NonGenericAddresses { get; set; }
+        public IEnumerable NonGenericLiveAddresses { get; set; }
+
+        public IEnumerable NonGenericStayAddresses { get; set; }
     }
 }

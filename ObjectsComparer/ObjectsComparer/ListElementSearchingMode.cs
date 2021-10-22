@@ -1,7 +1,7 @@
 ﻿namespace ObjectsComparer
 {
     /// <summary>
-    /// List element searching mode.
+    /// List element search mode.
     /// </summary>
     internal enum ListElementSearchMode
     {
