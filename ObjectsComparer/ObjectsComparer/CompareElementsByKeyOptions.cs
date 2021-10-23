@@ -13,14 +13,14 @@ namespace ObjectsComparer
     public class CompareElementsByKeyOptions
     {
         /// <summary>
-        /// Default key prefix for an integer key. It will be used for formatting <see cref="Difference.MemberPath"/> property, for example: "Addresses[KEY=123]".
+        /// Default key prefix for an integer key. It will be used as part of the <see cref="Difference.MemberPath"/> property, for example: "Addresses[KEY=123]".
         /// See <see cref="KeyPrefix"/> for more info.
         /// </summary>
         /// <example>Addresses</example>
         public const string DefaultIntKeyPrefix = "KEY=";
 
         /// <summary>
-        /// Default element identifier for element that refers to null. It will be used for formatting <see cref="Difference.MemberPath"/> property, for example: "Addresses[NULLREF]". 
+        /// Default element identifier for element that refers to null. It will be used as part of the <see cref="Difference.MemberPath"/> property, for example: "Addresses[NULLREF]". 
         /// See <see cref="NullElementIdentifier"/> for more info.        
         /// </summary>
         public const string DefaultNullElementIdentifier = "NULLREF";
@@ -50,7 +50,7 @@ namespace ObjectsComparer
         public string KeyPrefix { get; set; } = null;
 
         /// <summary>
-        /// If the list element refers to a null value, this symbol will eventually be used as list element identifier in the <see cref="Difference.MemberPath"/> property.
+        /// If the list element refers to a null value, this symbol will eventually be used as a list element identifier in the <see cref="Difference.MemberPath"/> property.
         /// Default value = <see cref="DefaultNullElementIdentifier"/>.
         /// If you don't want to use it at all, set this property to <see cref="string.Empty"/>.
         /// </summary>

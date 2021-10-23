@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
@@ -228,12 +229,13 @@ namespace ObjectsComparer.Tests
         {
             var settings = new JsonSerializerSettings()
             {
-                ContractResolver = ShouldSerializeContractResolver.Instance,
+                ContractResolver = ComparisonContextContractResolver.Instance,
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             };
-            settings.Converters.Add(new StringEnumConverter { CamelCaseText = true });
+            settings.Converters.Add(new StringEnumConverter { CamelCaseText = false });
+            settings.Converters.Add(new MemberInfoConverter());
 
-            return JsonConvert.SerializeObject(context, Formatting.None, settings);
+            return JsonConvert.SerializeObject(context, Formatting.Indented, settings);
         }
 
         [Test]
@@ -382,63 +384,69 @@ namespace ObjectsComparer.Tests
         }
     }
 
-    class ShouldSerializeContractResolver : DefaultContractResolver
+    internal class ComparisonContextContractResolver : DefaultContractResolver
     {
-        /*
-         * https://stackoverflow.com/questions/46977905/overriding-a-property-value-in-custom-json-net-contract-resolver
-         * https://dotnetfiddle.net/PAZULK
-         * https://stackoverflow.com/questions/2441290/javascriptserializer-json-serialization-of-enum-as-string
-         * 
-         */
-        public static readonly ShouldSerializeContractResolver Instance = new ShouldSerializeContractResolver();
+        public static readonly ComparisonContextContractResolver Instance = new ComparisonContextContractResolver();
 
         protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
         {
             JsonProperty property = base.CreateProperty(member, memberSerialization);
 
-            if (property.DeclaringType == typeof(ComparisonContext) && property.PropertyName == nameof(ComparisonContext.Member))
+            if (property.DeclaringType == typeof(ComparisonContext)) 
             {
                 property.ShouldSerialize =
                     instance =>
                     {
-                        //ComparisonContext ctx = (ComparisonContext)instance;
-                        return false;
+                        ComparisonContext ctx = (ComparisonContext)instance;
+
+                        if (property.PropertyName == nameof(ComparisonContext.Descendants))
+                        {
+                            return ctx.Descendants.Any();
+                        }
+
+                        if (property.PropertyName == nameof(ComparisonContext.Differences))
+                        {
+                            return ctx.Differences.Any();
+                        }
+
+                        if (property.PropertyName == nameof(ComparisonContext.Member))
+                        {
+                            return ctx.Member != null;
+                        }
+
+                        if (property.PropertyName == nameof(ComparisonContext.Ancestor))
+                        {
+                            return ctx.Ancestor != null;
+                        }
+
+                        return true;
                     };
             }
-
-            //if (property.DeclaringType == typeof(Difference) && property.PropertyName == nameof(Difference.DifferenceType))
-            //{
-            //    property.ValueProvider = new ValueProvider(differenceObj =>
-            //    {
-            //        var difference = (Difference)differenceObj;
-            //        return difference.DifferenceType.ToString();
-            //    });
-            //}
 
             return property;
         }
     }
 
-    class ValueProvider : IValueProvider
+    /// <summary>
+    /// Converts <see cref="MemberInfo"/> object to JSON.
+    /// </summary>
+    internal class MemberInfoConverter : JsonConverter<MemberInfo>
     {
-        readonly Func<object, object> _getValueProviderImpl;
-
-        public ValueProvider(Func<object, object> valueProviderImpl)
-        {
-            _getValueProviderImpl = valueProviderImpl;
+        public override void WriteJson(JsonWriter writer, MemberInfo value, JsonSerializer serializer)
+        {            
+            writer.WriteStartObject();
+            writer.WritePropertyName(nameof(MemberInfo.Name));
+            writer.WriteValue(value.Name);
+            writer.WritePropertyName(nameof(MemberInfo.DeclaringType));
+            writer.WriteValue(value.DeclaringType.FullName);
+            writer.WriteEndObject();
         }
 
-
-        //Ser
-        public object GetValue(object target)
-        {
-            return _getValueProviderImpl(target);
-        }
-
-        //Deser
-        public void SetValue(object target, object value)
+        public override MemberInfo ReadJson(JsonReader reader, Type objectType, MemberInfo existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             throw new NotImplementedException();
         }
+
+        public override bool CanRead => false;
     }
 }

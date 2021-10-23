@@ -39,8 +39,6 @@ namespace ObjectsComparer
         /// </summary>
         public MemberInfo Member { get; }
 
-        public string MemberName => Member?.Name;
-
         /// <summary>
         /// Ancestor context.
         /// </summary>
@@ -109,6 +107,9 @@ namespace ObjectsComparer
             return false;
         }
 
+        /// <summary>
+        /// Removes all <see cref="Descendants"/> which have no <see cref="Differences"/> directly or indirectly in their <see cref="Descendants"/>.
+        /// </summary>
         public void Shrink()
         {
             lock (_shrinkLock)
@@ -125,14 +126,9 @@ namespace ObjectsComparer
                     }
                 });
 
-                removeDescendants.ForEach(d => _descendants.Remove(d));
+                _descendants.RemoveAll(ctx => removeDescendants.Contains(ctx));
+                //removeDescendants.ForEach(d => _descendants.Remove(d));
             }
-            
         }
-
-        //public bool ShouldSerializeMember()
-        //{
-        //    return false;
-        //}
     }
 }
