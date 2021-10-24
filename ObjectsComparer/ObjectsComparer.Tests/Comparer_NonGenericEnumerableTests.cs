@@ -8,6 +8,7 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
 using NUnit.Framework;
 using ObjectsComparer.Tests.TestClasses;
+using ObjectsComparer.Tests.Utils;
 using ObjectsComparer.Utils;
 
 namespace ObjectsComparer.Tests
@@ -162,7 +163,7 @@ namespace ObjectsComparer.Tests
         [Test]
         public void RightComparisonContextGraph()
         {
-            var p1 = new Person
+            var person1 = new Person
             {
                 FirstName = "FirstName1",
                 LastName = "LastName1",
@@ -183,10 +184,10 @@ namespace ObjectsComparer.Tests
                         Id = 2,
                         City = "City3"
                     },
-                }
+                },
             };
 
-            var p2 = new Person
+            var person2 = new Person
             {
                 FirstName = "FirstName2",
                 LastName = "LastName2",
@@ -218,26 +219,13 @@ namespace ObjectsComparer.Tests
 
             var comparer = new Comparer<Person>(settings);
             var rootContext = ComparisonContext.Create();
-            var differences = comparer.CalculateDifferences(p1, p2, rootContext).ToList();
+            var differences = comparer.CalculateDifferences(person1, person2, rootContext).ToList();
             var hasDiffs = rootContext.HasDifferences(false);
-            var scontextBeforeShrink = SerializeComparisonContext(rootContext);
+            var scontextBeforeShrink = rootContext.ToJson();
             rootContext.Shrink();
-            var scontextAfterShrink = SerializeComparisonContext(rootContext);
+            var scontextAfterShrink = rootContext.ToJson();
         }
-
-        string SerializeComparisonContext(ComparisonContext context)
-        {
-            var settings = new JsonSerializerSettings()
-            {
-                ContractResolver = ComparisonContextContractResolver.Instance,
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-            };
-            settings.Converters.Add(new StringEnumConverter { CamelCaseText = false });
-            settings.Converters.Add(new MemberInfoConverter());
-
-            return JsonConvert.SerializeObject(context, Formatting.Indented, settings);
-        }
-
+        
         [Test]
         public void InequalityCount_InequalityProperty_CompareByIndex()
         {
@@ -382,71 +370,5 @@ namespace ObjectsComparer.Tests
 
             Assert.IsTrue(isEqual);
         }
-    }
-
-    internal class ComparisonContextContractResolver : DefaultContractResolver
-    {
-        public static readonly ComparisonContextContractResolver Instance = new ComparisonContextContractResolver();
-
-        protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
-        {
-            JsonProperty property = base.CreateProperty(member, memberSerialization);
-
-            if (property.DeclaringType == typeof(ComparisonContext)) 
-            {
-                property.ShouldSerialize =
-                    instance =>
-                    {
-                        ComparisonContext ctx = (ComparisonContext)instance;
-
-                        if (property.PropertyName == nameof(ComparisonContext.Descendants))
-                        {
-                            return ctx.Descendants.Any();
-                        }
-
-                        if (property.PropertyName == nameof(ComparisonContext.Differences))
-                        {
-                            return ctx.Differences.Any();
-                        }
-
-                        if (property.PropertyName == nameof(ComparisonContext.Member))
-                        {
-                            return ctx.Member != null;
-                        }
-
-                        if (property.PropertyName == nameof(ComparisonContext.Ancestor))
-                        {
-                            return ctx.Ancestor != null;
-                        }
-
-                        return true;
-                    };
-            }
-
-            return property;
-        }
-    }
-
-    /// <summary>
-    /// Converts <see cref="MemberInfo"/> object to JSON.
-    /// </summary>
-    internal class MemberInfoConverter : JsonConverter<MemberInfo>
-    {
-        public override void WriteJson(JsonWriter writer, MemberInfo value, JsonSerializer serializer)
-        {            
-            writer.WriteStartObject();
-            writer.WritePropertyName(nameof(MemberInfo.Name));
-            writer.WriteValue(value.Name);
-            writer.WritePropertyName(nameof(MemberInfo.DeclaringType));
-            writer.WriteValue(value.DeclaringType.FullName);
-            writer.WriteEndObject();
-        }
-
-        public override MemberInfo ReadJson(JsonReader reader, Type objectType, MemberInfo existingValue, bool hasExistingValue, JsonSerializer serializer)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool CanRead => false;
     }
 }

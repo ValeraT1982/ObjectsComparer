@@ -62,7 +62,7 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// Compares list elements by key. It will try to find a property specified by argument <paramref name="key"/>.
+        /// Compares list elements by key. It will try to find a property specified by <paramref name="key"/> parameter.
         /// </summary>
         public void UseKey(string key, bool caseSensitive = false)
         {
@@ -75,7 +75,7 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// Compares list elements by key. It will try to find one of the public properties specified by argument <paramref name="keys"/>, in that order.
+        /// Compares list elements by key. It will try to find one of the public properties specified by <paramref name="keys"/> parameter, in that order.
         /// </summary>
         public void UseKey(string[] keys, bool caseSensitive = false)
         {
