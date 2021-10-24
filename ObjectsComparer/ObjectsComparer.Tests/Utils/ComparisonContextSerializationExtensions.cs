@@ -105,10 +105,30 @@ namespace ObjectsComparer.Tests.Utils
 
                             return true;
                         };
+
+                    //if (property.PropertyName == nameof(ComparisonContext.Ancestor))
+                    //{
+                    //    property.ValueProvider = new AncestorValueProvider();
+                    //}
                 }
 
                 return property;
             }
         }
+
+        //class AncestorValueProvider : IValueProvider
+        //{
+        //    public object GetValue(object target)
+        //    {
+        //        var ancestor = (target as ComparisonContext).Ancestor;
+        //        var newAncestor = ComparisonContext.Create(member: ancestor?.Member);
+        //        return newAncestor;
+        //    }
+
+        //    public void SetValue(object target, object value)
+        //    {
+        //        throw new NotImplementedException();
+        //    }
+        //}
     }
 }

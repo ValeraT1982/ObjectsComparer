@@ -14,7 +14,6 @@ namespace ObjectsComparer
         /// <summary>
         /// Configures list comparison behavior.
         /// </summary>
-        /// <param name="configureOptions"></param>
         public void Configure(Action<ComparisonContext, ListConfigurationOptions> configureOptions)
         {
             if (configureOptions is null)
@@ -23,6 +22,19 @@ namespace ObjectsComparer
             }
 
             ConfigureOptionsAction = configureOptions;
+        }
+
+        /// <summary>
+        /// Configures list comparison behavior.
+        /// </summary>
+        public void Configure(Action<ListConfigurationOptions> configureOptions)
+        {
+            if (configureOptions is null)
+            {
+                throw new ArgumentNullException(nameof(configureOptions));
+            }
+
+            ConfigureOptionsAction = (_, opt) => configureOptions(opt);
         }
     }
 }

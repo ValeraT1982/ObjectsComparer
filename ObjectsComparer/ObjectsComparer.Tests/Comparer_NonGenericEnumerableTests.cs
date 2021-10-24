@@ -166,13 +166,14 @@ namespace ObjectsComparer.Tests
             var person1 = new Person
             {
                 FirstName = "FirstName1",
-                LastName = "LastName1",
+                LastName = "LastName 1",
                 NonGenericLiveAddresses = new ArrayList
                 {
                     new Address
                     {
                         Id = 1,
-                        City = "City1"
+                        City = "City 1",
+                        State = "State 1"
                     },
 
                     new Address{}
@@ -182,15 +183,15 @@ namespace ObjectsComparer.Tests
                     new Address
                     {
                         Id = 2,
-                        City = "City3"
+                        City = "City 3"
                     },
                 },
             };
 
             var person2 = new Person
             {
-                FirstName = "FirstName2",
-                LastName = "LastName2",
+                FirstName = "FirstName 2",
+                LastName = "LastName 2",
                 NonGenericLiveAddresses = new ArrayList
                 {
                     null,
@@ -198,7 +199,8 @@ namespace ObjectsComparer.Tests
                     new Address
                     {
                         Id = 1,
-                        City = "City2"
+                        City = "City 2",
+                        State = "State 2"
                     },
 
                     null
@@ -207,7 +209,7 @@ namespace ObjectsComparer.Tests
 
             var settings = new ComparisonSettings();
 
-            settings.List.Configure((_, options) => 
+            settings.List.Configure(options => 
             {
                 options.CompareUnequalLists = true;
                 options.CompareElementsByKey(keyOptions =>
