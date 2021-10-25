@@ -96,10 +96,10 @@ namespace ObjectsComparer
 
             var keyOptions = CompareElementsByKeyOptions.Default();
             listConfigurationOptions.KeyOptionsAction?.Invoke(keyOptions);
-            var nullElementIdentifier = CompareElementsByKeyOptions.ResolveNullElementIdentifier(keyOptions);
 
-            foreach (var element1 in array1)
+            for (int element1Index = 0; element1Index < array1.Length; element1Index++) 
             {
+                var element1 = array1[element1Index];
                 var elementContext = ComparisonContext.Create(member: null, ancestor: listComparisonContext);
 
                 if (element1 == null)
@@ -109,7 +109,9 @@ namespace ObjectsComparer
                         continue;
                     }
 
-                    yield return AddDifferenceToComparisonContext(new Difference($"[{nullElementIdentifier}]", string.Empty, string.Empty, DifferenceTypes.MissedElementInSecondObject), elementContext);
+                    var formattedNullElementIdentifier = keyOptions.GetFormattedNullElementIdentifier(element1Index);
+
+                    yield return AddDifferenceToComparisonContext(new Difference($"[{formattedNullElementIdentifier}]", string.Empty, string.Empty, DifferenceTypes.MissedElementInSecondObject), elementContext);
                     continue;
                 }
 
@@ -125,7 +127,7 @@ namespace ObjectsComparer
                     continue;
                 }
 
-                var keyPrefix = CompareElementsByKeyOptions.ResolveKeyPrefix(element1Key, keyOptions);
+                var formattedElement1Key = keyOptions.GetFormattedElementKey(element1Index, element1Key);
 
                 if (array2.Any(elm2 => object.Equals(element1Key, keyOptions.KeyProvider(elm2)))) 
                 {
@@ -134,18 +136,20 @@ namespace ObjectsComparer
 
                     foreach (var failure in comparer.CalculateDifferences(element1.GetType(), element1, element2, elementContext))
                     {
-                        yield return failure.InsertPath($"[{keyPrefix}{element1Key}]");
+                        yield return failure.InsertPath($"[{formattedElement1Key}]");
                     }
                 }
                 else
                 {
                     var valueComparer1 = OverridesCollection.GetComparer(element1.GetType()) ?? DefaultValueComparer;                    
-                    yield return AddDifferenceToComparisonContext(new Difference($"[{keyPrefix}{element1Key}]", valueComparer1.ToString(element1), string.Empty, DifferenceTypes.MissedElementInSecondObject), elementContext);
+                    yield return AddDifferenceToComparisonContext(new Difference($"[{formattedElement1Key}]", valueComparer1.ToString(element1), string.Empty, DifferenceTypes.MissedElementInSecondObject), elementContext);
                 }
             }
 
-            foreach (var element2 in array2)
+            for (int element2Index = 0; element2Index < array2.Length; element2Index++) 
             {
+                var element2 = array2[element2Index];
+
                 if (element2 == null)
                 {
                     if (array1.Any(elm1 => elm1 == null))
@@ -154,8 +158,9 @@ namespace ObjectsComparer
                     }
 
                     var elementContext = ComparisonContext.Create(member: null, ancestor: listComparisonContext);
+                    var formattedNullElementIdentifier = keyOptions.GetFormattedNullElementIdentifier(element2Index);
 
-                    yield return AddDifferenceToComparisonContext(new Difference($"[{nullElementIdentifier}]", string.Empty, string.Empty, DifferenceTypes.MissedElementInFirstObject), elementContext);
+                    yield return AddDifferenceToComparisonContext(new Difference($"[{formattedNullElementIdentifier}]", string.Empty, string.Empty, DifferenceTypes.MissedElementInFirstObject), elementContext);
                     continue;
                 }
 
@@ -174,9 +179,9 @@ namespace ObjectsComparer
                 if (array1.Any(elm1 => object.Equals(element2Key, keyOptions.KeyProvider(elm1))) == false) 
                 {
                     var elementContext = ComparisonContext.Create(member: null, ancestor: listComparisonContext);
-                    var keyPrefix = CompareElementsByKeyOptions.ResolveKeyPrefix(element2Key, keyOptions);
+                    var formattedElement2Key = keyOptions.GetFormattedElementKey(element2Index, element2Key);
                     var valueComparer2 = OverridesCollection.GetComparer(element2.GetType()) ?? DefaultValueComparer;
-                    yield return AddDifferenceToComparisonContext(new Difference($"[{keyPrefix}{element2Key}]", string.Empty, valueComparer2.ToString(element2), DifferenceTypes.MissedElementInFirstObject), elementContext);
+                    yield return AddDifferenceToComparisonContext(new Difference($"[{formattedElement2Key}]", string.Empty, valueComparer2.ToString(element2), DifferenceTypes.MissedElementInFirstObject), elementContext);
                 }
             }
         }

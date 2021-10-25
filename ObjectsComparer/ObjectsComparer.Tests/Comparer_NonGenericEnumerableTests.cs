@@ -209,13 +209,15 @@ namespace ObjectsComparer.Tests
 
             var settings = new ComparisonSettings();
 
-            settings.List.Configure(options => 
+            settings.List.Configure((ctx, options) => 
             {
                 options.CompareUnequalLists = true;
                 options.CompareElementsByKey(keyOptions =>
                 {
-                    keyOptions.KeyPrefix = "Key: ";
-                    keyOptions.NullElementIdentifier = "Null-ref";
+                    keyOptions.FormatElementKey((index, key) => $"Key: {key}");
+                    //keyOptions.FormatNullElementidentifier = index => $"NULLREFAT-{index}";
+                    //keyOptions.NullElementIdentifier = "Null-ref";
+                    //keyOptions.FormatNullElementIdentifier(index => $"NULLREFAT-{index}");
                 });
             });
 

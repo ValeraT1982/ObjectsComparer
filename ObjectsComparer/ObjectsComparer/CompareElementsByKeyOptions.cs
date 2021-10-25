@@ -13,24 +13,24 @@ namespace ObjectsComparer
     public class CompareElementsByKeyOptions
     {
         /// <summary>
-        /// Default key prefix for an integer key. It will be used as part of the <see cref="Difference.MemberPath"/> property, for example: "Addresses[KEY=123]".
-        /// See <see cref="KeyPrefix"/> for more info.
+        /// Default identifier template for those elements that refer null value.  
+        /// It will be used as part of the <see cref="Difference.MemberPath"/> property.
+        /// For example: "Addresses[NULL_74]" that means there is an element at index 74 in the property Addresses that refers null value.
+        /// See <see cref="FormatNullElementIdentifier(Func{int, string})"/> for more info.        
         /// </summary>
-        /// <example>Addresses</example>
-        public const string DefaultIntKeyPrefix = "KEY=";
-
-        /// <summary>
-        /// Default element identifier for element that refers to null. It will be used as part of the <see cref="Difference.MemberPath"/> property, for example: "Addresses[NULLREF]". 
-        /// See <see cref="NullElementIdentifier"/> for more info.        
-        /// </summary>
-        public const string DefaultNullElementIdentifier = "NULLREF";
+        public const string DefaultNullElementIdentifierTemplate = "NULL_{0}";
 
         CompareElementsByKeyOptions()
         {
             Initialize();
         }
 
-        internal static CompareElementsByKeyOptions Default() => new CompareElementsByKeyOptions();
+        /// <summary>
+        /// See <see cref="FormatElementKey(Func{int, object, string})"/>.
+        /// </summary>
+        internal Func<int, object, string> ElementKeyFormatter { get; private set; }
+
+        internal Func<int, string> NullElementIdentifierFormatter { get; private set; }
 
         /// <summary>
         /// If value = false and element key will not be found, the element will be excluded from comparison and no difference will be logged. If value = true and element key will not be found, an exception of type <see cref="ElementKeyNotFoundException"/> will be thrown.
@@ -44,17 +44,13 @@ namespace ObjectsComparer
         internal Func<object, object> KeyProvider { get; private set; } = null;
 
         /// <summary>
-        /// To avoid confusion with the index, an optional key element prefix can be used. If value = null, which is the default value, <see cref="DefaultIntKeyPrefix"/> will be used for integer key type and no prefix will be used for other types.
-        /// If you don't want to use prefix at all, set this property to <see cref="string.Empty"/>.
-        /// </summary>
-        public string KeyPrefix { get; set; } = null;
-
-        /// <summary>
         /// If the list element refers to a null value, this symbol will eventually be used as a list element identifier in the <see cref="Difference.MemberPath"/> property.
-        /// Default value = <see cref="DefaultNullElementIdentifier"/>.
+        /// Default value = <see cref="DefaultNullElementIdentifierTemplate"/>.
         /// If you don't want to use it at all, set this property to <see cref="string.Empty"/>.
         /// </summary>
-        public string NullElementIdentifier { get; set; } = DefaultNullElementIdentifier;
+        public string NullElementIdentifier { get; set; } = DefaultNullElementIdentifierTemplate;
+
+        internal static CompareElementsByKeyOptions Default() => new CompareElementsByKeyOptions();
 
         void Initialize()
         {
@@ -141,49 +137,58 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// See <see cref="KeyPrefix"/>.
+        /// Obtains formatted or unformatted <paramref name="elementKey"/>.  See <see cref="FormatElementKey(Func{int, object, string})"/>.
         /// </summary>
-        internal static string ResolveKeyPrefix(object elementKey, CompareElementsByKeyOptions options)
+        /// <param name="elementIndex"></param>
+        /// <param name="elementKey"></param>
+        /// <returns></returns>
+        internal string GetFormattedElementKey(int elementIndex, object elementKey)
         {
-            if (elementKey is null)
+            var formattedKey = ElementKeyFormatter?.Invoke(elementIndex, elementKey);
+
+            if (string.IsNullOrWhiteSpace(formattedKey))
             {
-                throw new ArgumentNullException(nameof(elementKey));
+                formattedKey = elementKey.ToString();
             }
 
-            if (options is null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
-            if (options.KeyPrefix == string.Empty)
-            {
-                return string.Empty;
-            }
-
-            if (options.KeyPrefix == null)
-            {
-                if (elementKey is byte || elementKey is short || elementKey is int || elementKey is long)
-                {
-                    return DefaultIntKeyPrefix;
-                }
-            }
-
-            return options.KeyPrefix.Left(10);
+            return formattedKey.Left(50);  //This must be enough for a long data type and some prefix. 
         }
 
-        internal static string ResolveNullElementIdentifier(CompareElementsByKeyOptions options)
+        internal string GetFormattedNullElementIdentifier(int elementIndex)
         {
-            if (options is null)
+            var elementIdentifier = NullElementIdentifierFormatter?.Invoke(elementIndex);
+
+            if (string.IsNullOrWhiteSpace(elementIdentifier))
             {
-                throw new ArgumentNullException(nameof(options));
+                elementIdentifier = string.Format(DefaultNullElementIdentifierTemplate, elementIndex);
             }
 
-            if (options.NullElementIdentifier == null) 
+            return elementIdentifier.Left(20);
+        }
+
+        /// <summary>
+        /// To avoid possible confusion of the element key with the element index, the element key can be formatted with any text, e.g. element key with value = 1 can be formatted as "Key=1".
+        /// The formatted key is then used as part of the <see cref="Difference.MemberPath"/> property, e.g. "...Addresses[Key=1]".
+        /// </summary>
+        /// <param name="formatter">First parameter: Element index. Second parameter: Element key. Return value: Formatted key.</param>
+        public void FormatElementKey(Func<int, object, string> formatter)
+        {
+            if (formatter is null)
             {
-                return string.Empty;
+                throw new ArgumentNullException(nameof(formatter));
             }
 
-            return options.NullElementIdentifier.Left(10);
+            ElementKeyFormatter = formatter;
+        }
+
+        public void FormatNullElementIdentifier(Func<int, string> formatter)
+        {
+            if (formatter is null)
+            {
+                throw new ArgumentNullException(nameof(formatter));
+            }
+
+            NullElementIdentifierFormatter = formatter;
         }
     }
 }
