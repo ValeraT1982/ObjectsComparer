@@ -20,6 +20,16 @@ namespace ObjectsComparer
         /// </summary>
         public const string DefaultNullElementIdentifierTemplate = "NULL_{0}";
 
+        /// <summary>
+        /// Max. length of the formatted key of the element. See <see cref="FormatElementKey(Func{int, object, string})"/>.
+        /// </summary>
+        const int FormattedKeyMaxLength = 50;
+
+        /// <summary>
+        /// Max. length of the identifier of the element that refers to null value. See <see cref="FormatNullElementIdentifier(Func{int, string})"/>.
+        /// </summary>
+        const int NullElementIdentifierMaxLength = 20;
+
         CompareElementsByKeyOptions()
         {
             Initialize();
@@ -36,7 +46,7 @@ namespace ObjectsComparer
         internal Func<int, string> NullElementIdentifierFormatter { get; private set; }
 
         /// <summary>
-        /// If value = false and element key will not be found, the element will be excluded from comparison and no difference will be logged except for possible <see cref="DifferenceTypes.NumberOfElementsMismatch"/>.
+        /// If value = false and element key will not be found, the element will be excluded from comparison and no difference will be added except for possible <see cref="DifferenceTypes.NumberOfElementsMismatch"/> difference.
         /// If value = true and element key will not be found, an exception of type <see cref="ElementKeyNotFoundException"/> will be thrown.
         /// Default value = true.
         /// </summary>
@@ -149,7 +159,7 @@ namespace ObjectsComparer
                 formattedKey = elementKey.ToString();
             }
 
-            return formattedKey.Left(50);  //This must be enough for a long data type and some prefix. 
+            return formattedKey.Left(FormattedKeyMaxLength);  //This must be enough for a long data type and some prefix. 
         }
 
         internal string GetFormattedNullElementIdentifier(int elementIndex)
@@ -161,7 +171,7 @@ namespace ObjectsComparer
                 elementIdentifier = string.Format(DefaultNullElementIdentifierTemplate, elementIndex);
             }
 
-            return elementIdentifier.Left(20);
+            return elementIdentifier.Left(NullElementIdentifierMaxLength);
         }
 
         /// <summary>
