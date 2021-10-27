@@ -13,12 +13,9 @@ namespace ObjectsComparer
     public class CompareElementsByKeyOptions
     {
         /// <summary>
-        /// Default identifier template for those elements that refer to null value.  
-        /// It will be used as part of the <see cref="Difference.MemberPath"/> property.
-        /// For example value "Addresses[NULL_74]" in the <see cref="Difference.MemberPath"/> property means that there is an element that refers to null value at index 74 in the Addresses property.
-        /// See <see cref="FormatNullElementIdentifier(Func{int, string})"/> for more info.        
+        /// Default element identifier template for element that refers to null value. See <see cref="FormatNullElementIdentifier(Func{int, string})"/> for more info.        
         /// </summary>
-        public const string DefaultNullElementIdentifierTemplate = "NULL_{0}";
+        public const string DefaultNullElementIdentifierTemplate = "NullAtIdx:{0}";
 
         /// <summary>
         /// Max. length of the formatted key of the element. See <see cref="FormatElementKey(Func{int, object, string})"/>.
@@ -38,12 +35,12 @@ namespace ObjectsComparer
         /// <summary>
         /// See <see cref="FormatElementKey(Func{int, object, string})"/>.
         /// </summary>
-        internal Func<int, object, string> ElementKeyFormatter { get; private set; }
+        Func<int, object, string> ElementKeyFormatter { get; set; }
 
         /// <summary>
         /// See <see cref="FormatNullElementIdentifier(Func{int, string})"/>.
         /// </summary>
-        internal Func<int, string> NullElementIdentifierFormatter { get; private set; }
+        Func<int, string> NullElementIdentifierFormatter { get; set; }
 
         /// <summary>
         /// If value = false and element key will not be found, the element will be excluded from comparison and no difference will be added except for possible <see cref="DifferenceTypes.NumberOfElementsMismatch"/> difference.
@@ -145,13 +142,15 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// Obtains formatted or unformatted <paramref name="elementKey"/>.  See <see cref="FormatElementKey(Func{int, object, string})"/>.
+        /// Returns optional formatted or unformatted <paramref name="elementKey"/>. See <see cref="FormatElementKey(Func{int, object, string})"/>.
         /// </summary>
-        /// <param name="elementIndex"></param>
-        /// <param name="elementKey"></param>
-        /// <returns></returns>
         internal string GetFormattedElementKey(int elementIndex, object elementKey)
         {
+            if (elementKey is null)
+            {
+                throw new ArgumentNullException(nameof(elementKey));
+            }
+
             var formattedKey = ElementKeyFormatter?.Invoke(elementIndex, elementKey);
 
             if (string.IsNullOrWhiteSpace(formattedKey))
@@ -159,9 +158,12 @@ namespace ObjectsComparer
                 formattedKey = elementKey.ToString();
             }
 
-            return formattedKey.Left(FormattedKeyMaxLength);  //This must be enough for a long data type and some prefix. 
+            return formattedKey.Left(FormattedKeyMaxLength);
         }
 
+        /// <summary>
+        /// Returns formatted element identifier that referes to null. See <see cref="FormatNullElementIdentifier(Func{int, string})"/>.
+        /// </summary>
         internal string GetFormattedNullElementIdentifier(int elementIndex)
         {
             var elementIdentifier = NullElementIdentifierFormatter?.Invoke(elementIndex);
@@ -177,8 +179,8 @@ namespace ObjectsComparer
         /// <summary>
         /// To avoid possible confusion of the element key with the element index, the element key can be formatted with any text.<br/>
         /// For example, element key with value = 1 can be formatted as "Id=1".
-        /// The formatted key is then used as part of the <see cref="Difference.MemberPath"/> property, e.g. "...Addresses[Id=1]".<br/>
-        /// By default, the key will not be formatted.
+        /// The formatted element key is then used as part of the <see cref="Difference.MemberPath"/> property, e.g. "Addresses[Id=1]".<br/>
+        /// By default, the element key will not be formatted.
         /// </summary>
         /// <param name="formatter">First parameter: Element index. Second parameter: Element key. Return value: Formatted key.</param>
         public void FormatElementKey(Func<int, object, string> formatter)
@@ -192,8 +194,8 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// Formats identifier of the element that refers to null value. Formatted identifier is then used as part of the <see cref="Difference.MemberPath"/> property.<br/>
-        /// By default, <see cref="DefaultNullElementIdentifierTemplate"/> template will be used for format the identifier.
+        /// Formats the element identifier if it refers to null. Formatted identifier is then used as part of the <see cref="Difference.MemberPath"/> property.<br/>
+        /// By default, <see cref="DefaultNullElementIdentifierTemplate"/> template will be used to format the identifier.
         /// </summary>
         /// <param name="formatter">First parameter: Element index. Return value: Formatted identifier.</param>
         public void FormatNullElementIdentifier(Func<int, string> formatter)

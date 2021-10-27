@@ -9,7 +9,11 @@ namespace ObjectsComparer
     /// </summary>
     public class ListComparisonSettings
     {
+        ListComparisonSettings() { }
+
         internal Action<ComparisonContext, ListConfigurationOptions> ConfigureOptionsAction { get; private set; } = null;
+
+        internal static ListComparisonSettings Default() => new ListComparisonSettings();
 
         /// <summary>
         /// Configures list comparison behavior.

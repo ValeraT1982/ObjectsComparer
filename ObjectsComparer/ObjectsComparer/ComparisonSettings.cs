@@ -30,7 +30,7 @@ namespace ObjectsComparer
         /// <summary>
         /// List comparison settings.
         /// </summary>
-        public ListComparisonSettings List { get; } = new ListComparisonSettings();
+        public ListComparisonSettings List { get; } = ListComparisonSettings.Default();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ComparisonSettings" /> class. 
