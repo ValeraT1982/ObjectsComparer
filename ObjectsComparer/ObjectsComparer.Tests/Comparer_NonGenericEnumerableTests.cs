@@ -213,11 +213,10 @@ namespace ObjectsComparer.Tests
             {
                 options.CompareUnequalLists = true;
                 options.CompareElementsByKey(keyOptions =>
-                {
+                {                    
                     keyOptions.FormatElementKey((index, key) => $"Key: {key}");
-                    //keyOptions.FormatNullElementidentifier = index => $"NULLREFAT-{index}";
-                    //keyOptions.NullElementIdentifier = "Null-ref";
-                    //keyOptions.FormatNullElementIdentifier(index => $"NULLREFAT-{index}");
+                    keyOptions.UseKey("");
+                    
                 });
             });
 

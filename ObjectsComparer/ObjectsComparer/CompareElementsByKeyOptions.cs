@@ -62,7 +62,7 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// Compares list elements by key. It will try to find a property specified by <paramref name="key"/> parameter.
+        /// Key identification. It attempts to find the key using the property specified by the <paramref name="key"/> parameter.
         /// </summary>
         public void UseKey(string key, bool caseSensitive = false)
         {
@@ -75,7 +75,7 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// Compares list elements by key. It will try to find one of the public properties specified by <paramref name="keys"/> parameter, in that order.
+        /// Key identification. It attempts to find the key using one of the public properties specified by the <paramref name="keys"/> parameter, in the specified order.
         /// </summary>
         public void UseKey(string[] keys, bool caseSensitive = false)
         {
@@ -101,7 +101,7 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// Compares list elements by key using <paramref name="keyProvider"/>.
+        /// Key identification. It attempts to find the key using the <paramref name="keyProvider"/> parameter.
         /// </summary>
         /// <param name="keyProvider">First parameter: The element whose key is required. Return value: The element's key.</param>
         public void UseKey(Func<object, object> keyProvider)
@@ -115,7 +115,7 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// It will try to find one of the public properties specified by <paramref name="keys"/>, then it returns its value.
+        /// It will try to find one of the public properties specified by the <paramref name="keys"/> parameter, then it returns its value.
         /// </summary>
         /// <returns>Returns the value of the property that corresponds to the specified key. If no property matches the specified key, it returns the <paramref name="instance"/> itself.</returns>
         static object GetKeyValue(object instance, bool caseSensitive, params string[] keys)
@@ -164,6 +164,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Returns element identifier for element that referes to null. See <see cref="FormatNullElementIdentifier(Func{int, string})"/>.
         /// </summary>
+        /// <param name="elementIndex">Element index.</param>
         internal string GetNullElementIdentifier(int elementIndex)
         {
             var elementIdentifier = NullElementIdentifierFormatter?.Invoke(elementIndex);
