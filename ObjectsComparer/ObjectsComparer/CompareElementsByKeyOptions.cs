@@ -162,9 +162,9 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// Returns formatted element identifier that referes to null. See <see cref="FormatNullElementIdentifier(Func{int, string})"/>.
+        /// Returns element identifier for element that referes to null. See <see cref="FormatNullElementIdentifier(Func{int, string})"/>.
         /// </summary>
-        internal string GetFormattedNullElementIdentifier(int elementIndex)
+        internal string GetNullElementIdentifier(int elementIndex)
         {
             var elementIdentifier = NullElementIdentifierFormatter?.Invoke(elementIndex);
 

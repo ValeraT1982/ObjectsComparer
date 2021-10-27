@@ -109,9 +109,9 @@ namespace ObjectsComparer
                         continue;
                     }
 
-                    var formattedNullElementIdentifier = keyOptions.GetFormattedNullElementIdentifier(element1Index);
+                    var nullElementIdentifier = keyOptions.GetNullElementIdentifier(element1Index);
 
-                    yield return AddDifferenceToComparisonContext(new Difference($"[{formattedNullElementIdentifier}]", string.Empty, string.Empty, DifferenceTypes.MissedElementInSecondObject), elementComparisonContext);
+                    yield return AddDifferenceToComparisonContext(new Difference($"[{nullElementIdentifier}]", string.Empty, string.Empty, DifferenceTypes.MissedElementInSecondObject), elementComparisonContext);
                     continue;
                 }
 
@@ -121,7 +121,7 @@ namespace ObjectsComparer
                 {
                     if (keyOptions.ThrowKeyNotFound)
                     {
-                        throw new ElementKeyNotFoundException(element1);
+                        throw new ElementKeyNotFoundException(element1, elementComparisonContext);
                     }
 
                     continue;
@@ -149,6 +149,7 @@ namespace ObjectsComparer
             for (int element2Index = 0; element2Index < array2.Length; element2Index++) 
             {
                 var element2 = array2[element2Index];
+                var elementComparisonContext = ComparisonContext.Create(ancestor: listComparisonContext);
 
                 if (element2 == null)
                 {
@@ -157,10 +158,9 @@ namespace ObjectsComparer
                         continue;
                     }
 
-                    var elementComparisonContext = ComparisonContext.Create(ancestor: listComparisonContext);
-                    var formattedNullElementIdentifier = keyOptions.GetFormattedNullElementIdentifier(element2Index);
+                    var nullElementIdentifier = keyOptions.GetNullElementIdentifier(element2Index);
 
-                    yield return AddDifferenceToComparisonContext(new Difference($"[{formattedNullElementIdentifier}]", string.Empty, string.Empty, DifferenceTypes.MissedElementInFirstObject), elementComparisonContext);
+                    yield return AddDifferenceToComparisonContext(new Difference($"[{nullElementIdentifier}]", string.Empty, string.Empty, DifferenceTypes.MissedElementInFirstObject), elementComparisonContext);
                     continue;
                 }
 
@@ -170,7 +170,7 @@ namespace ObjectsComparer
                 {
                     if (keyOptions.ThrowKeyNotFound)
                     {
-                        throw new ElementKeyNotFoundException(element2);
+                        throw new ElementKeyNotFoundException(element2, elementComparisonContext);
                     }
 
                     continue;
@@ -178,7 +178,7 @@ namespace ObjectsComparer
 
                 if (array1.Any(elm1 => object.Equals(element2Key, keyOptions.KeyProvider(elm1))) == false) 
                 {
-                    var elementComparisonContext = ComparisonContext.Create(ancestor: listComparisonContext);
+                    //var elementComparisonContext = ComparisonContext.Create(ancestor: listComparisonContext);
                     var formattedElement2Key = keyOptions.GetFormattedElementKey(element2Index, element2Key);
                     var valueComparer2 = OverridesCollection.GetComparer(element2.GetType()) ?? DefaultValueComparer;
                     yield return AddDifferenceToComparisonContext(new Difference($"[{formattedElement2Key}]", string.Empty, valueComparer2.ToString(element2), DifferenceTypes.MissedElementInFirstObject), elementComparisonContext);
