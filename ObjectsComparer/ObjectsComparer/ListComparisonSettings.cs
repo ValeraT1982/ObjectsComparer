@@ -31,6 +31,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Configures list comparison behavior.
         /// </summary>
+        /// <param name="configureOptions">See <see cref="ListConfigurationOptions"/>.</param>
         public void Configure(Action<ListConfigurationOptions> configureOptions)
         {
             if (configureOptions is null)

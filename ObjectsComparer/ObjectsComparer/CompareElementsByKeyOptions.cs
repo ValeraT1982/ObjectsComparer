@@ -15,7 +15,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Default element identifier template for element that refers to null value. See <see cref="FormatNullElementIdentifier(Func{int, string})"/> for more info.        
         /// </summary>
-        public const string DefaultNullElementIdentifierTemplate = "NullAtIdx:{0}";
+        public const string DefaultNullElementIdentifierTemplate = "NullAtIdx={0}";
 
         /// <summary>
         /// Max. length of the formatted key of the element. See <see cref="FormatElementKey(Func{int, object, string})"/>.

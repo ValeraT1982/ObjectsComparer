@@ -209,15 +209,10 @@ namespace ObjectsComparer.Tests
 
             var settings = new ComparisonSettings();
 
-            settings.List.Configure((ctx, options) => 
+            settings.List.Configure(options =>
             {
                 options.CompareUnequalLists = true;
-                options.CompareElementsByKey(keyOptions =>
-                {                    
-                    keyOptions.FormatElementKey((index, key) => $"Key: {key}");
-                    keyOptions.UseKey("");
-                    
-                });
+                options.CompareElementsByKey();
             });
 
             var comparer = new Comparer<Person>(settings);
