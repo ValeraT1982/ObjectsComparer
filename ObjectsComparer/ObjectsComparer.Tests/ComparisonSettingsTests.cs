@@ -81,7 +81,7 @@ namespace ObjectsComparer.Tests
 
             Assert.AreEqual(true, listConfigurationOptions.CompareUnequalLists);
             Assert.AreEqual(true, listConfigurationOptions.ElementSearchMode == ListElementSearchMode.Key);
-            Assert.AreEqual(true, compareElementsByKeyOptions.ThrowKeyNotFound);
+            Assert.AreEqual(false, compareElementsByKeyOptions.ThrowKeyNotFound);
         }
 
         /// <summary>

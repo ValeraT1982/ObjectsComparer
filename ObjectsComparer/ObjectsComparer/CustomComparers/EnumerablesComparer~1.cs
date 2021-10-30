@@ -6,12 +6,11 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    internal class EnumerablesComparer<T> : AbstractComparer, IContextableComparer, IContextableComparer<T>
+    internal class EnumerablesComparer<T> : EnumerablesComparerBase, IContextableComparer, IContextableComparer<T>
     {
         private readonly IComparer<T> _comparer;
 
-        public EnumerablesComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory)
-            :base(settings, parentComparer, factory)
+        public EnumerablesComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory) : base(settings, parentComparer, factory)
         {
             _comparer = Factory.GetObjectsComparer<T>(Settings, this);
         }
@@ -21,11 +20,11 @@ namespace ObjectsComparer
             return CalculateDifferences(type, obj1, obj2, ComparisonContext.CreateRoot());
         }
 
-        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, ComparisonContext comparisonContext)
+        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, ComparisonContext listComparisonContext)
         {
-            if (comparisonContext is null)
+            if (listComparisonContext is null)
             {
-                throw new ArgumentNullException(nameof(comparisonContext));
+                throw new ArgumentNullException(nameof(listComparisonContext));
             }
 
             if (!type.InheritsFrom(typeof(IEnumerable<>)))
@@ -55,32 +54,44 @@ namespace ObjectsComparer
             var list1 = ((IEnumerable<T>)obj1).ToList();
             var list2 = ((IEnumerable<T>)obj2).ToList();
 
+            var listConfigurationOptions = ListConfigurationOptions.Default();
+            Settings.List.ConfigureOptionsAction?.Invoke(listComparisonContext, listConfigurationOptions);
+
             if (list1.Count != list2.Count)
             {
                 if (!type.GetTypeInfo().IsArray)
                 {
-                    yield return new Difference("", list1.Count.ToString(), list2.Count.ToString(),
-                        DifferenceTypes.NumberOfElementsMismatch);
+                    yield return AddDifferenceToComparisonContext(new Difference("", list1.Count().ToString(), list2.Count().ToString(), DifferenceTypes.NumberOfElementsMismatch), listComparisonContext);
                 }
 
-                yield break;
+                if (listConfigurationOptions.CompareUnequalLists == false)
+                {
+                    yield break;
+                }
             }
 
-            for (var i = 0; i < list2.Count; i++)
-            {
-                //List item has not got its MemberInfo, but has got its ancestor - list.
-                var context = ComparisonContext.Create(member: null, ancestor: comparisonContext);
+            //for (var i = 0; i < list2.Count; i++)
+            //{
+            //    //List item has not got its MemberInfo, but has got its ancestor - list.
+            //    var context = ComparisonContext.Create(member: null, ancestor: comparisonContext);
 
-                foreach (var failure in _comparer.CalculateDifferences(list1[i], list2[i], context))
-                {
-                    yield return failure.InsertPath($"[{i}]");
-                }
+            //    foreach (var failure in _comparer.CalculateDifferences(list1[i], list2[i], context))
+            //    {
+            //        yield return failure.InsertPath($"[{i}]");
+            //    }
+            //}
+
+            IEnumerable<Difference> failrues = CalculateDifferences(list1, list2, listComparisonContext, listConfigurationOptions);
+
+            foreach (var failrue in failrues)
+            {
+                yield return failrue;
             }
         }
 
-        public IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, ComparisonContext comparisonContext)
+        public IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, ComparisonContext listComparisonContext)
         {
-            return CalculateDifferences(((object)obj1 ?? obj2).GetType(), obj1, obj2, comparisonContext);
+            return CalculateDifferences(((object)obj1 ?? obj2).GetType(), obj1, obj2, listComparisonContext);
         }
     }
 }

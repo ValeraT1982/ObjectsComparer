@@ -60,107 +60,6 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void InequalityCount_InequalityProperty_CompareByKey()
-        {
-            var a1 = new A
-            {
-                NonGenericEnumerable = new ArrayList
-                {
-                    new B { Property1 = "Str2" },
-                    new B { Property1 = "Str1" } ,
-                    null
-                }
-            };
-
-            var a2 = new A
-            {
-                NonGenericEnumerable = new ArrayList
-                {
-                    new B { Property1 = "Str1" }
-                }
-            };
-
-            //ComparisonContext.BelongsTo(): Returns true if current context's Member belongs to the member or if it is the member itself.
-            //var r = PropertyHelper.GetMemberInfo<string>(() => new B().Property1);
-
-            var settings = new ComparisonSettings();
-
-            settings.List.Configure((ctx, options) =>
-            {
-                options.CompareUnequalLists = true;
-                options.CompareElementsByKey(keyOptions => keyOptions.UseKey(nameof(B.Property1)));
-            });
-
-            var comparer = new Comparer<A>(settings);
-            var rootContext = ComparisonContext.Create();
-            var differences = comparer.CalculateDifferences(a1, a2, rootContext).ToList();
-
-            CollectionAssert.IsNotEmpty(differences);
-            Assert.AreEqual("NonGenericEnumerable", differences.First().MemberPath);
-            Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences.First().DifferenceType);
-            Assert.AreEqual("3", differences.First().Value1);
-            Assert.AreEqual("1", differences.First().Value2);
-            Assert.AreEqual(DifferenceTypes.MissedElementInSecondObject, differences[1].DifferenceType);
-            Assert.AreEqual("NonGenericEnumerable[Str2]", differences[1].MemberPath);
-            Assert.AreEqual(false, string.IsNullOrWhiteSpace(differences[1].Value1));
-            Assert.AreEqual(true, string.IsNullOrWhiteSpace(differences[1].Value2));
-            Assert.AreEqual(DifferenceTypes.MissedElementInSecondObject, differences[2].DifferenceType);
-            Assert.AreEqual("NonGenericEnumerable[NULL]", differences[2].MemberPath);
-            Assert.AreEqual(true, differences[2].Value2 == string.Empty);
-        }
-
-        [Test]
-        public void InequalityCount_InequalityProperty_CompareByKey2()
-        {
-            var a1 = new A
-            {
-                NonGenericEnumerable = new ArrayList
-                {
-                    new B { Property1 = "Str1" }
-                }
-            };
-
-            var a2 = new A
-            {
-                NonGenericEnumerable = new ArrayList
-                {
-                    new B { Property1 = "Str2" },
-                    new B { Property1 = "Str1" } ,
-                    null
-                }
-            };
-                        
-            //ComparisonContext.BelongsTo(): Returns true if current context's Member belongs to the member or if it is the member itself.
-            //var r = PropertyHelper.GetMemberInfo<string>(() => new B().Property1);
-
-            var settings = new ComparisonSettings();
-
-            settings.List.Configure((ctx, options) =>
-            {
-                options.CompareUnequalLists = true;
-                options.CompareElementsByKey(keyOptions => keyOptions.UseKey(nameof(B.Property1)));
-            });
-
-            var comparer = new Comparer<A>(settings);
-            var rootContext = ComparisonContext.Create();
-            var differences = comparer.CalculateDifferences(a1, a2, rootContext).ToList();
-
-            CollectionAssert.IsNotEmpty(differences);
-            Assert.AreEqual("NonGenericEnumerable", differences.First().MemberPath);
-            Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences.First().DifferenceType);
-            Assert.AreEqual("1", differences.First().Value1);
-            Assert.AreEqual("3", differences.First().Value2);
-            Assert.AreEqual(DifferenceTypes.MissedElementInFirstObject, differences[1].DifferenceType);
-            Assert.AreEqual("NonGenericEnumerable[Str2]", differences[1].MemberPath);
-            Assert.AreEqual(true, string.IsNullOrWhiteSpace(differences[1].Value1));
-            Assert.AreEqual(false, string.IsNullOrWhiteSpace(differences[1].Value2));
-            Assert.AreEqual(DifferenceTypes.MissedElementInFirstObject, differences[2].DifferenceType);
-            Assert.AreEqual("NonGenericEnumerable[NULL]", differences[2].MemberPath);
-            Assert.AreEqual(true, differences[2].Value2 == string.Empty);
-            Assert.AreEqual(true, differences[2].Value2 == string.Empty);
-        }
-
-        [Test]
         public void RightComparisonContextGraph()
         {
             var person1 = new Person
@@ -212,7 +111,7 @@ namespace ObjectsComparer.Tests
             settings.List.Configure(options =>
             {
                 options.CompareUnequalLists = true;
-                options.CompareElementsByKey();
+                //options.CompareElementsByKey();
             });
 
             var comparer = new Comparer<Person>(settings);
@@ -224,52 +123,6 @@ namespace ObjectsComparer.Tests
             var scontextAfterShrink = rootContext.ToJson();
         }
         
-        [Test]
-        public void InequalityCount_InequalityProperty_CompareByIndex()
-        {
-            var a1 = new A
-            {
-                NonGenericEnumerable = new ArrayList
-                {
-                    new B { Property1 = "Str2" },
-                    new B { Property1 = "Str1" } ,
-                    null
-                }
-            };
-
-            var a2 = new A 
-            {
-                NonGenericEnumerable = new ArrayList 
-                {
-                    new B { Property1 = "Str1" } 
-                } 
-            };
-
-            var settings = new ComparisonSettings();
-
-            settings.List.Configure((ctx, options) =>
-            {
-                options.CompareUnequalLists = true;
-            });
-
-            var comparer = new Comparer<A>(settings);
-            var rootContext = ComparisonContext.Create();
-            var differences = comparer.CalculateDifferences(a1, a2, rootContext).ToList();
-
-            CollectionAssert.IsNotEmpty(differences);
-            Assert.AreEqual("NonGenericEnumerable", differences.First().MemberPath);
-            Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences.First().DifferenceType);
-            Assert.AreEqual("3", differences.First().Value1);
-            Assert.AreEqual("1", differences.First().Value2);
-            Assert.AreEqual(DifferenceTypes.ValueMismatch, differences[1].DifferenceType);
-            Assert.AreEqual("NonGenericEnumerable[0].Property1", differences[1].MemberPath);
-            Assert.AreEqual("Str2", differences[1].Value1);
-            Assert.AreEqual("Str1", differences[1].Value2);
-            Assert.AreEqual(DifferenceTypes.MissedElementInSecondObject, differences[2].DifferenceType);
-            Assert.AreEqual(true, differences[2].Value1 != string.Empty);
-            Assert.AreEqual(true, differences[2].Value2 == string.Empty);
-        }
-
         [Test]
         public void NullElementsEquality()
         {
