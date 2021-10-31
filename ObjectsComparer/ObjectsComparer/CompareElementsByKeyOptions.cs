@@ -181,7 +181,7 @@ namespace ObjectsComparer
         /// To avoid possible confusion of the element key with the element index, the element key can be formatted with any text.<br/>
         /// For example, element key with value = 1 can be formatted as "Id=1".
         /// The formatted element key is then used as part of the <see cref="Difference.MemberPath"/> property, e.g. "Addresses[Id=1]".<br/>
-        /// By default, the element key will not be formatted.
+        /// By default the element key is not formatted.
         /// </summary>
         /// <param name="formatter">First parameter: Element index. Second parameter: Element key. Return value: Formatted key.</param>
         public void FormatElementKey(Func<int, object, string> formatter)

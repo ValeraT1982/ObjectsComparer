@@ -108,6 +108,30 @@ namespace ObjectsComparer
         }
 
         /// <summary>
+        /// Returns differences directly or indirectly related to this context.
+        /// </summary>
+        /// <param name="recursive">If value is true, it also looks for <see cref="Differences"/> in <see cref="Descendants"/>.</param>
+        public IEnumerable<Difference> GetDifferences(bool recursive)
+        {
+            foreach (var difference in _differences)
+            {
+                yield return difference;
+            }
+
+            if (recursive)
+            {
+                foreach (var descendant in _descendants)
+                {
+                    var differences = descendant.GetDifferences(true);
+                    foreach (var difference in differences)
+                    {
+                        yield return difference;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Removes all <see cref="Descendants"/> which have no <see cref="Differences"/> directly or indirectly in their <see cref="Descendants"/>.
         /// </summary>
         public void Shrink()
