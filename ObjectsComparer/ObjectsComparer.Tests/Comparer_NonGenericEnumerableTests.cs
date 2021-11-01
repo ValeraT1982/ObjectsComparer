@@ -198,7 +198,6 @@ namespace ObjectsComparer.Tests
         [Test]
         public void NullElementsEquality_CompareUnequalLists()
         {
-            //DaN
             var a1 = new A { NonGenericEnumerable = new ArrayList { null } };
             var a2 = new A { NonGenericEnumerable = new ArrayList { null, null } };
 
@@ -222,7 +221,6 @@ namespace ObjectsComparer.Tests
         [Test]
         public void NullElementsEquality_CompareUnequalLists_CompareByKey()
         {
-            //DaN
             var a1 = new A { NonGenericEnumerable = new ArrayList { null } };
             var a2 = new A { NonGenericEnumerable = new ArrayList { null, null } };
 
@@ -236,14 +234,10 @@ namespace ObjectsComparer.Tests
             var comparer = new Comparer<A>(settings);
             var isEqual = comparer.Compare(a1, a2, out var diffs);
             var differences = diffs.ToArray();
-            Assert.IsTrue(differences.Count() == 2);
+            Assert.IsTrue(differences.Count() == 1);
             Assert.IsTrue(differences[0].DifferenceType == DifferenceTypes.NumberOfElementsMismatch);
             Assert.IsTrue(differences[0].Value1 == "1");
             Assert.IsTrue(differences[0].Value2 == "2");
-            Assert.IsTrue(differences[1].DifferenceType == DifferenceTypes.MissedElementInFirstObject);
-            Assert.IsTrue(differences[1].MemberPath == "NonGenericEnumerable[1]");
-            Assert.IsTrue(differences[1].Value1 == string.Empty);
-            Assert.IsTrue(differences[1].Value2 == string.Empty);
             Assert.IsFalse(isEqual);
         }
 
@@ -252,6 +246,7 @@ namespace ObjectsComparer.Tests
         {
             var a1 = new A { NonGenericEnumerable = new ArrayList { null, "Str1" } };
             var a2 = new A { NonGenericEnumerable = new ArrayList { "Str2", null } };
+
             var comparer = new Comparer<A>();
 
             var differences = comparer.CalculateDifferences(a1, a2).ToList();
@@ -263,6 +258,36 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual("NonGenericEnumerable[1]", differences[1].MemberPath);
             Assert.AreEqual("Str1", differences[1].Value1);
             Assert.AreEqual(string.Empty, differences[1].Value2);
+        }
+
+        [Test]
+        public void NullAndNotNullElementsInequality_CompareByKey()
+        {
+            var a1 = new A { NonGenericEnumerable = new ArrayList { null, "Str1" } };
+            var a2 = new A { NonGenericEnumerable = new ArrayList { "Str2", null } };
+
+            var settings = new ComparisonSettings();
+            settings.List.Configure(listOptions =>
+            {
+                listOptions.CompareElementsByKey(); 
+            });
+
+            var comparer = new Comparer<A>(settings);
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            Assert.AreEqual(2, differences.Count);
+
+            //Missed element given a key in second object.
+            Assert.AreEqual(DifferenceTypes.MissedElementInSecondObject, differences[0].DifferenceType);
+            Assert.AreEqual("NonGenericEnumerable[Str1]", differences[0].MemberPath);            
+            Assert.AreEqual("Str1", differences[0].Value1);
+            Assert.AreEqual(string.Empty, differences[0].Value2);
+
+            Assert.AreEqual(DifferenceTypes.MissedElementInFirstObject, differences[1].DifferenceType);
+            Assert.AreEqual("NonGenericEnumerable[Str2]", differences[0].MemberPath);
+            Assert.AreEqual(string.Empty, differences[0].Value1);
+            Assert.AreEqual("Str2", differences[0].Value2);
         }
 
         [Test]
