@@ -36,7 +36,7 @@ namespace ObjectsComparer
         /// </summary>
         protected virtual IEnumerable<Difference> CalculateDifferencesByKey<T>(IList<T> array1, IList<T> array2, ComparisonContext listComparisonContext, ListConfigurationOptions listConfigurationOptions)
         {
-            Debug.WriteLine(nameof(CalculateDifferencesByKey));
+            Debug.WriteLine($"{nameof(CalculateDifferencesByKey)}: {array1?.GetType().Name}");
 
             var keyOptions = CompareElementsByKeyOptions.Default();
             listConfigurationOptions.KeyOptionsAction?.Invoke(keyOptions);
@@ -122,7 +122,6 @@ namespace ObjectsComparer
 
                 if (array1.Any(elm1 => object.Equals(element2Key, keyOptions.KeyProvider(elm1))) == false)
                 {
-                    //var elementComparisonContext = ComparisonContext.Create(ancestor: listComparisonContext);
                     var formattedElement2Key = keyOptions.GetFormattedElementKey(element2Index, element2Key);
                     var valueComparer2 = OverridesCollection.GetComparer(element2.GetType()) ?? DefaultValueComparer;
                     yield return AddDifferenceToComparisonContext(new Difference($"[{formattedElement2Key}]", string.Empty, valueComparer2.ToString(element2), DifferenceTypes.MissedElementInFirstObject), elementComparisonContext);
@@ -135,7 +134,7 @@ namespace ObjectsComparer
         /// </summary>
         protected virtual IEnumerable<Difference> CalculateDifferencesByIndex<T>(IList<T> array1, IList<T> array2, ComparisonContext listComparisonContext)
         {
-            Debug.WriteLine(nameof(CalculateDifferencesByIndex));
+            Debug.WriteLine($"{nameof(CalculateDifferencesByIndex)}: {array1?.GetType().Name}");
 
             int array1Count = array1.Count();
             int array2Count = array2.Count();

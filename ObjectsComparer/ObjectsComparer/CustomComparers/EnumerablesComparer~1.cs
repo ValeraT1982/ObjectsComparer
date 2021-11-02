@@ -70,17 +70,6 @@ namespace ObjectsComparer
                 }
             }
 
-            //for (var i = 0; i < list2.Count; i++)
-            //{
-            //    //List item has not got its MemberInfo, but has got its ancestor - list.
-            //    var context = ComparisonContext.Create(member: null, ancestor: comparisonContext);
-
-            //    foreach (var failure in _comparer.CalculateDifferences(list1[i], list2[i], context))
-            //    {
-            //        yield return failure.InsertPath($"[{i}]");
-            //    }
-            //}
-
             IEnumerable<Difference> failrues = CalculateDifferences(list1, list2, listComparisonContext, listConfigurationOptions);
 
             foreach (var failrue in failrues)
