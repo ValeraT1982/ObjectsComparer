@@ -278,7 +278,6 @@ namespace ObjectsComparer.Tests
 
             Assert.AreEqual(2, differences.Count);
 
-            //Missed element given a key in second object.
             Assert.AreEqual(DifferenceTypes.MissedElementInSecondObject, differences[0].DifferenceType);
             Assert.AreEqual("NonGenericEnumerable[Str1]", differences[0].MemberPath);            
             Assert.AreEqual("Str1", differences[0].Value1);

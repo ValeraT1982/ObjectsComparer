@@ -22,6 +22,25 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
+        public void ValueTypeArrayEquality_CompareByKey()
+        {
+            var a1 = new A { IntArray = new[] { 2, 1 } };
+            var a2 = new A { IntArray = new[] { 1, 2 } };
+
+            var settings = new ComparisonSettings();
+            settings.List.Configure(listOptions =>
+            {
+                listOptions.CompareElementsByKey();
+            });
+
+            var comparer = new Comparer<A>(settings);
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsTrue(isEqual);
+        }
+
+        [Test]
         public void PrimitiveTypeArrayInequalityCount()
         {
             var a1 = new A { IntArray = new[] { 1, 2 } };
@@ -35,6 +54,40 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual("IntArray.Length", differences[0].MemberPath);
             Assert.AreEqual("2", differences[0].Value1);
             Assert.AreEqual("3", differences[0].Value2);
+        }
+
+        [Test]
+        public void PrimitiveTypeArrayInequalityCount_CompareUnequalLists()
+        {
+            var a1 = new A { IntArray = new[] { 1, 2 } };
+            var a2 = new A { IntArray = new[] { 1, 2, 3 } };
+
+            var settings = new ComparisonSettings();
+            settings.List.Configure(listOptions =>
+            {
+                listOptions.CompareUnequalLists = true;
+            });
+
+            var comparer = new Comparer<A>(settings);
+            var rootCtx = ComparisonContext.CreateRoot();
+            var differences = comparer.CalculateDifferences(a1, a2, rootCtx).ToList();
+
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(2, differences.Count);
+
+            Assert.AreEqual(DifferenceTypes.MissedElementInFirstObject, differences[0].DifferenceType);
+            Assert.AreEqual("IntArray[2]", differences[0].MemberPath);
+            Assert.AreEqual(string.Empty, differences[0].Value1);
+            Assert.AreEqual("3", differences[0].Value2);            
+
+            Assert.AreEqual("IntArray.Length", differences[1].MemberPath);
+            Assert.AreEqual("2", differences[1].Value1);
+            Assert.AreEqual("3", differences[1].Value2);
+
+            var diffsFromCtx = rootCtx.GetDifferences(recursive: true).ToList();
+            Assert.AreEqual(2, diffsFromCtx.Count);
+            Assert.AreEqual(differences[0], diffsFromCtx[0]);
+            Assert.AreEqual(differences[1], diffsFromCtx[1]);
         }
 
         [Test]
