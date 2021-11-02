@@ -71,7 +71,7 @@ namespace ObjectsComparer
                     continue;
                 }
 
-                var formattedElement1Key = keyOptions.GetFormattedElementKey(element1Index, element1Key);
+                var formattedElement1Key = keyOptions.GetFormattedElementKey(element1Index, element1Key, element1);
 
                 if (array2.Any(elm2 => object.Equals(element1Key, keyOptions.KeyProvider(elm2))))
                 {
@@ -122,7 +122,7 @@ namespace ObjectsComparer
 
                 if (array1.Any(elm1 => object.Equals(element2Key, keyOptions.KeyProvider(elm1))) == false)
                 {
-                    var formattedElement2Key = keyOptions.GetFormattedElementKey(element2Index, element2Key);
+                    var formattedElement2Key = keyOptions.GetFormattedElementKey(element2Index, element2Key, element2);
                     var valueComparer2 = OverridesCollection.GetComparer(element2.GetType()) ?? DefaultValueComparer;
                     yield return AddDifferenceToComparisonContext(new Difference($"[{formattedElement2Key}]", string.Empty, valueComparer2.ToString(element2), DifferenceTypes.MissedElementInFirstObject), elementComparisonContext);
                 }

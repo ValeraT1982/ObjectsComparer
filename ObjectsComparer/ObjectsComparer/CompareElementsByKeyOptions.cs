@@ -35,7 +35,7 @@ namespace ObjectsComparer
         /// <summary>
         /// See <see cref="FormatElementKey(Func{int, object, string})"/>.
         /// </summary>
-        Func<int, object, string> ElementKeyFormatter { get; set; }
+        Func<int, object, object, string> ElementKeyFormatter { get; set; }
 
         /// <summary>
         /// See <see cref="FormatNullElementIdentifier(Func{int, string})"/>.
@@ -144,14 +144,14 @@ namespace ObjectsComparer
         /// <summary>
         /// Returns optional formatted or unformatted <paramref name="elementKey"/>. See <see cref="FormatElementKey(Func{int, object, string})"/>.
         /// </summary>
-        internal string GetFormattedElementKey(int elementIndex, object elementKey)
+        internal string GetFormattedElementKey(int elementIndex, object elementKey, object element)
         {
             if (elementKey is null)
             {
                 throw new ArgumentNullException(nameof(elementKey));
             }
 
-            var formattedKey = ElementKeyFormatter?.Invoke(elementIndex, elementKey);
+            var formattedKey = ElementKeyFormatter?.Invoke(elementIndex, elementKey, element);
 
             if (string.IsNullOrWhiteSpace(formattedKey))
             {
@@ -178,13 +178,31 @@ namespace ObjectsComparer
         }
 
         /// <summary>
+        /// Formats element key. For more info, see <see cref="FormatElementKey(Func{int, object, object, string})"/>.
+        /// </summary>
+        /// <param name="formatter">Parameter: Element key. Return value: Formatted element key.</param>
+        public void FormatElementKey(Func<object, string> formatter)
+        {
+            FormatElementKey((elementIndex, elementKey, element) => formatter(elementKey));
+        }
+
+        /// <summary>
+        /// Formats element key. For more info, see <see cref="FormatElementKey(Func{int, object, object, string})"/>.
+        /// </summary>
+        /// <param name="formatter">First parameter: Element index. Second parameter: Element key. Return value: Formatted element key.</param>
+        public void FormatElementKey(Func<int, object, string> formatter)
+        {
+            FormatElementKey((elementIndex, elementKey, element) => formatter(elementIndex, elementKey));
+        }
+
+        /// <summary>
         /// To avoid possible confusion of the element key with the element index, the element key can be formatted with any text.<br/>
         /// For example, element key with value = 1 can be formatted as "Id=1".
         /// The formatted element key is then used as part of the <see cref="Difference.MemberPath"/> property, e.g. "Addresses[Id=1]".<br/>
         /// By default the element key is not formatted.
         /// </summary>
-        /// <param name="formatter">First parameter: Element index. Second parameter: Element key. Return value: Formatted key.</param>
-        public void FormatElementKey(Func<int, object, string> formatter)
+        /// <param name="formatter">First parameter: Element index. Second parameter: Element key. Third parameter: Element. Return value: Formatted element key.</param>
+        public void FormatElementKey(Func<int, object, object, string> formatter)
         {
             if (formatter is null)
             {

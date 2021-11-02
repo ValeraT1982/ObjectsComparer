@@ -146,7 +146,7 @@ namespace ObjectsComparer.Tests
             var settings = new ComparisonSettings();
             settings.List.Configure(listOptions =>
             {
-                listOptions.CompareElementsByKey(keyOptions => keyOptions.FormatElementKey((idx, elementKey) => $"Key={elementKey}"));
+                listOptions.CompareElementsByKey(keyOptions => keyOptions.FormatElementKey(elementKey => $"Key={elementKey}"));
             });
 
             var comparer = new Comparer<A>(settings);
@@ -400,12 +400,11 @@ namespace ObjectsComparer.Tests
         [Test]
         public void ClassArrayInequalityProperty_CompareByKey_FormatKey()
         {
-            //!!!
             var a1 = new A { ArrayOfB = new[] { new B { Property1 = "Str2", Id = 4 }, new B { Property1 = "Str1", Id = 9 } } };
             var a2 = new A { ArrayOfB = new[] { new B { Property1 = "Str1", Id = 9 }, new B { Property1 = "Str3", Id = 4 } } };
 
             var settings = new ComparisonSettings();
-            settings.List.Configure(listOptions => listOptions.CompareElementsByKey(keyOptions => keyOptions.FormatElementKey((idx, elementKey) => $"Key={elementKey}")));
+            settings.List.Configure(listOptions => listOptions.CompareElementsByKey(keyOptions => keyOptions.FormatElementKey(elementKey => $"Key={elementKey}")));
 
             var comparer = new Comparer<A>(settings);
 
@@ -423,6 +422,22 @@ namespace ObjectsComparer.Tests
             var a1 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
             var a2 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
             var comparer = new Comparer<A>();
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsTrue(isEqual);
+        }
+
+        [Test]
+        public void CollectionEquality_CompareByKey()
+        {
+            var a1 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str2", Id = 1 }, new B { Property1 = "Str1", Id = 2 } } };
+            var a2 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1", Id = 2 }, new B { Property1 = "Str2", Id = 1 } } };
+
+            var settings = new ComparisonSettings();
+            settings.List.Configure(listOptions => listOptions.CompareElementsByKey());
+
+            var comparer = new Comparer<A>(settings);
 
             var isEqual = comparer.Compare(a1, a2);
 
