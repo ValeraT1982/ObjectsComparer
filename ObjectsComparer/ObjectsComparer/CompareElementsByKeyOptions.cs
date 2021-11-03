@@ -151,6 +151,11 @@ namespace ObjectsComparer
                 throw new ArgumentNullException(nameof(elementKey));
             }
 
+            if (element is null)
+            {
+                throw new ArgumentNullException(nameof(element));
+            }
+
             var formattedKey = ElementKeyFormatter?.Invoke(elementIndex, elementKey, element);
 
             if (string.IsNullOrWhiteSpace(formattedKey))
@@ -183,6 +188,11 @@ namespace ObjectsComparer
         /// <param name="formatter">Parameter: Element key. Return value: Formatted element key.</param>
         public void FormatElementKey(Func<object, string> formatter)
         {
+            if (formatter is null)
+            {
+                throw new ArgumentNullException(nameof(formatter));
+            }
+
             FormatElementKey((elementIndex, elementKey, element) => formatter(elementKey));
         }
 
@@ -192,6 +202,11 @@ namespace ObjectsComparer
         /// <param name="formatter">First parameter: Element index. Second parameter: Element key. Return value: Formatted element key.</param>
         public void FormatElementKey(Func<int, object, string> formatter)
         {
+            if (formatter is null)
+            {
+                throw new ArgumentNullException(nameof(formatter));
+            }
+
             FormatElementKey((elementIndex, elementKey, element) => formatter(elementIndex, elementKey));
         }
 

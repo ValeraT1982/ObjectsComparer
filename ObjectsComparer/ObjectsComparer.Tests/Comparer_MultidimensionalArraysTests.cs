@@ -26,6 +26,35 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
+        public void IntOfIntInequality1_CompareByKey()
+        {
+            //???
+            var a1 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 3 } } };
+            var a2 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 3, 1 } } };
+
+            var settings = new ComparisonSettings();
+            settings.List.Configure((ctx, listOptions) => 
+            {
+                if (ctx.Member?.Name == "IntOfInt") 
+                {
+
+                }
+                else
+                {
+                    listOptions.CompareElementsByKey();
+                }
+            });
+
+            var comparer = new Comparer<MultidimensionalArrays>(settings);
+
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsTrue(isEqual);
+            CollectionAssert.IsEmpty(differences);
+        }
+
+        [Test]
         public void IntOfIntInequality2()
         {
             var a1 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 2 }, new[] { 3, 4 } } };

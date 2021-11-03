@@ -36,7 +36,7 @@ namespace ObjectsComparer
         /// </summary>
         protected virtual IEnumerable<Difference> CalculateDifferencesByKey<T>(IList<T> array1, IList<T> array2, ComparisonContext listComparisonContext, ListConfigurationOptions listConfigurationOptions)
         {
-            Debug.WriteLine($"{nameof(CalculateDifferencesByKey)}: {array1?.GetType().Name}");
+            Debug.WriteLine($"{GetType().Name}.{nameof(CalculateDifferencesByKey)}: {array1?.GetType().Name}");
 
             var keyOptions = CompareElementsByKeyOptions.Default();
             listConfigurationOptions.KeyOptionsAction?.Invoke(keyOptions);
@@ -134,7 +134,7 @@ namespace ObjectsComparer
         /// </summary>
         protected virtual IEnumerable<Difference> CalculateDifferencesByIndex<T>(IList<T> array1, IList<T> array2, ComparisonContext listComparisonContext)
         {
-            Debug.WriteLine($"{nameof(CalculateDifferencesByIndex)}: {array1?.GetType().Name}");
+            Debug.WriteLine($"{GetType().Name}.{nameof(CalculateDifferencesByIndex)}: {array1?.GetType().Name}");
 
             int array1Count = array1.Count();
             int array2Count = array2.Count();

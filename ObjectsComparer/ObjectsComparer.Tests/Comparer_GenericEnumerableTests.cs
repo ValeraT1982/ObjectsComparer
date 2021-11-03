@@ -4,6 +4,7 @@ using NUnit.Framework;
 using ObjectsComparer.Tests.TestClasses;
 using System.Collections.Generic;
 using ObjectsComparer.Exceptions;
+using System;
 
 namespace ObjectsComparer.Tests
 {
@@ -31,7 +32,7 @@ namespace ObjectsComparer.Tests
             var settings = new ComparisonSettings();
             settings.List.Configure(listOptions =>
             {
-                listOptions.CompareElementsByKey();
+                listOptions.CompareElementsByKey(opt => opt.UseKey("MyKey"));
             });
 
             var comparer = new Comparer<A>(settings);
@@ -113,10 +114,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { IntArray = new[] { 1, 3 } };
 
             var settings = new ComparisonSettings();
-            settings.List.Configure(listOptions =>
-            {
-                listOptions.CompareElementsByKey();
-            });
+            settings.List.Configure(listOptions => listOptions.CompareElementsByKey());
 
             var comparer = new Comparer<A>(settings);
 
@@ -190,10 +188,7 @@ namespace ObjectsComparer.Tests
             var a1 = new A();
             var a2 = new A { IntArray = new int[0] };
             var settings = new ComparisonSettings();
-            settings.List.Configure(listOptions =>
-            {
-                listOptions.CompareElementsByKey();
-            });
+            settings.List.Configure(listOptions => listOptions.CompareElementsByKey());
 
             var comparer = new Comparer<A>(settings);
 
@@ -228,10 +223,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A();
 
             var settings = new ComparisonSettings();
-            settings.List.Configure(listOptions =>
-            {
-                listOptions.CompareElementsByKey();
-            });
+            settings.List.Configure(listOptions => listOptions.CompareElementsByKey());
 
             var comparer = new Comparer<A>(settings);
 
@@ -262,10 +254,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { ArrayOfB = new[] { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
 
             var settings = new ComparisonSettings();
-            settings.List.Configure(listOptions =>
-            {
-                listOptions.CompareElementsByKey();
-            });
+            settings.List.Configure(listOptions => listOptions.CompareElementsByKey());
 
             var comparer = new Comparer<A>(settings);
 
@@ -285,11 +274,14 @@ namespace ObjectsComparer.Tests
             settings.List.Configure(listOptions => listOptions.CompareElementsByKey(keyOptions => keyOptions.ThrowKeyNotFound = false));
 
             var comparer = new Comparer<A>(settings);
+            bool isEqual = false;
 
             Assert.DoesNotThrow(() =>
             {
-                var isEqual = comparer.Compare(a1, a2);
+                isEqual = comparer.Compare(a1, a2);
             });
+
+            Assert.IsTrue(isEqual);
         }
 
         [Test]
@@ -400,18 +392,18 @@ namespace ObjectsComparer.Tests
         [Test]
         public void ClassArrayInequalityProperty_CompareByKey_FormatKey()
         {
-            var a1 = new A { ArrayOfB = new[] { new B { Property1 = "Str2", Id = 4 }, new B { Property1 = "Str1", Id = 9 } } };
-            var a2 = new A { ArrayOfB = new[] { new B { Property1 = "Str1", Id = 9 }, new B { Property1 = "Str3", Id = 4 } } };
+            var a1 = new A { ArrayOfB = new[] { new B { Property1 = "Str2", Id = 2 }, new B { Property1 = "Str1", Id = 1 } } };
+            var a2 = new A { ArrayOfB = new[] { new B { Property1 = "Str1", Id = 1 }, new B { Property1 = "Str3", Id = 2 } } };
 
             var settings = new ComparisonSettings();
-            settings.List.Configure(listOptions => listOptions.CompareElementsByKey(keyOptions => keyOptions.FormatElementKey(elementKey => $"Key={elementKey}")));
+            settings.List.Configure(listOptions => listOptions.CompareElementsByKey(keyOptions => keyOptions.FormatElementKey(elementKey => $"Id={elementKey}")));
 
             var comparer = new Comparer<A>(settings);
 
             var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
-            CollectionAssert.IsNotEmpty(differences);
-            Assert.AreEqual("ArrayOfB[Key=4].Property1", differences.First().MemberPath);
+            Assert.AreEqual(1, differences.Count);
+            Assert.AreEqual("ArrayOfB[Id=2].Property1", differences.First().MemberPath);
             Assert.AreEqual("Str2", differences.First().Value1);
             Assert.AreEqual("Str3", differences.First().Value2);
         }
@@ -462,11 +454,64 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
+        public void CollectionInequalityCount_CompareUnequalLists()
+        {
+            var a1 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
+            var a2 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1" } } };
+
+            var settings = new ComparisonSettings();
+            settings.List.Configure(listOptions =>             
+            {
+                listOptions.CompareUnequalLists = true;
+            });
+
+            var comparer = new Comparer<A>(settings);
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(2, differences.Count);
+
+            Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences[0].DifferenceType);
+            Assert.AreEqual("CollectionOfB", differences[0].MemberPath);
+            Assert.AreEqual("2", differences[0].Value1);
+            Assert.AreEqual("1", differences[0].Value2);
+
+            Assert.AreEqual(DifferenceTypes.MissedElementInSecondObject, differences[1].DifferenceType);
+            Assert.AreEqual("CollectionOfB[1]", differences[1].MemberPath);
+            Assert.AreEqual("ObjectsComparer.Tests.TestClasses.B", differences[1].Value1);
+            Assert.AreEqual("", differences[1].Value2);
+        }
+
+        [Test]
         public void CollectionAndNullInequality()
         {
             var a1 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
             var a2 = new A();
             var comparer = new Comparer<A>();
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(1, differences.Count);
+            Assert.AreEqual("CollectionOfB", differences[0].MemberPath);
+            Assert.AreEqual(a1.CollectionOfB.ToString(), differences[0].Value1);
+            Assert.AreEqual(string.Empty, differences[0].Value2);
+        }
+
+        [Test]
+        public void CollectionAndNullInequality_CompareByKey()
+        {
+            var a1 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
+            var a2 = new A();
+
+            var settings = new ComparisonSettings();
+            settings.List.Configure(listOptions =>
+            {
+                listOptions.CompareElementsByKey();
+            });
+
+            var comparer = new Comparer<A>(settings);
 
             var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
@@ -494,6 +539,29 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
+        public void NullAndCollectionInequality_CompareByKey()
+        {
+            var a1 = new A();
+            var a2 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
+
+            var settings = new ComparisonSettings();
+            settings.List.Configure(listOptions =>
+            {
+                listOptions.CompareElementsByKey();
+            });
+
+            var comparer = new Comparer<A>(settings);
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(1, differences.Count);
+            Assert.AreEqual("CollectionOfB", differences[0].MemberPath);
+            Assert.AreEqual(string.Empty, differences[0].Value1);
+            Assert.AreEqual(a2.CollectionOfB.ToString(), differences[0].Value2);
+        }
+
+        [Test]
         public void CollectionInequalityProperty()
         {
             var a1 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
@@ -509,11 +577,46 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
+        public void CollectionInequalityProperty_CompareByKey()
+        {
+            var a1 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str2", Id = 1 }, new B { Property1 = "Str1", Id = 2 } } };
+            var a2 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1", Id = 2 }, new B { Property1 = "Str3", Id = 1 } } };
+
+            var settings = new ComparisonSettings();
+            settings.List.Configure(listOptions => listOptions.CompareElementsByKey());
+            
+            var comparer = new Comparer<A>(settings);
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual("CollectionOfB[1].Property1", differences.First().MemberPath);
+            Assert.AreEqual("Str2", differences.First().Value1);
+            Assert.AreEqual("Str3", differences.First().Value2);
+        }
+
+        [Test]
         public void ClassImplementsCollectionEquality()
         {
             var a1 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
             var a2 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
             var comparer = new Comparer<A>();
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsTrue(isEqual);
+        }
+
+        [Test]
+        public void ClassImplementsCollectionEquality_CompareByKey()
+        {
+            var a1 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str1", Id = 1 }, new B { Property1 = "Str2", Id = 2 } } };
+            var a2 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str1", Id = 1 }, new B { Property1 = "Str2", Id = 2 } } };
+
+            var settings = new ComparisonSettings();
+            settings.List.Configure(listOptions => listOptions.CompareElementsByKey());
+
+            var comparer = new Comparer<A>(settings);
 
             var isEqual = comparer.Compare(a1, a2);
 
@@ -538,6 +641,64 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
+        public void ClassImplementsCollectionInequalityCount_CompareUnequalLists()
+        {
+            var a1 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
+            var a2 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str1" } } };
+
+            var settings = new ComparisonSettings();
+            settings.List.Configure(listOptions => listOptions.CompareUnequalLists = true);
+
+            var comparer = new Comparer<A>(settings);
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(2, differences.Count);
+
+            Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences[0].DifferenceType);
+            Assert.AreEqual("ClassImplementsCollectionOfB", differences[0].MemberPath);
+            Assert.AreEqual("2", differences[0].Value1);
+            Assert.AreEqual("1", differences[0].Value2);
+
+            Assert.AreEqual(DifferenceTypes.MissedElementInSecondObject, differences[1].DifferenceType);
+            Assert.AreEqual("ClassImplementsCollectionOfB[1]", differences[1].MemberPath);
+            Assert.AreEqual("ObjectsComparer.Tests.TestClasses.B", differences[1].Value1);
+            Assert.AreEqual("", differences[1].Value2);
+        }
+
+        [Test]
+        public void ClassImplementsCollectionInequalityCount_CompareUnequalLists_CompareByKey()
+        {
+            var a1 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str1", Id = 1 }, new B { Property1 = "Str2", Id = 2 } } };
+            var a2 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str1", Id = 1 } } };
+
+            var settings = new ComparisonSettings();
+            settings.List.Configure(listOptions => 
+            {
+                listOptions.CompareUnequalLists = true;
+                listOptions.CompareElementsByKey();
+            });
+
+            var comparer = new Comparer<A>(settings);
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(2, differences.Count);
+
+            Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences[0].DifferenceType);
+            Assert.AreEqual("ClassImplementsCollectionOfB", differences[0].MemberPath);
+            Assert.AreEqual("2", differences[0].Value1);
+            Assert.AreEqual("1", differences[0].Value2);
+
+            Assert.AreEqual(DifferenceTypes.MissedElementInSecondObject, differences[1].DifferenceType);
+            Assert.AreEqual("ClassImplementsCollectionOfB[2]", differences[1].MemberPath);
+            Assert.AreEqual("ObjectsComparer.Tests.TestClasses.B", differences[1].Value1);
+            Assert.AreEqual("", differences[1].Value2);
+        }
+
+        [Test]
         public void ClassImplementsCollectionInequalityProperty()
         {
             var a1 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
@@ -548,6 +709,29 @@ namespace ObjectsComparer.Tests
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("ClassImplementsCollectionOfB[1].Property1", differences.First().MemberPath);
+            Assert.AreEqual("Str2", differences.First().Value1);
+            Assert.AreEqual("Str3", differences.First().Value2);
+        }
+
+        [Test]
+        public void ClassImplementsCollectionInequalityProperty_CompareByKey()
+        {
+            var a1 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str1", Id = 1 }, new B { Property1 = "Str2", Id = 2 } } };
+            var a2 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str1", Id = 1 }, new B { Property1 = "Str3", Id = 2 } } };
+
+            var settings = new ComparisonSettings();
+            settings.List.Configure(listOptions =>
+            {
+                listOptions.CompareUnequalLists = true;
+                listOptions.CompareElementsByKey();
+            });
+
+            var comparer = new Comparer<A>(settings);
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual("ClassImplementsCollectionOfB[2].Property1", differences.First().MemberPath);
             Assert.AreEqual("Str2", differences.First().Value1);
             Assert.AreEqual("Str3", differences.First().Value2);
         }
@@ -641,6 +825,74 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
+        public void CollectionOfBCountInequality1_CompareElementsByKey()
+        {
+            var a1 = new A
+            {
+                EnumerableOfB = new[] { new B { Property1 = "B1" } }
+            };
+            var a2 = new A
+            {
+                EnumerableOfB = new[] { new B { Property1 = "B1" }, new B { Property1 = "B2" } }
+            };
+
+            var settings = new ComparisonSettings();
+            settings.List.Configure(listOptions => listOptions.CompareElementsByKey());
+
+            var comparer = new Comparer<A>(settings);
+
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(1, differences.Count);
+            Assert.AreEqual("EnumerableOfB", differences.First().MemberPath);
+            Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences.First().DifferenceType);
+            Assert.AreEqual("1", differences.First().Value1);
+            Assert.AreEqual("2", differences.First().Value2);
+        }
+
+        [Test]
+        public void CollectionOfBCountInequality1_CompareElementsByKey_CompareUnequalLists()
+        {
+            var a1 = new A
+            {
+                EnumerableOfB = new[] { new B { Property1 = "B1", Id = 1 } }
+            };
+            var a2 = new A
+            {
+                EnumerableOfB = new[] { new B { Property1 = "B1", Id = 1 }, new B { Property1 = "B2", Id = 2 } }
+            };
+
+            var settings = new ComparisonSettings();
+            settings.List.Configure(listOptions =>
+            {
+                listOptions.CompareUnequalLists = true;
+                listOptions.CompareElementsByKey();
+            });
+
+            var comparer = new Comparer<A>(settings);
+
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(2, differences.Count);
+
+            Assert.AreEqual("EnumerableOfB", differences.First().MemberPath);
+            Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences.First().DifferenceType);
+            Assert.AreEqual("1", differences.First().Value1);
+            Assert.AreEqual("2", differences.First().Value2);
+
+            Assert.AreEqual("EnumerableOfB[2]", differences[1].MemberPath);
+            Assert.AreEqual(DifferenceTypes.MissedElementInFirstObject, differences[1].DifferenceType);
+            Assert.AreEqual("", differences[1].Value1);
+            Assert.AreEqual("ObjectsComparer.Tests.TestClasses.B", differences[1].Value2);
+        }
+
+        [Test]
         public void CollectionOfBCountInequality2()
         {
             var a1 = new A
@@ -650,7 +902,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A
             {
                 EnumerableOfB = new B[0]
-            };
+            };                        
             var comparer = new Comparer<A>();
 
             var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
@@ -665,6 +917,43 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual("0", differences.First().Value2);
         }
 
+        [Test]
+        public void CollectionOfBCountInequality2_CompareByKey()
+        {
+            var a1 = new A
+            {
+                EnumerableOfB = new[] { new B { Property1 = "B1", Id = 1 } }
+            };
+            var a2 = new A
+            {
+                EnumerableOfB = new B[0]
+            };
+
+            var settings = new ComparisonSettings();
+            settings.List.Configure(listOptions =>
+            {
+                listOptions.CompareUnequalLists = true;
+                listOptions.CompareElementsByKey();
+            });
+            var comparer = new Comparer<A>(settings);
+
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(2, differences.Count);
+
+            Assert.AreEqual("EnumerableOfB", differences.First().MemberPath);
+            Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences.First().DifferenceType);
+            Assert.AreEqual("1", differences.First().Value1);
+            Assert.AreEqual("0", differences.First().Value2);
+
+            Assert.AreEqual("EnumerableOfB[1]", differences[1].MemberPath);
+            Assert.AreEqual(DifferenceTypes.MissedElementInSecondObject, differences[1].DifferenceType);
+            Assert.AreEqual("ObjectsComparer.Tests.TestClasses.B", differences[1].Value1);
+            Assert.AreEqual("", differences[1].Value2);
+        }
 
         [Test]
         public void HashSetEqualitySameOrder()
