@@ -1070,6 +1070,105 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
+        public void CompareAsIList_CompareUnequalLists()
+        {
+            var list1 = new List<int> { 1, 2 };
+            var list2 = new List<int> { 1 };
+
+            var settings = new ComparisonSettings();
+            settings.List.Configure(listOptions => listOptions.CompareUnequalLists = true);
+
+            var comparer = new Comparer<IList<int>>(settings);
+
+            var differences = comparer.CalculateDifferences(list1, list2).ToList();
+
+            Assert.AreEqual(2, differences.Count);
+
+            Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences.First().DifferenceType);
+            Assert.AreEqual("2", differences.First().Value1);
+            Assert.AreEqual("1", differences.First().Value2);
+
+            Assert.AreEqual(DifferenceTypes.MissedElementInSecondObject, differences[1].DifferenceType);
+            Assert.AreEqual("[1]", differences[1].MemberPath);
+            Assert.AreEqual("2", differences[1].Value1);
+            Assert.AreEqual(string.Empty, differences[1].Value2);
+        }
+
+        [Test]
+        public void CompareAsIList_CompareUnequalLists_CompareElementsByKey()
+        {
+            var list1 = new List<int> { 1, 2 };
+            var list2 = new List<int> { 1 };
+
+            var settings = new ComparisonSettings();
+            settings.List.Configure(listOptions => 
+            {
+                listOptions.CompareUnequalLists = true;
+                listOptions.CompareElementsByKey();
+            });
+
+            var comparer = new Comparer<IList<int>>(settings);
+
+            var differences = comparer.CalculateDifferences(list1, list2).ToList();
+
+            Assert.AreEqual(2, differences.Count);
+
+            Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences.First().DifferenceType);
+            Assert.AreEqual("2", differences.First().Value1);
+            Assert.AreEqual("1", differences.First().Value2);
+
+            Assert.AreEqual(DifferenceTypes.MissedElementInSecondObject, differences[1].DifferenceType);
+            Assert.AreEqual("[2]", differences[1].MemberPath);
+            Assert.AreEqual("2", differences[1].Value1);
+            Assert.AreEqual(string.Empty, differences[1].Value2);
+        }
+
+        [Test]
+        public void CompareAsIList_CompareUnequalLists_CompareElementsByKey_FormatKey()
+        {
+            var list1 = new List<int> { 1, 2 };
+            var list2 = new List<int> { 1 };
+
+            var settings = new ComparisonSettings();
+            settings.List.Configure(listOptions =>
+            {
+                //DaN Fluent.
+                //listOptions.CompareUnequalLists().CompareElementsByKey(keyOptions => keyOptions.FormatElementKey(elementKey => $"Key={elementKey}"));
+
+                /*
+                 * listOptions
+                 *  .CompareUnequalLists()
+                 *  .CompareElementsByKey(keyOptions => keyOptions.FormatElementKey(elementKey => $"Key={elementKey}"));
+                 */
+
+                listOptions.CompareUnequalLists = true;
+
+                listOptions.CompareElementsByKey(keyOptions =>
+                {
+                    keyOptions.FormatElementKey(elementKey =>
+                    {
+                        return $"Key={elementKey}";
+                    });
+                });
+            });
+
+            var comparer = new Comparer<IList<int>>(settings);
+
+            var differences = comparer.CalculateDifferences(list1, list2).ToList();
+
+            Assert.AreEqual(2, differences.Count);
+
+            Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences.First().DifferenceType);
+            Assert.AreEqual("2", differences.First().Value1);
+            Assert.AreEqual("1", differences.First().Value2);
+
+            Assert.AreEqual(DifferenceTypes.MissedElementInSecondObject, differences[1].DifferenceType);
+            Assert.AreEqual("[Key=2]", differences[1].MemberPath);
+            Assert.AreEqual("2", differences[1].Value1);
+            Assert.AreEqual(string.Empty, differences[1].Value2);
+        }
+
+        [Test]
         public void DictionaryEqualitySameOrder()
         {
             var a1 = new Dictionary<int, string> { { 1, "One" }, { 2, "Two" } };
@@ -1077,6 +1176,23 @@ namespace ObjectsComparer.Tests
             var comparer = new Comparer<Dictionary<int, string>>();
 
             var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsTrue(isEqual);
+        }
+
+        [Test]
+        public void DictionaryEqualitySameOrder_CompareByKey()
+        {
+            var a1 = new Dictionary<int, string> { { 1, "One" }, { 2, "TwoXXX" } };
+            var a2 = new Dictionary<int, string> { { 1, "One" }, { 2, "Two" } };
+
+            var settings = new ComparisonSettings();
+            settings.List.Configure(listOptions => listOptions.CompareElementsByKey());
+
+            var comparer = new Comparer<Dictionary<int, string>>(settings);
+
+            var isEqual = comparer.Compare(a1, a2, out var differences);
+            var diffs = differences.ToArray();
 
             Assert.IsTrue(isEqual);
         }
