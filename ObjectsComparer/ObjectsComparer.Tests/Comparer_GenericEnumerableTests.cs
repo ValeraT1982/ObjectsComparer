@@ -144,7 +144,7 @@ namespace ObjectsComparer.Tests
             var settings = new ComparisonSettings();
             settings.List.Configure(listOptions =>
             {
-                listOptions.CompareElementsByKey(keyOptions => keyOptions.FormatElementKey(elementKey => $"Key={elementKey}"));
+                listOptions.CompareElementsByKey(keyOptions => keyOptions.FormatElementKey(args => $"Key={args.ElementKey}"));
             });
 
             var comparer = new Comparer<A>(settings);
@@ -396,7 +396,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { ArrayOfB = new[] { new B { Property1 = "Str1", Id = 1 }, new B { Property1 = "Str3", Id = 2 } } };
 
             var settings = new ComparisonSettings();
-            settings.List.Configure(listOptions => listOptions.CompareElementsByKey(keyOptions => keyOptions.FormatElementKey(elementKey => $"Id={elementKey}")));
+            settings.List.Configure(listOptions => listOptions.CompareElementsByKey(keyOptions => keyOptions.FormatElementKey(args => $"Id={args.ElementKey}")));
 
             var comparer = new Comparer<A>(settings);
 
@@ -1145,9 +1145,9 @@ namespace ObjectsComparer.Tests
 
                 listOptions.CompareElementsByKey(keyOptions =>
                 {
-                    keyOptions.FormatElementKey(elementKey =>
+                    keyOptions.FormatElementKey(args =>
                     {
-                        return $"Key={elementKey}";
+                        return $"Key={args.ElementKey}";
                     });
                 });
             });

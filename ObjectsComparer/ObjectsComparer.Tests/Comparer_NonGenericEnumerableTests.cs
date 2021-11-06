@@ -94,7 +94,7 @@ namespace ObjectsComparer.Tests
                 listOptions.CompareElementsByKey(keyOptions =>
                 {
                     keyOptions.UseKey("Property1");
-                    keyOptions.FormatElementKey((elementIndex, elementKey) => $"Property1={elementKey}");
+                    keyOptions.FormatElementKey(args => $"Property1={args.ElementKey}");
                 });
             });
             var comparer = new Comparer<A>(settings);
@@ -284,9 +284,9 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual(string.Empty, differences[0].Value2);
 
             Assert.AreEqual(DifferenceTypes.MissedElementInFirstObject, differences[1].DifferenceType);
-            Assert.AreEqual("NonGenericEnumerable[Str2]", differences[0].MemberPath);
-            Assert.AreEqual(string.Empty, differences[0].Value1);
-            Assert.AreEqual("Str2", differences[0].Value2);
+            Assert.AreEqual("NonGenericEnumerable[Str2]", differences[1].MemberPath);
+            Assert.AreEqual(string.Empty, differences[1].Value1);
+            Assert.AreEqual("Str2", differences[1].Value2);
         }
 
         [Test]

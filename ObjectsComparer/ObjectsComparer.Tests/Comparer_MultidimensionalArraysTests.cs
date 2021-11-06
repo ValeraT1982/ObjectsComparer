@@ -39,7 +39,7 @@ namespace ObjectsComparer.Tests
                 listOptions.CompareElementsByKey(
                     keyOptions =>
                     {
-                        keyOptions.FormatElementKey(element =>
+                        keyOptions.FormatElementKey(args =>
                         {
                             if (ctx.Ancestor == null)
                             {

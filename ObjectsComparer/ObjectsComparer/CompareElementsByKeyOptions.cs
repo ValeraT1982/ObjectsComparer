@@ -7,6 +7,7 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
+
     /// <summary>
     /// Configures the behavior of list elements if elements are to be compared by key.
     /// </summary>
@@ -35,7 +36,7 @@ namespace ObjectsComparer
         /// <summary>
         /// See <see cref="FormatElementKey(Func{int, object, string})"/>.
         /// </summary>
-        Func<int, object, object, string> ElementKeyFormatter { get; set; }
+        Func<FormatListElementKeyArgs, string> ElementKeyFormatter { get; set; }
 
         /// <summary>
         /// See <see cref="FormatNullElementIdentifier(Func{int, string})"/>.
@@ -142,25 +143,20 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// Returns optional formatted or unformatted <paramref name="elementKey"/>. See <see cref="FormatElementKey(Func{int, object, string})"/>.
+        /// Returns optional formatted or unformatted <paramref name="elementKey"/>. See <see cref="FormatElementKey(Func{FormatListElementKeyArgs, string})"/>
         /// </summary>
-        internal string GetFormattedElementKey(int elementIndex, object elementKey, object element)
+        internal string GetFormattedElementKey(FormatListElementKeyArgs formatElementKeyArgs)
         {
-            if (elementKey is null)
+            if (formatElementKeyArgs is null)
             {
-                throw new ArgumentNullException(nameof(elementKey));
+                throw new ArgumentNullException(nameof(formatElementKeyArgs));
             }
 
-            if (element is null)
-            {
-                throw new ArgumentNullException(nameof(element));
-            }
-
-            var formattedKey = ElementKeyFormatter?.Invoke(elementIndex, elementKey, element);
+            var formattedKey = ElementKeyFormatter?.Invoke(formatElementKeyArgs);
 
             if (string.IsNullOrWhiteSpace(formattedKey))
             {
-                formattedKey = elementKey.ToString();
+                formattedKey = formatElementKeyArgs.ElementKey.ToString();
             }
 
             return formattedKey.Left(FormattedKeyMaxLength);
@@ -183,41 +179,12 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// Formats element key. For more info, see <see cref="FormatElementKey(Func{int, object, object, string})"/>.
-        /// </summary>
-        /// <param name="formatter">Parameter: Element key. Return value: Formatted element key.</param>
-        public void FormatElementKey(Func<object, string> formatter)
-        {
-            if (formatter is null)
-            {
-                throw new ArgumentNullException(nameof(formatter));
-            }
-
-            FormatElementKey((elementIndex, elementKey, element) => formatter(elementKey));
-        }
-
-        /// <summary>
-        /// Formats element key. For more info, see <see cref="FormatElementKey(Func{int, object, object, string})"/>.
-        /// </summary>
-        /// <param name="formatter">First parameter: Element index. Second parameter: Element key. Return value: Formatted element key.</param>
-        public void FormatElementKey(Func<int, object, string> formatter)
-        {
-            if (formatter is null)
-            {
-                throw new ArgumentNullException(nameof(formatter));
-            }
-
-            FormatElementKey((elementIndex, elementKey, element) => formatter(elementIndex, elementKey));
-        }
-
-        /// <summary>
         /// To avoid possible confusion of the element key with the element index, the element key can be formatted with any text.<br/>
         /// For example, element key with value = 1 can be formatted as "Id=1".
-        /// The formatted element key is then used as part of the <see cref="Difference.MemberPath"/> property, e.g. "Addresses[Id=1]".<br/>
+        /// The formatted element key is then used as part of the <see cref="Difference.MemberPath"/> property, e.g. "Addresses[Id=1]" instead of "Addresses[1]".<br/>
         /// By default the element key is not formatted.
         /// </summary>
-        /// <param name="formatter">First parameter: Element index. Second parameter: Element key. Third parameter: Element. Return value: Formatted element key.</param>
-        public void FormatElementKey(Func<int, object, object, string> formatter)
+        public void FormatElementKey(Func<FormatListElementKeyArgs, string> formatter)
         {
             if (formatter is null)
             {
