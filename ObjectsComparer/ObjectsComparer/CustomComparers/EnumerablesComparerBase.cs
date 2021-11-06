@@ -38,7 +38,7 @@ namespace ObjectsComparer
         {
             Debug.WriteLine($"{GetType().Name}.{nameof(CalculateDifferencesByKey)}: {array1?.GetType().Name}");
 
-            var keyOptions = CompareElementsByKeyOptions.Default();
+            var keyOptions = CompareListElementsByKeyOptions.Default();
             listConfigurationOptions.KeyOptionsAction?.Invoke(keyOptions);
 
             for (int element1Index = 0; element1Index < array1.Count(); element1Index++)

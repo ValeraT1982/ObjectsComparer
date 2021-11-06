@@ -3,7 +3,7 @@
 namespace ObjectsComparer
 {
     /// <summary>
-    /// Useful arguments for list element key formatter, see <see cref="CompareElementsByKeyOptions.FormatElementKey(Func{FormatListElementKeyArgs, string})"/>.
+    /// Useful arguments for list element key formatter, see <see cref="CompareListElementsByKeyOptions.FormatElementKey(Func{FormatListElementKeyArgs, string})"/>.
     /// </summary>
     public class FormatListElementKeyArgs
     {

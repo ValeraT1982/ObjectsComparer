@@ -76,7 +76,7 @@ namespace ObjectsComparer.Tests
             var listConfigurationOptions = ListConfigurationOptions.Default();
             var ctx = ComparisonContext.Create();
             settings.List.ConfigureOptionsAction(ctx, listConfigurationOptions);
-            var compareElementsByKeyOptions = CompareElementsByKeyOptions.Default();
+            var compareElementsByKeyOptions = CompareListElementsByKeyOptions.Default();
             listConfigurationOptions.KeyOptionsAction(compareElementsByKeyOptions);
 
             Assert.AreEqual(true, listConfigurationOptions.CompareUnequalLists);

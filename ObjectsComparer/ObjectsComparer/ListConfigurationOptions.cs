@@ -30,7 +30,7 @@ namespace ObjectsComparer
             KeyOptionsAction = null;
         }
 
-        internal Action<CompareElementsByKeyOptions> KeyOptionsAction { get; private set; }
+        internal Action<CompareListElementsByKeyOptions> KeyOptionsAction { get; private set; }
 
         /// <summary>
         /// Compares list elements by key.
@@ -43,7 +43,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Compares list elements by key.
         /// </summary>
-        public void CompareElementsByKey(Action<CompareElementsByKeyOptions> keyOptions)
+        public void CompareElementsByKey(Action<CompareListElementsByKeyOptions> keyOptions)
         {
             if (keyOptions is null)
             {

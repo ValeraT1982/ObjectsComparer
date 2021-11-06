@@ -7,11 +7,10 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-
     /// <summary>
-    /// Configures the behavior of list elements if elements are to be compared by key.
+    /// Configures the behavior of list elements if list elements are to be compared by key.
     /// </summary>
-    public class CompareElementsByKeyOptions
+    public class CompareListElementsByKeyOptions
     {
         /// <summary>
         /// Default element identifier template for element that refers to null value. See <see cref="FormatNullElementIdentifier(Func{int, string})"/> for more info.        
@@ -28,7 +27,7 @@ namespace ObjectsComparer
         /// </summary>
         const int NullElementIdentifierMaxLength = 20;
 
-        CompareElementsByKeyOptions()
+        CompareListElementsByKeyOptions()
         {
             Initialize();
         }
@@ -55,7 +54,7 @@ namespace ObjectsComparer
         /// </summary>
         internal Func<object, object> KeyProvider { get; private set; } = null;
 
-        internal static CompareElementsByKeyOptions Default() => new CompareElementsByKeyOptions();
+        internal static CompareListElementsByKeyOptions Default() => new CompareListElementsByKeyOptions();
 
         void Initialize()
         {
