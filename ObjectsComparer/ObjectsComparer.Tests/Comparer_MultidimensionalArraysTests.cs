@@ -33,16 +33,31 @@ namespace ObjectsComparer.Tests
             var a2 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 3, 1 } } };
 
             var settings = new ComparisonSettings();
-            settings.List.Configure((ctx, listOptions) => 
-            {
-                if (ctx.Member?.Name == "IntOfInt") 
-                {
 
-                }
-                else
-                {
-                    listOptions.CompareElementsByKey();
-                }
+            settings.List.Configure((ctx, listOptions) =>
+            {
+                listOptions.CompareElementsByKey(
+                    keyOptions =>
+                    {
+                        keyOptions.FormatElementKey(element =>
+                        {
+                            if (ctx.Ancestor == null)
+                            {
+                                return "a";
+                            }
+
+                            return "b";
+                        });
+
+                        if (ctx.Member.Name == "IntOfInt")
+                        {
+                            keyOptions.UseKey(element => "");
+                        }
+                        else
+                        {
+                            keyOptions.UseKey("Key");
+                        }
+                    });
             });
 
             var comparer = new Comparer<MultidimensionalArrays>(settings);

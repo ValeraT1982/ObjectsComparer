@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using ObjectsComparer.Utils;
@@ -22,6 +23,8 @@ namespace ObjectsComparer
 
         public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, ComparisonContext listComparisonContext)
         {
+            Debug.WriteLine($"{GetType().Name}.{nameof(CalculateDifferences)}: {type.Name}");
+
             if (listComparisonContext is null)
             {
                 throw new ArgumentNullException(nameof(listComparisonContext));
