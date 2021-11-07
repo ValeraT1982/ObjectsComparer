@@ -42,9 +42,16 @@ namespace ObjectsComparer.Tests
             var settings = new ComparisonSettings();
 
             settings.List.Configure(listOptions => listOptions.CompareElementsByKey());
+            /*
+             * settings.List.Configure(listOptions => listOptions
+             *  .CompareUnequalLists(true)
+             *  .CompareElementsByKey(keyOptions => keyOptions.UseKey("MyKey")));
+             */
 
             settings.List.Configure((listCtx, listOptions) =>
             {
+                listOptions.CompareUnequalLists = true;
+
                 listOptions.CompareElementsByKey(
                     keyOptions =>
                     {
