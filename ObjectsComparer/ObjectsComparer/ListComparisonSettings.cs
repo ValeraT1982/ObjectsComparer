@@ -16,8 +16,9 @@ namespace ObjectsComparer
         internal static ListComparisonSettings Default() => new ListComparisonSettings();
 
         /// <summary>
-        /// Configures list comparison behavior.
+        /// Configures list comparison behavior, see <see cref="ListConfigurationOptions"/>.
         /// </summary>
+        /// <param name="configureOptions">First parameter: Current list comparison context.</param>
         public void Configure(Action<ComparisonContext, ListConfigurationOptions> configureOptions)
         {
             if (configureOptions is null)
@@ -29,7 +30,7 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// Configures list comparison behavior.
+        /// Configures list comparison behavior, see <see cref="ListConfigurationOptions"/>.
         /// </summary>
         /// <param name="configureOptions">See <see cref="ListConfigurationOptions"/>.</param>
         public void Configure(Action<ListConfigurationOptions> configureOptions)

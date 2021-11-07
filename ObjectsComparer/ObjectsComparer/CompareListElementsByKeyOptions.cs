@@ -50,9 +50,9 @@ namespace ObjectsComparer
         public bool ThrowKeyNotFound { get; set; } = true;
 
         /// <summary>
-        /// If null, the elements should be compared by their index, otherwise by key. Default value = null.
+        /// See <see cref="UseKey(Func{ListElementKeyProviderArgs, object})"/>.
         /// </summary>
-        internal Func<object, object> KeyProvider { get; private set; } = null;
+        internal Func<ListElementKeyProviderArgs, object> KeyProviderAction { get; private set; } = null;
 
         internal static CompareListElementsByKeyOptions Default() => new CompareListElementsByKeyOptions();
 
@@ -104,14 +104,14 @@ namespace ObjectsComparer
         /// Key identification. It attempts to find the key using the <paramref name="keyProvider"/> parameter.
         /// </summary>
         /// <param name="keyProvider">First parameter: The element whose key is required. Return value: The element's key.</param>
-        public void UseKey(Func<object, object> keyProvider)
+        public void UseKey(Func<ListElementKeyProviderArgs, object> keyProvider)
         {
             if (keyProvider is null)
             {
                 throw new ArgumentNullException(nameof(keyProvider));
             }
 
-            KeyProvider = keyProvider;
+            KeyProviderAction = keyProvider;
         }
 
         /// <summary>

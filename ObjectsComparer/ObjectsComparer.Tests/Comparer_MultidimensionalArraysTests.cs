@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using NUnit.Framework;
 using ObjectsComparer.Tests.TestClasses;
 
@@ -13,7 +14,6 @@ namespace ObjectsComparer.Tests
             var a1 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 2 } } };
             var a2 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 3 } } };
             var comparer = new Comparer<MultidimensionalArrays>();
-
             var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
             var differences = differencesEnum.ToList();
 
@@ -28,30 +28,49 @@ namespace ObjectsComparer.Tests
         [Test]
         public void IntOfIntInequality1_CompareByKey()
         {
+            var a = new A { ListOfB = new System.Collections.Generic.List<B> { new B { Property1 = "p" } } };
+            var test = a.ListOfB.Where(b =>
+            {
+                a.ListOfB.Add(new B { });
+                return true;
+            }).ToArray();
+
             //???
             var a1 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 3 } } };
             var a2 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 3, 1 } } };
 
             var settings = new ComparisonSettings();
 
-            settings.List.Configure((ctx, listOptions) =>
+            settings.List.Configure(listOptions => listOptions.CompareElementsByKey());
+
+            settings.List.Configure((listCtx, listOptions) =>
             {
                 listOptions.CompareElementsByKey(
                     keyOptions =>
                     {
-                        keyOptions.FormatElementKey(args =>
+                        keyOptions.UseKey("MyId");
+
+                        keyOptions.FormatElementKey(formatElementKeyArgs =>
                         {
-                            if (ctx.Ancestor == null)
+                            if (listCtx.Ancestor == null)
                             {
-                                return "a";
+                                return $"Key={formatElementKeyArgs.ElementKey}";
                             }
 
                             return "b";
                         });
 
-                        if (ctx.Member.Name == "IntOfInt")
+                        if (listCtx.Member.Name == "IntOfInt")
                         {
-                            keyOptions.UseKey(element => "");
+                            keyOptions.UseKey(keyProviderArgs => 
+                            {
+                                if (true)
+                                {
+                                    //return keyProviderArgs.DefaulKeyProvider(keyProviderArgs.Element);
+                                }
+                                var c = listCtx;
+                                return "1";
+                            });
                         }
                         else
                         {
