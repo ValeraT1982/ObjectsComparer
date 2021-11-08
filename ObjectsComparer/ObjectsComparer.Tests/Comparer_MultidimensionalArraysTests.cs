@@ -41,7 +41,27 @@ namespace ObjectsComparer.Tests
 
             var settings = new ComparisonSettings();
 
-            settings.List.Configure(listOptions => listOptions.CompareElementsByKey());
+            settings.List.Configure((ComparisonContext ctx, ListConfigurationOptions listOptions) => listOptions
+                .WithUnequalLists(true)
+                .CompareElementsByKey(keyOptions =>
+                {
+                    if (ctx.Member == null) 
+                    {
+                        keyOptions.UseKey(args => args.Element.ToString());
+                    }
+                    else
+                    {
+                        keyOptions.UseKey(args => $"100{args.Element}");
+                    }
+                }));
+
+            settings.List.Configure(listOptions => 
+            {
+                listOptions
+                    .WithUnequalLists(true)
+                    .CompareElementsByKey();
+            });
+
             /*
              * settings.List.Configure(listOptions => listOptions
              *  .CompareUnequalLists(true)
@@ -50,8 +70,6 @@ namespace ObjectsComparer.Tests
 
             settings.List.Configure((listCtx, listOptions) =>
             {
-                listOptions.CompareUnequalLists = true;
-
                 listOptions.CompareElementsByKey(
                     keyOptions =>
                     {

@@ -18,16 +18,28 @@ namespace ObjectsComparer
         /// <summary>
         /// Whether to compare elements of the lists even if their number differs. Regardless of the value, the respective difference of type <see cref="DifferenceTypes.NumberOfElementsMismatch"/> will always be logged. Default value = false.
         /// </summary>
-        public bool CompareUnequalLists { get; set; } = false;
+        internal bool CompareUnequalLists { get; private set; } = false;
+
+        /// <summary>
+        /// Whether to compare elements of the lists even if their number differs. Regardless of the value, the respective difference of type <see cref="DifferenceTypes.NumberOfElementsMismatch"/> will always be logged. Default value = false.
+        /// </summary>
+        public ListConfigurationOptions WithUnequalLists(bool value)
+        {
+            CompareUnequalLists = value;
+
+            return this;
+        }
 
         internal static ListConfigurationOptions Default() => new ListConfigurationOptions();
 
         /// <summary>
         /// Compares list elements by index. Default behavior.
         /// </summary>
-        public void CompareElementsByIndex()
+        public ListConfigurationOptions CompareElementsByIndex()
         {
             KeyOptionsAction = null;
+
+            return this;
         }
 
         internal Action<CompareListElementsByKeyOptions> KeyOptionsAction { get; private set; }
@@ -35,15 +47,15 @@ namespace ObjectsComparer
         /// <summary>
         /// Compares list elements by key.
         /// </summary>
-        public void CompareElementsByKey()
+        public ListConfigurationOptions CompareElementsByKey()
         {
-            CompareElementsByKey(options => { });
+            return CompareElementsByKey(options => { });
         }
 
         /// <summary>
         /// Compares list elements by key.
         /// </summary>
-        public void CompareElementsByKey(Action<CompareListElementsByKeyOptions> keyOptions)
+        public ListConfigurationOptions CompareElementsByKey(Action<CompareListElementsByKeyOptions> keyOptions)
         {
             if (keyOptions is null)
             {
@@ -51,6 +63,8 @@ namespace ObjectsComparer
             }
 
             KeyOptionsAction = keyOptions;
+
+            return this;
         }
 
         /// <summary>

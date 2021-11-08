@@ -64,20 +64,20 @@ namespace ObjectsComparer
         /// <summary>
         /// Key identification. It attempts to find the key using the property specified by the <paramref name="key"/> parameter.
         /// </summary>
-        public void UseKey(string key, bool caseSensitive = false)
+        public CompareListElementsByKeyOptions UseKey(string key, bool caseSensitive = false)
         {
             if (string.IsNullOrWhiteSpace(key))
             {
                 throw new ArgumentException($"'{nameof(key)}' cannot be null or whitespace.", nameof(key));
             }
 
-            UseKey(new string[] { key }, caseSensitive);
+            return UseKey(new string[] { key }, caseSensitive);
         }
 
         /// <summary>
         /// Key identification. It attempts to find the key using one of the public properties specified by the <paramref name="keys"/> parameter, in the specified order.
         /// </summary>
-        public void UseKey(string[] keys, bool caseSensitive = false)
+        public CompareListElementsByKeyOptions UseKey(string[] keys, bool caseSensitive = false)
         {
             if (keys is null)
             {
@@ -94,7 +94,7 @@ namespace ObjectsComparer
                 throw new ArgumentException($"'{nameof(keys)}' cannot contain null or whitespace.", nameof(keys));
             }
 
-            UseKey(element =>
+            return UseKey(element =>
             {
                 return GetKeyValue(element, caseSensitive, keys);
             });
@@ -104,7 +104,7 @@ namespace ObjectsComparer
         /// Key identification. It attempts to find the key using the <paramref name="keyProvider"/> parameter.
         /// </summary>
         /// <param name="keyProvider">First parameter: The element whose key is required. Return value: The element's key.</param>
-        public void UseKey(Func<ListElementKeyProviderArgs, object> keyProvider)
+        public CompareListElementsByKeyOptions UseKey(Func<ListElementKeyProviderArgs, object> keyProvider)
         {
             if (keyProvider is null)
             {
@@ -112,6 +112,8 @@ namespace ObjectsComparer
             }
 
             KeyProviderAction = keyProvider;
+
+            return this;
         }
 
         /// <summary>
@@ -183,7 +185,7 @@ namespace ObjectsComparer
         /// The formatted element key is then used as part of the <see cref="Difference.MemberPath"/> property, e.g. "Addresses[Id=1]" instead of "Addresses[1]".<br/>
         /// By default the element key is not formatted.
         /// </summary>
-        public void FormatElementKey(Func<FormatListElementKeyArgs, string> formatter)
+        public CompareListElementsByKeyOptions FormatElementKey(Func<FormatListElementKeyArgs, string> formatter)
         {
             if (formatter is null)
             {
@@ -191,6 +193,8 @@ namespace ObjectsComparer
             }
 
             ElementKeyFormatter = formatter;
+
+            return this;
         }
 
         /// <summary>
@@ -198,7 +202,7 @@ namespace ObjectsComparer
         /// By default, <see cref="DefaultNullElementIdentifierTemplate"/> template will be used to format the identifier.
         /// </summary>
         /// <param name="formatter">First parameter: Element index. Return value: Formatted identifier.</param>
-        public void FormatNullElementIdentifier(Func<int, string> formatter)
+        public CompareListElementsByKeyOptions FormatNullElementIdentifier(Func<int, string> formatter)
         {
             if (formatter is null)
             {
@@ -206,6 +210,8 @@ namespace ObjectsComparer
             }
 
             NullElementIdentifierFormatter = formatter;
+
+            return this;
         }
     }
 }
