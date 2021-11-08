@@ -67,7 +67,7 @@ namespace ObjectsComparer
                     yield return AddDifferenceToComparisonContext(new Difference("", list1.Count().ToString(), list2.Count().ToString(), DifferenceTypes.NumberOfElementsMismatch), listComparisonContext);
                 }
 
-                if (listConfigurationOptions.CompareUnequalLists == false)
+                if (listConfigurationOptions.UnequalListsComparisonEnabled == false)
                 {
                     yield break;
                 }

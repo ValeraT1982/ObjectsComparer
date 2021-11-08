@@ -16,16 +16,16 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// Whether to compare elements of the lists even if their number differs. Regardless of the value, the respective difference of type <see cref="DifferenceTypes.NumberOfElementsMismatch"/> will always be logged. Default value = false.
+        /// See <see cref="CompareUnequalLists(bool)"/>.
         /// </summary>
-        internal bool CompareUnequalLists { get; private set; } = false;
+        internal bool UnequalListsComparisonEnabled { get; private set; } = false;
 
         /// <summary>
-        /// Whether to compare elements of the lists even if their number differs. Regardless of the value, the respective difference of type <see cref="DifferenceTypes.NumberOfElementsMismatch"/> will always be logged. Default value = false.
+        /// Whether to compare elements of the lists even if their number differs. Regardless of the <paramref name="value"/>, the respective difference of type <see cref="DifferenceTypes.NumberOfElementsMismatch"/> will always be logged. Default value = false.
         /// </summary>
-        public ListConfigurationOptions WithUnequalLists(bool value)
+        public ListConfigurationOptions CompareUnequalLists(bool value)
         {
-            CompareUnequalLists = value;
+            UnequalListsComparisonEnabled = value;
 
             return this;
         }
