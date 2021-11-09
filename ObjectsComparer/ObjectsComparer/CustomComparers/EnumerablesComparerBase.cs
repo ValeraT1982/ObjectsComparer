@@ -53,7 +53,7 @@ namespace ObjectsComparer
                         continue;
                     }
 
-                    var nullElementIdentifier = keyOptions.GetNullElementIdentifier(element1Index);
+                    var nullElementIdentifier = keyOptions.GetNullElementIdentifier(new FormatNullElementIdentifierArgs(element1Index));
 
                     yield return AddDifferenceToComparisonContext(new Difference($"[{nullElementIdentifier}]", string.Empty, string.Empty, DifferenceTypes.MissedElementInSecondObject), elementComparisonContext);
                     continue;
@@ -102,7 +102,7 @@ namespace ObjectsComparer
                         continue;
                     }
 
-                    var nullElementIdentifier = keyOptions.GetNullElementIdentifier(element2Index);
+                    var nullElementIdentifier = keyOptions.GetNullElementIdentifier(new FormatNullElementIdentifierArgs(element2Index));
 
                     yield return AddDifferenceToComparisonContext(new Difference($"[{nullElementIdentifier}]", string.Empty, string.Empty, DifferenceTypes.MissedElementInFirstObject), elementComparisonContext);
                     continue;

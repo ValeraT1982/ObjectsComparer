@@ -40,7 +40,7 @@ namespace ObjectsComparer
         /// <summary>
         /// See <see cref="FormatNullElementIdentifier(Func{int, string})"/>.
         /// </summary>
-        Func<int, string> NullElementIdentifierFormatter { get; set; }
+        Func<FormatNullElementIdentifierArgs, string> NullElementIdentifierFormatter { get; set; }
 
         /// <summary>
         /// See <see cref="ThrowKeyNotFound(bool)"/>.
@@ -178,14 +178,19 @@ namespace ObjectsComparer
         /// <summary>
         /// Returns element identifier for element that referes to null. See <see cref="FormatNullElementIdentifier(Func{int, string})"/>.
         /// </summary>
-        /// <param name="elementIndex">Element index.</param>
-        internal string GetNullElementIdentifier(int elementIndex)
+        /// <param name="args">Element index.</param>
+        internal string GetNullElementIdentifier(FormatNullElementIdentifierArgs args)
         {
-            var elementIdentifier = NullElementIdentifierFormatter?.Invoke(elementIndex);
+            if (args is null)
+            {
+                throw new ArgumentNullException(nameof(args));
+            }
+
+            var elementIdentifier = NullElementIdentifierFormatter?.Invoke(args);
 
             if (string.IsNullOrWhiteSpace(elementIdentifier))
             {
-                elementIdentifier = string.Format(DefaultNullElementIdentifierTemplate, elementIndex);
+                elementIdentifier = string.Format(DefaultNullElementIdentifierTemplate, args);
             }
 
             return elementIdentifier.Left(NullElementIdentifierMaxLength);
@@ -214,7 +219,7 @@ namespace ObjectsComparer
         /// By default, <see cref="DefaultNullElementIdentifierTemplate"/> template will be used to format the identifier.
         /// </summary>
         /// <param name="formatter">First parameter: Element index. Return value: Formatted identifier.</param>
-        public CompareListElementsByKeyOptions FormatNullElementIdentifier(Func<int, string> formatter)
+        public CompareListElementsByKeyOptions FormatNullElementIdentifier(Func<FormatNullElementIdentifierArgs, string> formatter)
         {
             if (formatter is null)
             {

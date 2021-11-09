@@ -217,7 +217,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void FluentTest_WithUnequalLists_CompareElementsByKey_FormatKey_FormatNullElementIdntf()
+        public void FluentTest_WithUnequalLists_CompareElementsByKey_FormatKey_FormatNullElementIdentifier()
         {
             var a1 = new int?[] { 3, 2, 1 };
             var a2 = new int?[] { 1, 2, 3, 4, null };
@@ -226,46 +226,49 @@ namespace ObjectsComparer.Tests
             settings.List.Configure(listOptions => listOptions
                 .WithUnequalLists(true)
                 .CompareElementsByKey(keyOptions => keyOptions
-                    .FormatElementKey(args => $"Key={args.ElementKey}")
-                    .FormatNullElementIdentifier(idx => $"Null at {idx}")));
-
-            settings.List.Configure(listOptions => 
-            {
-                listOptions.WithUnequalLists(true);
-
-                listOptions.CompareElementsByKey(keyOptions =>
-                {
-                    keyOptions.FormatElementKey(args => $"Key={args.ElementKey}");
-                    keyOptions.FormatNullElementIdentifier(idx => $"Null at {idx}");
-                });
-            });
-
-            settings.List.Configure((ctx, listOptions) =>
-            {
-                bool unequalEnabled = ctx.Member.Name == "List1";
-                listOptions.WithUnequalLists(unequalEnabled);
-
-                listOptions.CompareElementsByKey(keyOptions =>
-                {
-                    keyOptions.FormatElementKey(args => $"Key={args.ElementKey}");
-                    keyOptions.FormatNullElementIdentifier(idx => $"Null at {idx}");
-
-                    if (ctx.Member.Name == nameof(A.ListOfB))
-                    {
-                        keyOptions.UseKey(args =>
-                        {
-                            if (args.Element is B element)
-                            {
-                                return element.Property1;
-                            }
-
-                            return args.Element;
-                        });
-                    }
-                });
-            });
+                    .FormatElementKey(formatArgs => $"Key={formatArgs.ElementKey}")
+                    .FormatNullElementIdentifier(formatArgs => $"Null at {formatArgs.ElementIndex}")));
 
             var comparer = new Comparer(settings);
+
+            //settings = new ComparisonSettings();
+            //settings.List.Configure(listOptions => 
+            //{
+            //    listOptions.WithUnequalLists(true);
+
+            //    listOptions.CompareElementsByKey(keyOptions =>
+            //    {
+            //        keyOptions.FormatElementKey(args => $"Key={args.ElementKey}");
+            //        keyOptions.FormatNullElementIdentifier(idx => $"Null at {idx}");
+            //    });
+            //});
+
+            //settings = new ComparisonSettings();
+            //settings.List.Configure((ctx, listOptions) =>
+            //{
+            //    bool unequalEnabled = ctx.Member.Name == "List1";
+            //    listOptions.WithUnequalLists(unequalEnabled);
+
+            //    listOptions.CompareElementsByKey(keyOptions =>
+            //    {
+            //        keyOptions.FormatElementKey(args => $"Key={args.ElementKey}");
+            //        keyOptions.FormatNullElementIdentifier(args => $"Null at {args.ElementIndex}");
+
+            //        if (ctx.Member.Name == nameof(A.ListOfB))
+            //        {
+            //            keyOptions.UseKey(args =>
+            //            {
+            //                if (args.Element is B element)
+            //                {
+            //                    return element.Property1;
+            //                }
+
+            //                return args.Element;
+            //            });
+            //        }
+            //    });
+            //});
+                        
             var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             Assert.AreEqual(3, differences.Count);
