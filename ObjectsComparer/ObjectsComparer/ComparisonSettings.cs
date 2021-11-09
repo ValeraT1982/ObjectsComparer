@@ -28,11 +28,6 @@ namespace ObjectsComparer
         private readonly Dictionary<Tuple<Type, string>, object> _settings = new Dictionary<Tuple<Type, string>, object>();
 
         /// <summary>
-        /// List comparison settings.
-        /// </summary>
-        public ListComparisonSettings List { get; } = ListComparisonSettings.Default();
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ComparisonSettings" /> class. 
         /// </summary>
         public ComparisonSettings()
@@ -70,6 +65,33 @@ namespace ObjectsComparer
             }
 
             throw new KeyNotFoundException();
+        }
+
+        internal Action<ComparisonContext, ListConfigurationOptions> ConfigureOptionsAction { get; private set; } = null;
+
+        /// <summary>
+        /// Configures list comparison behavior, especially the type of comparison. See <see cref="ListConfigurationOptions"/>.
+        /// </summary>
+        /// <param name="configureOptions">First parameter: Current list comparison context.</param>
+        public ComparisonSettings ConfigureList(Action<ComparisonContext, ListConfigurationOptions> configureOptions)
+        {
+            if (configureOptions is null)
+            {
+                throw new ArgumentNullException(nameof(configureOptions));
+            }
+
+            ConfigureOptionsAction = configureOptions;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Configures list comparison behavior, especially the type of comparison.. See <see cref="ListConfigurationOptions"/>.
+        /// </summary>
+        /// <param name="configureOptions">See <see cref="ListConfigurationOptions"/>.</param>
+        public ComparisonSettings ConfigureList(Action<ListConfigurationOptions> configureOptions)
+        {
+            return ConfigureList((_, options) => configureOptions(options));
         }
     }
 }

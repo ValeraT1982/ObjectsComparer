@@ -73,9 +73,9 @@ namespace ObjectsComparer
 
                 var formattedElement1Key = keyOptions.GetFormattedElementKey(new FormatListElementKeyArgs(element1Index, element1Key, element1));
 
-                if (array2.Any(elm2 => object.Equals(element1Key, keyOptions.KeyProviderAction(new ListElementKeyProviderArgs(elm2)))))
+                if (array2.Any(elm2 => elm2 != null && object.Equals(element1Key, keyOptions.KeyProviderAction(new ListElementKeyProviderArgs(elm2)))))
                 {
-                    var element2 = array2.First(elm2 => object.Equals(element1Key, keyOptions.KeyProviderAction(new ListElementKeyProviderArgs(elm2))));
+                    var element2 = array2.First(elm2 => elm2 != null && object.Equals(element1Key, keyOptions.KeyProviderAction(new ListElementKeyProviderArgs(elm2))));
                     var comparer = Factory.GetObjectsComparer(element1.GetType(), Settings, this);
 
                     foreach (var failure in comparer.CalculateDifferences(element1.GetType(), element1, element2, elementComparisonContext))
@@ -120,7 +120,7 @@ namespace ObjectsComparer
                     continue;
                 }
 
-                if (array1.Any(elm1 => object.Equals(element2Key, keyOptions.KeyProviderAction(new ListElementKeyProviderArgs(elm1)))) == false)
+                if (array1.Any(elm1 => elm1 != null && object.Equals(element2Key, keyOptions.KeyProviderAction(new ListElementKeyProviderArgs(elm1)))) == false)
                 {
                     var formattedElement2Key = keyOptions.GetFormattedElementKey(new FormatListElementKeyArgs(element2Index, element2Key, element2));
                     var valueComparer2 = OverridesCollection.GetComparer(element2.GetType()) ?? DefaultValueComparer;

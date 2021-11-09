@@ -58,7 +58,7 @@ namespace ObjectsComparer
             var array2 = ((IEnumerable)obj2).Cast<object>().ToArray();
 
             var listConfigurationOptions = ListConfigurationOptions.Default();
-            Settings.List.ConfigureOptionsAction?.Invoke(listComparisonContext, listConfigurationOptions);
+            Settings.ConfigureOptionsAction?.Invoke(listComparisonContext, listConfigurationOptions);
 
             if (array1.Length != array2.Length)
             {

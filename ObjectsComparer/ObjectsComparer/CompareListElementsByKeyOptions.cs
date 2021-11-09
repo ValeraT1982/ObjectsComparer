@@ -190,7 +190,7 @@ namespace ObjectsComparer
 
             if (string.IsNullOrWhiteSpace(elementIdentifier))
             {
-                elementIdentifier = string.Format(DefaultNullElementIdentifierTemplate, args);
+                elementIdentifier = string.Format(DefaultNullElementIdentifierTemplate, args.ElementIndex);
             }
 
             return elementIdentifier.Left(NullElementIdentifierMaxLength);
