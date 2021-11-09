@@ -63,12 +63,12 @@ namespace ObjectsComparer.Tests
 
             settings.List.Configure((comparisonContext, listOptions) =>
             {
-                listOptions.CompareUnequalLists(true);
+                listOptions.WithUnequalLists(true);
 
                 listOptions.CompareElementsByKey(keyOptions =>
                 {
                     keyOptions.UseKey("Key");
-                    keyOptions.ThrowKeyNotFound = false;
+                    keyOptions.ThrowKeyNotFoundEnabled = false;
                 });
             });
 
@@ -81,7 +81,7 @@ namespace ObjectsComparer.Tests
 
             Assert.AreEqual(true, listConfigurationOptions.UnequalListsComparisonEnabled);
             Assert.AreEqual(true, listConfigurationOptions.ElementSearchMode == ListElementSearchMode.Key);
-            Assert.AreEqual(false, compareElementsByKeyOptions.ThrowKeyNotFound);
+            Assert.AreEqual(false, compareElementsByKeyOptions.ThrowKeyNotFoundEnabled);
         }
 
         /// <summary>
@@ -104,6 +104,25 @@ namespace ObjectsComparer.Tests
             var comparer = new Comparer();
 
             var result = comparer.CalculateDifferences(a1, a2).ToArray();
+        }
+
+        [Test]
+        public void FluentTest()
+        {
+            var a1 = new ArrayList() { 3, 2, 1 };
+            var a2 = new ArrayList() { 1, 2, 3, 4 };
+
+            var settings = new ComparisonSettings();
+            settings.List.Configure(listOptions => listOptions.WithUnequalLists(true).CompareElementsByKey());
+
+            var comparer = new Comparer(settings);
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            Assert.AreEqual(2, differences.Count);
+            Assert.AreEqual(DifferenceTypes.MissedElementInFirstObject, differences[1].DifferenceType);
+            Assert.AreEqual("[1]", differences[0].MemberPath);
+            Assert.AreEqual("", differences[1].Value1);
+            Assert.AreEqual("4", differences[1].Value2);
         }
     }
 }

@@ -63,7 +63,7 @@ namespace ObjectsComparer
 
                 if (element1Key == null)
                 {
-                    if (keyOptions.ThrowKeyNotFound)
+                    if (keyOptions.ThrowKeyNotFoundEnabled)
                     {
                         throw new ElementKeyNotFoundException(element1, elementComparisonContext);
                     }
@@ -112,7 +112,7 @@ namespace ObjectsComparer
 
                 if (element2Key == null)
                 {
-                    if (keyOptions.ThrowKeyNotFound)
+                    if (keyOptions.ThrowKeyNotFoundEnabled)
                     {
                         throw new ElementKeyNotFoundException(element2, elementComparisonContext);
                     }

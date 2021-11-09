@@ -42,7 +42,7 @@ namespace ObjectsComparer.Tests
             var settings = new ComparisonSettings();
 
             settings.List.Configure((ComparisonContext ctx, ListConfigurationOptions listOptions) => listOptions
-                .CompareUnequalLists(true)
+                .WithUnequalLists(true)
                 .CompareElementsByKey(keyOptions =>
                 {
                     if (ctx.Member == null) 
@@ -58,7 +58,7 @@ namespace ObjectsComparer.Tests
             settings.List.Configure(listOptions => 
             {
                 listOptions
-                    .CompareUnequalLists(true)
+                    .WithUnequalLists(true)
                     .CompareElementsByKey();
             });
 

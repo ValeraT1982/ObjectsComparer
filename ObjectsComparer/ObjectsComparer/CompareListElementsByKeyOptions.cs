@@ -43,11 +43,23 @@ namespace ObjectsComparer
         Func<int, string> NullElementIdentifierFormatter { get; set; }
 
         /// <summary>
+        /// See <see cref="ThrowKeyNotFound(bool)"/>.
+        /// </summary>
+        internal bool ThrowKeyNotFoundEnabled { get; set; } = true;
+
+        /// <summary>
         /// If value = false and element key will not be found, the element will be excluded from comparison and no difference will be added except for possible <see cref="DifferenceTypes.NumberOfElementsMismatch"/> difference.
         /// If value = true and element key will not be found, an exception of type <see cref="ElementKeyNotFoundException"/> will be thrown.
         /// Default value = true.
         /// </summary>
-        public bool ThrowKeyNotFound { get; set; } = true;
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public CompareListElementsByKeyOptions ThrowKeyNotFound(bool value)
+        {
+            ThrowKeyNotFoundEnabled = value;
+
+            return this;
+        }
 
         /// <summary>
         /// See <see cref="UseKey(Func{ListElementKeyProviderArgs, object})"/>.
@@ -94,9 +106,9 @@ namespace ObjectsComparer
                 throw new ArgumentException($"'{nameof(keys)}' cannot contain null or whitespace.", nameof(keys));
             }
 
-            return UseKey(element =>
+            return UseKey(args =>
             {
-                return GetKeyValue(element, caseSensitive, keys);
+                return GetKeyValue(args.Element, caseSensitive, keys);
             });
         }
 

@@ -5,7 +5,7 @@ using System.Text;
 namespace ObjectsComparer.Exceptions
 {
     /// <summary>
-    /// Depending on the configuration, the exception is thrown if the key provider does not supply the key for list element <see cref="KeylessElement"/>. For more information see <see cref="CompareListElementsByKeyOptions.UseKey(Func{ListElementKeyProviderArgs, object})"/> and <see cref="CompareListElementsByKeyOptions.ThrowKeyNotFound"/>.
+    /// Depending on the configuration, the exception is thrown if the key provider does not supply the key for list element <see cref="KeylessElement"/>. For more information see <see cref="CompareListElementsByKeyOptions.UseKey(Func{ListElementKeyProviderArgs, object})"/> and <see cref="CompareListElementsByKeyOptions.ThrowKeyNotFoundEnabled"/>.
     /// </summary>
     public class ElementKeyNotFoundException : Exception
     {

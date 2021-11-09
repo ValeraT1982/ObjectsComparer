@@ -66,7 +66,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { NonGenericEnumerable = new ArrayList { new B { Property1 = "Str1" } } };
 
             var settings = new ComparisonSettings();
-            settings.List.Configure(listOptions => listOptions.CompareUnequalLists(true));
+            settings.List.Configure(listOptions => listOptions.WithUnequalLists(true));
             var comparer = new Comparer<A>(settings);
 
             var differences = comparer.CalculateDifferences(a1, a2).ToList();
@@ -93,7 +93,7 @@ namespace ObjectsComparer.Tests
             var settings = new ComparisonSettings();
             settings.List.Configure(listOptions => 
             {
-                listOptions.CompareUnequalLists(true);
+                listOptions.WithUnequalLists(true);
                 listOptions.CompareElementsByKey(keyOptions =>
                 {
                     keyOptions.UseKey("Property1");
@@ -124,7 +124,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { NonGenericEnumerable = new ArrayList { new B { Property1 = "Str1" } } };
 
             var settings = new ComparisonSettings();
-            settings.List.Configure(listOptions => listOptions.CompareUnequalLists(true).CompareElementsByKey(keyOptions => keyOptions.UseKey("Property1")));
+            settings.List.Configure(listOptions => listOptions.WithUnequalLists(true).CompareElementsByKey(keyOptions => keyOptions.UseKey("Property1")));
 
             var comparer = new Comparer<A>(settings);
 
@@ -202,7 +202,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { NonGenericEnumerable = new ArrayList { null, null } };
 
             var settings = new ComparisonSettings();
-            settings.List.Configure(listOptions => listOptions.CompareUnequalLists(true));
+            settings.List.Configure(listOptions => listOptions.WithUnequalLists(true));
 
             var comparer = new Comparer<A>(settings);
             var isEqual = comparer.Compare(a1, a2, out var diffs);
@@ -225,7 +225,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { NonGenericEnumerable = new ArrayList { null, null } };
 
             var settings = new ComparisonSettings();
-            settings.List.Configure(listOptions => listOptions.CompareUnequalLists(true).CompareElementsByKey());
+            settings.List.Configure(listOptions => listOptions.WithUnequalLists(true).CompareElementsByKey());
 
             var comparer = new Comparer<A>(settings);
             var isEqual = comparer.Compare(a1, a2, out var diffs);
