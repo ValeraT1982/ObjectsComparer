@@ -69,7 +69,7 @@ namespace ObjectsComparer.Tests
                 listOptions.CompareElementsByKey(keyOptions =>
                 {
                     keyOptions.UseKey("Key");
-                    keyOptions.ThrowKeyNotFoundEnabled = false;
+                    keyOptions.ThrowKeyNotFound(false);
                 });
             });
 

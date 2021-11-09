@@ -266,7 +266,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { ArrayOfB = new[] { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
 
             var settings = new ComparisonSettings();
-            settings.ConfigureList(listOptions => listOptions.CompareElementsByKey(keyOptions => keyOptions.ThrowKeyNotFoundEnabled = false));
+            settings.ConfigureList(listOptions => listOptions.CompareElementsByKey(keyOptions => keyOptions.ThrowKeyNotFound(false)));
 
             var comparer = new Comparer<A>(settings);
             bool isEqual = false;
@@ -302,7 +302,9 @@ namespace ObjectsComparer.Tests
             var a2 = new A { ArrayOfB = new[] { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
 
             var settings = new ComparisonSettings();
-            settings.ConfigureList(listOptions => listOptions.WithUnequalLists(true).CompareElementsByKey(keyOptions => keyOptions.ThrowKeyNotFoundEnabled = false));
+            settings.ConfigureList(listOptions => listOptions
+                .WithUnequalLists(true)
+                .CompareElementsByKey(keyOptions => keyOptions.ThrowKeyNotFound(false)));
 
             var comparer = new Comparer<A>(settings);
 
