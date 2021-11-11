@@ -98,7 +98,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void FluentTest_WithUnequalLists()
+        public void FluentTest_CompareUnequalLists()
         {
             var a1 = new int[] { 3, 2, 1 };
             var a2 = new int[] { 1, 2, 3, 4 };
@@ -133,7 +133,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void FluentTest_WithUnequalLists_CompareElementsByKey()
+        public void FluentTest_CompareUnequalLists_CompareElementsByKey()
         {
             var a1 = new int[] { 3, 2, 1 };
             var a2 = new int[] { 1, 2, 3, 4 };
@@ -158,7 +158,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void FluentTest_WithUnequalLists_CompareElementsByKey_FormatKey()
+        public void FluentTest_CompareUnequalLists_CompareElementsByKey_FormatKey()
         {
             var a1 = new int[] { 3, 2, 1 };
             var a2 = new int[] { 1, 2, 3, 4 };
@@ -185,7 +185,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void FluentTest_WithUnequalLists_CompareElementsByKey_FormatKey_DefaultNullElementIdentifier()
+        public void FluentTest_CompareUnequalLists_CompareElementsByKey_FormatKey_DefaultNullElementIdentifier()
         {
             var a1 = new int?[] { 3, 2, 1 };
             var a2 = new int?[] { 1, 2, 3, 4, null };
@@ -217,7 +217,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void FluentTest_WithUnequalLists_CompareElementsByKey_FormatKey_FormatNullElementIdentifier()
+        public void FluentTest_CompareUnequalLists_CompareElementsByKey_FormatKey_FormatNullElementIdentifier()
         {
             var a1 = new int?[] { 3, 2, 1 };
             var a2 = new int?[] { 1, 2, 3, 4, null };
@@ -234,7 +234,7 @@ namespace ObjectsComparer.Tests
             //settings = new ComparisonSettings();
             //settings.ConfigureList(listOptions => 
             //{
-            //    listOptions.WithUnequalLists(true);
+            //    listOptions.CompareUnequalLists(true);
 
             //    listOptions.CompareElementsByKey(keyOptions =>
             //    {
@@ -247,7 +247,7 @@ namespace ObjectsComparer.Tests
             //settings.ConfigureList((ctx, listOptions) =>
             //{
             //    bool unequalEnabled = ctx.Member.Name == "List1";
-            //    listOptions.WithUnequalLists(unequalEnabled);
+            //    listOptions.CompareUnequalLists(unequalEnabled);
 
             //    listOptions.CompareElementsByKey(keyOptions =>
             //    {
