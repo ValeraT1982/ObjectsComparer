@@ -16,14 +16,14 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// See <see cref="WithUnequalLists(bool)"/>.
+        /// See <see cref="CompareUnequalLists(bool)"/>.
         /// </summary>
         internal bool UnequalListsComparisonEnabled { get; private set; } = false;
 
         /// <summary>
-        /// Whether to compare elements of the lists even if their number differs. Regardless of the <paramref name="value"/>, the respective difference of type <see cref="DifferenceTypes.NumberOfElementsMismatch"/> will always be logged. Default value = false.
+        /// Whether to compare elements of the lists even if their number differs. Regardless of the <paramref name="value"/>, if lists are unequal, the difference of type <see cref="DifferenceTypes.NumberOfElementsMismatch"/> will always be logged. Default value = false - unequal lists will not be compared.
         /// </summary>
-        public ListConfigurationOptions WithUnequalLists(bool value)
+        public ListConfigurationOptions CompareUnequalLists(bool value)
         {
             UnequalListsComparisonEnabled = value;
 

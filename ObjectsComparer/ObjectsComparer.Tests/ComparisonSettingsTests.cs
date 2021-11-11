@@ -64,7 +64,7 @@ namespace ObjectsComparer.Tests
 
             settings.ConfigureList((comparisonContext, listOptions) =>
             {
-                listOptions.WithUnequalLists(true);
+                listOptions.CompareUnequalLists(true);
 
                 listOptions.CompareElementsByKey(keyOptions =>
                 {
@@ -104,7 +104,7 @@ namespace ObjectsComparer.Tests
             var a2 = new int[] { 1, 2, 3, 4 };
 
             var settings = new ComparisonSettings();
-            settings.ConfigureList(listOptions => listOptions.WithUnequalLists(true));
+            settings.ConfigureList(listOptions => listOptions.CompareUnequalLists(true));
 
             var comparer = new Comparer(settings);
             var differences = comparer.CalculateDifferences(a1, a2).ToList();
@@ -139,7 +139,7 @@ namespace ObjectsComparer.Tests
             var a2 = new int[] { 1, 2, 3, 4 };
 
             var settings = new ComparisonSettings();
-            settings.ConfigureList(listOptions => listOptions.WithUnequalLists(true).CompareElementsByKey());
+            settings.ConfigureList(listOptions => listOptions.CompareUnequalLists(true).CompareElementsByKey());
 
             var comparer = new Comparer(settings);
             var differences = comparer.CalculateDifferences(a1, a2).ToList();
@@ -165,7 +165,7 @@ namespace ObjectsComparer.Tests
 
             var settings = new ComparisonSettings();
             settings.ConfigureList(listOptions => listOptions
-                .WithUnequalLists(true)
+                .CompareUnequalLists(true)
                 .CompareElementsByKey(keyOptions => keyOptions.FormatElementKey(args => $"Key={args.ElementKey}")));
 
             var comparer = new Comparer(settings);
@@ -192,7 +192,7 @@ namespace ObjectsComparer.Tests
 
             var settings = new ComparisonSettings();
             settings.ConfigureList(listOptions => listOptions
-                .WithUnequalLists(true)
+                .CompareUnequalLists(true)
                 .CompareElementsByKey(keyOptions => keyOptions.FormatElementKey(args => $"Key={args.ElementKey}")));
 
             var comparer = new Comparer(settings);
@@ -224,7 +224,7 @@ namespace ObjectsComparer.Tests
 
             var settings = new ComparisonSettings();
             settings.ConfigureList(listOptions => listOptions
-                .WithUnequalLists(true)
+                .CompareUnequalLists(true)
                 .CompareElementsByKey(keyOptions => keyOptions
                     .FormatElementKey(formatArgs => $"Key={formatArgs.ElementKey}")
                     .FormatNullElementIdentifier(formatArgs => $"Null at {formatArgs.ElementIndex}")));
@@ -296,7 +296,7 @@ namespace ObjectsComparer.Tests
             var a2 = new List<int> { 1, 2, 3, 4 };
 
             var settings = new ComparisonSettings();
-            settings.ConfigureList(listOptions => listOptions.WithUnequalLists(true).CompareElementsByKey());
+            settings.ConfigureList(listOptions => listOptions.CompareUnequalLists(true).CompareElementsByKey());
 
             var comparer = new Comparer(settings);
             var differences = comparer.CalculateDifferences(a1, a2).ToList();
