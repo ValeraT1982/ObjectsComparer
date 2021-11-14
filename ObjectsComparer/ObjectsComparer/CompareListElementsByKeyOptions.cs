@@ -66,11 +66,23 @@ namespace ObjectsComparer
         /// </summary>
         internal Func<ListElementKeyProviderArgs, object> KeyProviderAction { get; private set; } = null;
 
+        public Func<ListElementKeyProviderArgs, object> DefaultKeyProvider { get; private set; } = args =>
+        {
+            if (TryGetPropertyValue(args.Element, caseSensitive: false, out var keyValue, "Id", "Name"))
+            {
+                return keyValue;
+            }
+
+            return args.Element;
+
+        };
+
         internal static CompareListElementsByKeyOptions Default() => new CompareListElementsByKeyOptions();
 
         void Initialize()
         {
-            UseKey(new string[] { "Id", "Name" }, caseSensitive: false);
+            KeyProviderAction = DefaultKeyProvider;
+            //UseKey(new string[] { "Id", "Name" }, caseSensitive: false);
         }
 
         /// <summary>
@@ -108,7 +120,8 @@ namespace ObjectsComparer
 
             return UseKey(args =>
             {
-                return GetKeyValue(args.Element, caseSensitive, keys);
+                TryGetPropertyValue(args.Element, caseSensitive, out var propertyValue, keys);
+                return propertyValue;
             });
         }
 
@@ -129,10 +142,10 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// It will try to find one of the public properties specified by the <paramref name="keys"/> parameter, then it returns its value.
+        /// It will try to find one of the public properties specified by the <paramref name="properties"/> parameter, then it returns its value.
         /// </summary>
         /// <returns>Returns the value of the property that corresponds to the specified key. If no property matches the specified key, it returns the <paramref name="instance"/> itself.</returns>
-        static object GetKeyValue(object instance, bool caseSensitive, params string[] keys)
+        static bool TryGetPropertyValue(object instance, bool caseSensitive, out object value, params string[] properties)
         {
             if (instance != null)
             {
@@ -142,17 +155,19 @@ namespace ObjectsComparer
                     bindingAttr |= BindingFlags.IgnoreCase;
                 }
 
-                foreach (var key in keys)
+                foreach (var key in properties)
                 {
                     var property = instance.GetType().GetTypeInfo().GetProperty(key, bindingAttr);
                     if (property != null)
                     {
-                        return property.GetValue(instance);
+                        value = property.GetValue(instance);
+                        return true;
                     }
                 }
             }
 
-            return instance;
+            value = null;
+            return false;
         }
 
         /// <summary>
