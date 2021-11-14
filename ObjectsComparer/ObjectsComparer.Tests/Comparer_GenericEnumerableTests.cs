@@ -1041,6 +1041,87 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
+        public void PrimitiveTypeArray_CompareByKey_CompareUnequalLists_Ignore_Repeated_Elements()
+        {
+            var a1 = new A() { IntArray = new int[] { 1, 2 } };
+            var a2 = new A() { IntArray = new int[] { 1, 2, 1, 2, 1, 2, 1, 2, 1, 2 } };
+
+            var settings = new ComparisonSettings();
+            settings.ConfigureList(listOptions => listOptions.CompareElementsByKey().CompareUnequalLists(true));
+
+            var comparer = new Comparer<A>(settings);
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            Assert.IsTrue(differences.Count == 1);
+            Assert.AreEqual(DifferenceTypes.ValueMismatch, differences[0].DifferenceType);
+            Assert.AreEqual("IntArray.Length", differences[0].MemberPath);
+            Assert.AreEqual("2", differences[0].Value1);
+            Assert.AreEqual("10", differences[0].Value2);
+        }
+
+        [Test]
+        public void PrimitiveTypeArray_CompareByIndex_CompareUnequalLists_Dont_Ignore_Repeated_Elements()
+        {
+            var a1 = new A() { IntArray = new int[] { 1, 2 } };
+            var a2 = new A() { IntArray = new int[] { 1, 2, 1, 2, 1, 2, 1, 2, 1, 2 } };
+
+            var settings = new ComparisonSettings();
+            settings.ConfigureList(listOptions => listOptions.CompareUnequalLists(true));
+
+            var comparer = new Comparer<A>(settings);
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            Assert.IsTrue(differences.Count == 9);
+
+            Assert.AreEqual(DifferenceTypes.MissedElementInFirstObject, differences[0].DifferenceType);
+            Assert.AreEqual("IntArray[2]", differences[0].MemberPath);
+            Assert.AreEqual("", differences[0].Value1);
+            Assert.AreEqual("1", differences[0].Value2);
+
+            Assert.AreEqual(DifferenceTypes.MissedElementInFirstObject, differences[1].DifferenceType);
+            Assert.AreEqual("IntArray[3]", differences[1].MemberPath);
+            Assert.AreEqual("", differences[1].Value1);
+            Assert.AreEqual("2", differences[1].Value2);
+
+            Assert.AreEqual(DifferenceTypes.MissedElementInFirstObject, differences[2].DifferenceType);
+            Assert.AreEqual("IntArray[4]", differences[2].MemberPath);
+            Assert.AreEqual("", differences[2].Value1);
+            Assert.AreEqual("1", differences[2].Value2);
+
+            Assert.AreEqual(DifferenceTypes.MissedElementInFirstObject, differences[3].DifferenceType);
+            Assert.AreEqual("IntArray[5]", differences[3].MemberPath);
+            Assert.AreEqual("", differences[3].Value1);
+            Assert.AreEqual("2", differences[3].Value2);
+
+            Assert.AreEqual(DifferenceTypes.MissedElementInFirstObject, differences[4].DifferenceType);
+            Assert.AreEqual("IntArray[6]", differences[4].MemberPath);
+            Assert.AreEqual("", differences[4].Value1);
+            Assert.AreEqual("1", differences[4].Value2);
+
+            Assert.AreEqual(DifferenceTypes.MissedElementInFirstObject, differences[5].DifferenceType);
+            Assert.AreEqual("IntArray[7]", differences[5].MemberPath);
+            Assert.AreEqual("", differences[5].Value1);
+            Assert.AreEqual("2", differences[5].Value2);
+
+            Assert.AreEqual(DifferenceTypes.MissedElementInFirstObject, differences[6].DifferenceType);
+            Assert.AreEqual("IntArray[8]", differences[6].MemberPath);
+            Assert.AreEqual("", differences[6].Value1);
+            Assert.AreEqual("1", differences[6].Value2);
+
+            Assert.AreEqual(DifferenceTypes.MissedElementInFirstObject, differences[7].DifferenceType);
+            Assert.AreEqual("IntArray[9]", differences[7].MemberPath);
+            Assert.AreEqual("", differences[7].Value1);
+            Assert.AreEqual("2", differences[7].Value2);
+
+            Assert.AreEqual(DifferenceTypes.ValueMismatch, differences[8].DifferenceType);
+            Assert.AreEqual("IntArray.Length", differences[8].MemberPath);
+            Assert.AreEqual("2", differences[8].Value1);
+            Assert.AreEqual("10", differences[8].Value2);
+        }
+
+        [Test]
         public void CompareAsIList_CompareUnequalLists()
         {
             var list1 = new List<int> { 1, 2 };
