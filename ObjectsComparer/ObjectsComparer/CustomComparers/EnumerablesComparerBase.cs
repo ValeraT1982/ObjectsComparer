@@ -13,33 +13,33 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// Selects calculation operation based on the current value of the <see cref="ListConfigurationOptions.ElementSearchMode"/> property.
+        /// Selects calculation operation based on the current value of the <see cref="ListComparisonOptions.ElementSearchMode"/> property.
         /// </summary>
-        protected virtual IEnumerable<Difference> CalculateDifferences<T>(IList<T> list1, IList<T> list2, ComparisonContext listComparisonContext, ListConfigurationOptions listConfigurationOptions)
+        protected virtual IEnumerable<Difference> CalculateDifferences<T>(IList<T> list1, IList<T> list2, ComparisonContext listComparisonContext, ListComparisonOptions listComparisonOptions)
         {
-            if (listConfigurationOptions.ElementSearchMode == ListElementSearchMode.Key)
+            if (listComparisonOptions.ElementSearchMode == ListElementSearchMode.Key)
             {
-                return CalculateDifferencesByKey(list1, list2, listComparisonContext, listConfigurationOptions);
+                return CalculateDifferencesByKey(list1, list2, listComparisonContext, listComparisonOptions);
             }
-            else if (listConfigurationOptions.ElementSearchMode == ListElementSearchMode.Index)
+            else if (listComparisonOptions.ElementSearchMode == ListElementSearchMode.Index)
             {
                 return CalculateDifferencesByIndex(list1, list2, listComparisonContext);
             }
             else
             {
-                throw new NotImplementedException($"{listConfigurationOptions.ElementSearchMode} not implemented yet.");
+                throw new NotImplementedException($"{listComparisonOptions.ElementSearchMode} not implemented yet.");
             }
         }
 
         /// <summary>
         /// Calculates differences using <see cref="ListElementSearchMode.Key"/> comparison mode.
         /// </summary>
-        protected virtual IEnumerable<Difference> CalculateDifferencesByKey<T>(IList<T> array1, IList<T> array2, ComparisonContext listComparisonContext, ListConfigurationOptions listConfigurationOptions)
+        protected virtual IEnumerable<Difference> CalculateDifferencesByKey<T>(IList<T> array1, IList<T> array2, ComparisonContext listComparisonContext, ListComparisonOptions listComparisonOptions)
         {
             Debug.WriteLine($"{GetType().Name}.{nameof(CalculateDifferencesByKey)}: {array1?.GetType().Name}");
 
-            var keyOptions = CompareListElementsByKeyOptions.Default();
-            listConfigurationOptions.KeyOptionsAction?.Invoke(keyOptions);
+            var keyOptions = ListElementComparisonByKeyOptions.Default();
+            listComparisonOptions.KeyOptionsAction?.Invoke(keyOptions);
 
             for (int element1Index = 0; element1Index < array1.Count(); element1Index++)
             {
@@ -59,7 +59,7 @@ namespace ObjectsComparer
                     continue;
                 }
 
-                var element1Key = keyOptions.KeyProviderAction(new ListElementKeyProviderArgs(element1));
+                var element1Key = keyOptions.ElementKeyProviderAction(new ListElementKeyProviderArgs(element1));
 
                 if (element1Key == null)
                 {
@@ -73,9 +73,9 @@ namespace ObjectsComparer
 
                 var formattedElement1Key = keyOptions.GetFormattedElementKey(new FormatListElementKeyArgs(element1Index, element1Key, element1));
 
-                if (array2.Any(elm2 => elm2 != null && object.Equals(element1Key, keyOptions.KeyProviderAction(new ListElementKeyProviderArgs(elm2)))))
+                if (array2.Any(elm2 => elm2 != null && object.Equals(element1Key, keyOptions.ElementKeyProviderAction(new ListElementKeyProviderArgs(elm2)))))
                 {
-                    var element2 = array2.First(elm2 => elm2 != null && object.Equals(element1Key, keyOptions.KeyProviderAction(new ListElementKeyProviderArgs(elm2))));
+                    var element2 = array2.First(elm2 => elm2 != null && object.Equals(element1Key, keyOptions.ElementKeyProviderAction(new ListElementKeyProviderArgs(elm2))));
                     var comparer = Factory.GetObjectsComparer(element1.GetType(), Settings, this);
 
                     foreach (var failure in comparer.CalculateDifferences(element1.GetType(), element1, element2, elementComparisonContext))
@@ -108,7 +108,7 @@ namespace ObjectsComparer
                     continue;
                 }
 
-                var element2Key = keyOptions.KeyProviderAction(new ListElementKeyProviderArgs(element2));
+                var element2Key = keyOptions.ElementKeyProviderAction(new ListElementKeyProviderArgs(element2));
 
                 if (element2Key == null)
                 {
@@ -120,7 +120,7 @@ namespace ObjectsComparer
                     continue;
                 }
 
-                if (array1.Any(elm1 => elm1 != null && object.Equals(element2Key, keyOptions.KeyProviderAction(new ListElementKeyProviderArgs(elm1)))) == false)
+                if (array1.Any(elm1 => elm1 != null && object.Equals(element2Key, keyOptions.ElementKeyProviderAction(new ListElementKeyProviderArgs(elm1)))) == false)
                 {
                     var formattedElement2Key = keyOptions.GetFormattedElementKey(new FormatListElementKeyArgs(element2Index, element2Key, element2));
                     var valueComparer2 = OverridesCollection.GetComparer(element2.GetType()) ?? DefaultValueComparer;

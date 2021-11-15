@@ -33,7 +33,7 @@ namespace ObjectsComparer.Tests
             var a2 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 3 } } };
 
             var settings = new ComparisonSettings();
-            settings.ConfigureList(options => options.CompareElementsByKey());
+            settings.ConfigureListComparison(options => options.CompareElementsByKey());
 
             var comparer = new Comparer<MultidimensionalArrays>(settings);
 
@@ -90,7 +90,7 @@ namespace ObjectsComparer.Tests
             var a2 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 2, 2 }, new[] { 3, 5 } } };
 
             var settings = new ComparisonSettings();
-            settings.ConfigureList(listOptions => listOptions.CompareUnequalLists(true));
+            settings.ConfigureListComparison(listOptions => listOptions.CompareUnequalLists(true));
 
             var comparer = new Comparer<MultidimensionalArrays>(settings);
 
@@ -161,7 +161,7 @@ namespace ObjectsComparer.Tests
             var a2 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 2 }, new[] { 3, 5, 6 } } };
 
             var settings = new ComparisonSettings();
-            settings.ConfigureList(listOptions => listOptions.CompareUnequalLists(true));
+            settings.ConfigureListComparison(listOptions => listOptions.CompareUnequalLists(true));
 
             var comparer = new Comparer<MultidimensionalArrays>(settings);
 

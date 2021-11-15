@@ -57,20 +57,20 @@ namespace ObjectsComparer
             var array1 = ((IEnumerable)obj1).Cast<object>().ToArray();
             var array2 = ((IEnumerable)obj2).Cast<object>().ToArray();
 
-            var listConfigurationOptions = ListConfigurationOptions.Default();
-            Settings.ConfigureOptionsAction?.Invoke(listComparisonContext, listConfigurationOptions);
+            var listComparisonOptions = ListComparisonOptions.Default();
+            Settings.ListComparisonOptionsAction?.Invoke(listComparisonContext, listComparisonOptions);
 
             if (array1.Length != array2.Length)
             {
                 yield return AddDifferenceToComparisonContext(new Difference("", array1.Length.ToString(), array2.Length.ToString(), DifferenceTypes.NumberOfElementsMismatch), listComparisonContext);
 
-                if (listConfigurationOptions.UnequalListsComparisonEnabled == false)
+                if (listComparisonOptions.UnequalListsComparisonEnabled == false)
                 {
                     yield break;
                 }
             }
 
-            IEnumerable<Difference> failrues = CalculateDifferences(array1, array2, listComparisonContext, listConfigurationOptions);
+            IEnumerable<Difference> failrues = CalculateDifferences(array1, array2, listComparisonContext, listComparisonOptions);
             
             foreach (var failrue in failrues)
             {

@@ -67,20 +67,20 @@ namespace ObjectsComparer
             throw new KeyNotFoundException();
         }
 
-        internal Action<ComparisonContext, ListConfigurationOptions> ConfigureOptionsAction { get; private set; } = null;
+        internal Action<ComparisonContext, ListComparisonOptions> ListComparisonOptionsAction { get; private set; } = null;
 
         /// <summary>
-        /// Configures list comparison behavior, especially the type of comparison. See <see cref="ListConfigurationOptions"/>.
+        /// Configures list comparison behavior, especially the type of the comparison. See <see cref="ListConfigurationOptions"/>.
         /// </summary>
-        /// <param name="configureOptions">First parameter: Current list comparison context.</param>
-        public ComparisonSettings ConfigureList(Action<ComparisonContext, ListConfigurationOptions> configureOptions)
+        /// <param name="comparisonOptions">First parameter: Current list comparison context.</param>
+        public ComparisonSettings ConfigureListComparison(Action<ComparisonContext, ListComparisonOptions> comparisonOptions)
         {
-            if (configureOptions is null)
+            if (comparisonOptions is null)
             {
-                throw new ArgumentNullException(nameof(configureOptions));
+                throw new ArgumentNullException(nameof(comparisonOptions));
             }
 
-            ConfigureOptionsAction = configureOptions;
+            ListComparisonOptionsAction = comparisonOptions;
 
             return this;
         }
@@ -88,10 +88,10 @@ namespace ObjectsComparer
         /// <summary>
         /// Configures list comparison behavior, especially the type of comparison. See <see cref="ListConfigurationOptions"/>.
         /// </summary>
-        /// <param name="configureOptions">See <see cref="ListConfigurationOptions"/>.</param>
-        public ComparisonSettings ConfigureList(Action<ListConfigurationOptions> configureOptions)
+        /// <param name="comparisonOptions">See <see cref="ListConfigurationOptions"/>.</param>
+        public ComparisonSettings ConfigureListComparison(Action<ListComparisonOptions> comparisonOptions)
         {
-            return ConfigureList((_, options) => configureOptions(options));
+            return ConfigureListComparison((_, options) => comparisonOptions(options));
         }
     }
 }

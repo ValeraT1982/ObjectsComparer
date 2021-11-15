@@ -10,7 +10,7 @@ namespace ObjectsComparer
     /// <summary>
     /// Configures the behavior of list elements if list elements are to be compared by key.
     /// </summary>
-    public class CompareListElementsByKeyOptions
+    public class ListElementComparisonByKeyOptions
     {
         /// <summary>
         /// Default element identifier template for element that refers to null value. See <see cref="FormatNullElementIdentifier(Func{int, string})"/> for more info.        
@@ -37,18 +37,18 @@ namespace ObjectsComparer
         /// </summary>
         const bool DefaultElementKeyCaseSensitivity = false;
 
-        CompareListElementsByKeyOptions()
+        ListElementComparisonByKeyOptions()
         {
             DefaultElementKeyProviderAction = args =>
             {
-                if (TryGetPropertyValue(args.Element, caseSensitive: DefaultElementKeyCaseSensitivity, out var keyValue, DefaultElementKeys))
-                {
-                    return keyValue;
-                }
-
                 if (TryGetKeyValueFromElement(args.Element, out var keyValue2))
                 {
                     return keyValue2;
+                }
+
+                if (TryGetPropertyValue(args.Element, caseSensitive: DefaultElementKeyCaseSensitivity, out var keyValue, DefaultElementKeys))
+                {
+                    return keyValue;
                 }
 
                 return null;
@@ -80,7 +80,7 @@ namespace ObjectsComparer
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public CompareListElementsByKeyOptions ThrowKeyNotFound(bool value)
+        public ListElementComparisonByKeyOptions ThrowKeyNotFound(bool value)
         {
             ThrowKeyNotFoundEnabled = value;
 
@@ -90,19 +90,21 @@ namespace ObjectsComparer
         /// <summary>
         /// See <see cref="UseKey(Func{ListElementKeyProviderArgs, object})"/>.
         /// </summary>
-        internal Func<ListElementKeyProviderArgs, object> KeyProviderAction { get; private set; } = null;
+        internal Func<ListElementKeyProviderArgs, object> ElementKeyProviderAction { get; private set; } = null;
 
         /// <summary>
-        /// 
+        /// Default list element key provider. If the element implements <see cref="IEquatable{T}"/>, the provider returns the element itself.
+        /// Otherwise, if the element contains one of the properties "Id", "Key", "Name", the provider returns first of them, in that order, even it will be null.
+        /// Otherwise the provider returns null.
         /// </summary>
         public Func<ListElementKeyProviderArgs, object> DefaultElementKeyProviderAction { get; private set; } = null;
 
-        internal static CompareListElementsByKeyOptions Default() => new CompareListElementsByKeyOptions();
+        internal static ListElementComparisonByKeyOptions Default() => new ListElementComparisonByKeyOptions();
 
         /// <summary>
         /// Key identification. It attempts to find the key using the property specified by the <paramref name="key"/> parameter.
         /// </summary>
-        public CompareListElementsByKeyOptions UseKey(string key, bool caseSensitive = false)
+        public ListElementComparisonByKeyOptions UseKey(string key, bool caseSensitive = false)
         {
             if (string.IsNullOrWhiteSpace(key))
             {
@@ -115,7 +117,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Key identification. It attempts to find the key using one of the public properties specified by the <paramref name="keys"/> parameter, in the specified order.
         /// </summary>
-        public CompareListElementsByKeyOptions UseKey(string[] keys, bool caseSensitive = false)
+        public ListElementComparisonByKeyOptions UseKey(string[] keys, bool caseSensitive = false)
         {
             if (keys is null)
             {
@@ -143,22 +145,22 @@ namespace ObjectsComparer
         /// Key identification. It attempts to find the key using the <paramref name="keyProvider"/> parameter.
         /// </summary>
         /// <param name="keyProvider">First parameter: The element whose key is required. Return value: The element's key.</param>
-        public CompareListElementsByKeyOptions UseKey(Func<ListElementKeyProviderArgs, object> keyProvider)
+        public ListElementComparisonByKeyOptions UseKey(Func<ListElementKeyProviderArgs, object> keyProvider)
         {
             if (keyProvider is null)
             {
                 throw new ArgumentNullException(nameof(keyProvider));
             }
 
-            KeyProviderAction = keyProvider;
+            ElementKeyProviderAction = keyProvider;
 
             return this;
         }
 
         /// <summary>
-        /// It will try to find one of the public properties specified by the <paramref name="properties"/> parameter, then it returns its value.
+        /// The out parameter <paramref name="value"/> returns first property value of the <paramref name="instance"/> from properties defined by <paramref name="properties"/>, in specified order. Value can be null. 
+        /// If no property is found in the object, false is returned by operation.
         /// </summary>
-        /// <returns>Returns the value of the property that corresponds to the specified key. If no property matches the specified key, it returns the <paramref name="instance"/> itself.</returns>
         bool TryGetPropertyValue(object instance, bool caseSensitive, out object value, params string[] properties)
         {
             if (instance != null)
@@ -184,6 +186,12 @@ namespace ObjectsComparer
             return false;
         }
 
+        /// <summary>
+        /// If <paramref name="element"/> is <see cref="IEquatable{T}"/> returns <paramref name="element"/>, otherwise returns null.
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="keyValue"></param>
+        /// <returns></returns>
         internal static bool TryGetKeyValueFromElement(object element, out object keyValue)
         {
             var elementType = element.GetType();
@@ -257,7 +265,7 @@ namespace ObjectsComparer
         /// The formatted element key is then used as part of the <see cref="Difference.MemberPath"/> property, e.g. "Addresses[Id=1]" instead of "Addresses[1]".<br/>
         /// By default the element key is not formatted.
         /// </summary>
-        public CompareListElementsByKeyOptions FormatElementKey(Func<FormatListElementKeyArgs, string> formatter)
+        public ListElementComparisonByKeyOptions FormatElementKey(Func<FormatListElementKeyArgs, string> formatter)
         {
             if (formatter is null)
             {
@@ -274,7 +282,7 @@ namespace ObjectsComparer
         /// By default, <see cref="DefaultNullElementIdentifierTemplate"/> template will be used to format the identifier.
         /// </summary>
         /// <param name="formatter">First parameter: Element index. Return value: Formatted identifier.</param>
-        public CompareListElementsByKeyOptions FormatNullElementIdentifier(Func<FormatNullElementIdentifierArgs, string> formatter)
+        public ListElementComparisonByKeyOptions FormatNullElementIdentifier(Func<FormatNullElementIdentifierArgs, string> formatter)
         {
             if (formatter is null)
             {

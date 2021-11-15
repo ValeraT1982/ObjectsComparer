@@ -57,8 +57,8 @@ namespace ObjectsComparer
             var list1 = ((IEnumerable<T>)obj1).ToList();
             var list2 = ((IEnumerable<T>)obj2).ToList();
 
-            var listConfigurationOptions = ListConfigurationOptions.Default();
-            Settings.ConfigureOptionsAction?.Invoke(listComparisonContext, listConfigurationOptions);
+            var listComparisonOptions = ListComparisonOptions.Default();
+            Settings.ListComparisonOptionsAction?.Invoke(listComparisonContext, listComparisonOptions);
 
             if (list1.Count != list2.Count)
             {
@@ -67,13 +67,13 @@ namespace ObjectsComparer
                     yield return AddDifferenceToComparisonContext(new Difference("", list1.Count().ToString(), list2.Count().ToString(), DifferenceTypes.NumberOfElementsMismatch), listComparisonContext);
                 }
 
-                if (listConfigurationOptions.UnequalListsComparisonEnabled == false)
+                if (listComparisonOptions.UnequalListsComparisonEnabled == false)
                 {
                     yield break;
                 }
             }
 
-            IEnumerable<Difference> failrues = CalculateDifferences(list1, list2, listComparisonContext, listConfigurationOptions);
+            IEnumerable<Difference> failrues = CalculateDifferences(list1, list2, listComparisonContext, listComparisonOptions);
 
             foreach (var failrue in failrues)
             {

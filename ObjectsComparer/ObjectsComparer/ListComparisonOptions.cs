@@ -6,13 +6,12 @@ using System.Text;
 
 namespace ObjectsComparer
 {
-    //TODO: Rename to ListComparisonOptions
     /// <summary>
     /// Configures list comparison behavior.
     /// </summary>
-    public class ListConfigurationOptions
+    public class ListComparisonOptions
     {
-        ListConfigurationOptions()
+        ListComparisonOptions()
         {
         }
 
@@ -24,31 +23,35 @@ namespace ObjectsComparer
         /// <summary>
         /// Whether to compare elements of the lists even if their number differs. Regardless of the <paramref name="value"/>, if lists are unequal, the difference of type <see cref="DifferenceTypes.NumberOfElementsMismatch"/> will always be logged. Default value = false - unequal lists will not be compared.
         /// </summary>
-        public ListConfigurationOptions CompareUnequalLists(bool value)
+        public ListComparisonOptions CompareUnequalLists(bool value)
         {
             UnequalListsComparisonEnabled = value;
 
             return this;
         }
 
-        internal static ListConfigurationOptions Default() => new ListConfigurationOptions();
+        /// <summary>
+        /// Default options.
+        /// </summary>
+        /// <returns></returns>
+        internal static ListComparisonOptions Default() => new ListComparisonOptions();
 
         /// <summary>
         /// Compares list elements by index. Default behavior.
         /// </summary>
-        public ListConfigurationOptions CompareElementsByIndex()
+        public ListComparisonOptions CompareElementsByIndex()
         {
             KeyOptionsAction = null;
 
             return this;
         }
 
-        internal Action<CompareListElementsByKeyOptions> KeyOptionsAction { get; private set; }
+        internal Action<ListElementComparisonByKeyOptions> KeyOptionsAction { get; private set; }
 
         /// <summary>
-        /// Compares list elements by key using <see cref="CompareListElementsByKeyOptions.DefaultElementKeyProviderAction"/>.
+        /// Compares list elements by key using <see cref="ListElementComparisonByKeyOptions.DefaultElementKeyProviderAction"/> element key provider.
         /// </summary>
-        public ListConfigurationOptions CompareElementsByKey()
+        public ListComparisonOptions CompareElementsByKey()
         {
             return CompareElementsByKey(options => { });
         }
@@ -56,7 +59,8 @@ namespace ObjectsComparer
         /// <summary>
         /// Compares list elements by key.
         /// </summary>
-        public ListConfigurationOptions CompareElementsByKey(Action<CompareListElementsByKeyOptions> keyOptions)
+        /// <param name="keyOptions">List element comparison options</param>
+        public ListComparisonOptions CompareElementsByKey(Action<ListElementComparisonByKeyOptions> keyOptions)
         {
             if (keyOptions is null)
             {
