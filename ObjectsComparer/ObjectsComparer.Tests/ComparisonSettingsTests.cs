@@ -231,44 +231,6 @@ namespace ObjectsComparer.Tests
 
             var comparer = new Comparer(settings);
 
-            //settings = new ComparisonSettings();
-            //settings.ConfigureList(listOptions => 
-            //{
-            //    listOptions.CompareUnequalLists(true);
-
-            //    listOptions.CompareElementsByKey(keyOptions =>
-            //    {
-            //        keyOptions.FormatElementKey(args => $"Key={args.ElementKey}");
-            //        keyOptions.FormatNullElementIdentifier(idx => $"Null at {idx}");
-            //    });
-            //});
-
-            //settings = new ComparisonSettings();
-            //settings.ConfigureList((ctx, listOptions) =>
-            //{
-            //    bool unequalEnabled = ctx.Member.Name == "List1";
-            //    listOptions.CompareUnequalLists(unequalEnabled);
-
-            //    listOptions.CompareElementsByKey(keyOptions =>
-            //    {
-            //        keyOptions.FormatElementKey(args => $"Key={args.ElementKey}");
-            //        keyOptions.FormatNullElementIdentifier(args => $"Null at {args.ElementIndex}");
-
-            //        if (ctx.Member.Name == nameof(A.ListOfB))
-            //        {
-            //            keyOptions.UseKey(args =>
-            //            {
-            //                if (args.Element is B element)
-            //                {
-            //                    return element.Property1;
-            //                }
-
-            //                return args.Element;
-            //            });
-            //        }
-            //    });
-            //});
-                        
             var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             Assert.AreEqual(3, differences.Count);
