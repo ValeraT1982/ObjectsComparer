@@ -6,6 +6,7 @@ using System.Text;
 
 namespace ObjectsComparer
 {
+    //TODO: Rename to ListComparisonOptions
     /// <summary>
     /// Configures list comparison behavior.
     /// </summary>

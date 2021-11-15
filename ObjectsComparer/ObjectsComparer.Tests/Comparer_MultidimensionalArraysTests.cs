@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using NUnit.Framework;
+using ObjectsComparer.Exceptions;
 using ObjectsComparer.Tests.TestClasses;
 
 namespace ObjectsComparer.Tests
@@ -36,15 +37,11 @@ namespace ObjectsComparer.Tests
 
             var comparer = new Comparer<MultidimensionalArrays>(settings);
 
-            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
-            var differences = differencesEnum.ToList();
-
-            Assert.IsFalse(isEqual);
-            CollectionAssert.IsNotEmpty(differences);
-            Assert.AreEqual(1, differences.Count);
-            Assert.AreEqual("IntOfInt[0][1]", differences[0].MemberPath);
-            Assert.AreEqual("2", differences[0].Value1);
-            Assert.AreEqual("3", differences[0].Value2);
+            Assert.Throws<ElementKeyNotFoundException>(() => 
+            {
+                var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
+                var differences = differencesEnum.ToList();
+            });
         }
 
         [Test]
@@ -87,6 +84,41 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
+        public void IntOfIntInequality3_CompareUnequalLists()
+        {
+            var a1 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 2 } } };
+            var a2 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 2, 2 }, new[] { 3, 5 } } };
+
+            var settings = new ComparisonSettings();
+            settings.ConfigureList(listOptions => listOptions.CompareUnequalLists(true));
+
+            var comparer = new Comparer<MultidimensionalArrays>(settings);
+
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(3, differences.Count);
+
+            Assert.AreEqual(DifferenceTypes.ValueMismatch, differences[0].DifferenceType);
+            Assert.AreEqual("IntOfInt[0][0]", differences[0].MemberPath);
+            Assert.AreEqual("1", differences[0].Value1);
+            Assert.AreEqual("2", differences[0].Value2);
+
+            Assert.AreEqual(DifferenceTypes.MissedElementInFirstObject, differences[1].DifferenceType);
+            Assert.AreEqual("IntOfInt[1]", differences[1].MemberPath);
+            Assert.AreEqual("", differences[1].Value1);
+            Assert.AreEqual("System.Int32[]", differences[1].Value2);
+
+            Assert.AreEqual(DifferenceTypes.ValueMismatch, differences[2].DifferenceType);
+            Assert.AreEqual("IntOfInt.Length", differences[2].MemberPath);
+            Assert.AreEqual("1", differences[2].Value1);
+            Assert.AreEqual("2", differences[2].Value2);
+        }
+
+        [Test]
         public void IntOfIntInequality4()
         {
             var a1 = new MultidimensionalArrays { IntOfInt = new int[0][] };
@@ -120,6 +152,35 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual("IntOfInt[1].Length", differences[0].MemberPath);
             Assert.AreEqual("2", differences[0].Value1);
             Assert.AreEqual("3", differences[0].Value2);
+        }
+
+        [Test]
+        public void IntOfIntInequality5____()
+        {
+            var a1 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 2 }, new[] { 3, 5 } } };
+            var a2 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 2 }, new[] { 3, 5, 6 } } };
+
+            var settings = new ComparisonSettings();
+            settings.ConfigureList(listOptions => listOptions.CompareUnequalLists(true));
+
+            var comparer = new Comparer<MultidimensionalArrays>(settings);
+
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(2, differences.Count);
+
+            Assert.AreEqual(DifferenceTypes.MissedElementInFirstObject, differences[0].DifferenceType);
+            Assert.AreEqual("IntOfInt[1][2]", differences[0].MemberPath);
+            Assert.AreEqual("", differences[0].Value1);
+            Assert.AreEqual("6", differences[0].Value2);
+
+            Assert.AreEqual(DifferenceTypes.ValueMismatch, differences[1].DifferenceType);
+            Assert.AreEqual("IntOfInt[1].Length", differences[1].MemberPath);
+            Assert.AreEqual("2", differences[1].Value1);
+            Assert.AreEqual("3", differences[1].Value2);
         }
 
         [Test]

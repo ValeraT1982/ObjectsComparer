@@ -86,7 +86,7 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// Configures list comparison behavior, especially the type of comparison.. See <see cref="ListConfigurationOptions"/>.
+        /// Configures list comparison behavior, especially the type of comparison. See <see cref="ListConfigurationOptions"/>.
         /// </summary>
         /// <param name="configureOptions">See <see cref="ListConfigurationOptions"/>.</param>
         public ComparisonSettings ConfigureList(Action<ListConfigurationOptions> configureOptions)
