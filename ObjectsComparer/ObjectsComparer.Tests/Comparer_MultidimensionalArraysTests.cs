@@ -24,7 +24,29 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual("2", differences[0].Value1);
             Assert.AreEqual("3", differences[0].Value2);
         }
-               
+
+        [Test]
+        public void IntOfIntInequality1_CompareByKey()
+        {
+            var a1 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 2 } } };
+            var a2 = new MultidimensionalArrays { IntOfInt = new[] { new[] { 1, 3 } } };
+
+            var settings = new ComparisonSettings();
+            settings.ConfigureList(options => options.CompareElementsByKey());
+
+            var comparer = new Comparer<MultidimensionalArrays>(settings);
+
+            var isEqual = comparer.Compare(a1, a2, out var differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(1, differences.Count);
+            Assert.AreEqual("IntOfInt[0][1]", differences[0].MemberPath);
+            Assert.AreEqual("2", differences[0].Value1);
+            Assert.AreEqual("3", differences[0].Value2);
+        }
+
         [Test]
         public void IntOfIntInequality2()
         {

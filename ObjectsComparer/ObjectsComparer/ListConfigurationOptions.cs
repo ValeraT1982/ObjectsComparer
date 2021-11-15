@@ -45,7 +45,7 @@ namespace ObjectsComparer
         internal Action<CompareListElementsByKeyOptions> KeyOptionsAction { get; private set; }
 
         /// <summary>
-        /// Compares list elements by key.
+        /// Compares list elements by key using <see cref="CompareListElementsByKeyOptions.DefaultElementKeyProviderAction"/>.
         /// </summary>
         public ListConfigurationOptions CompareElementsByKey()
         {

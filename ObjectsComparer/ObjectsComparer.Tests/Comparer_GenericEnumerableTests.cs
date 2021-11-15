@@ -5,6 +5,7 @@ using ObjectsComparer.Tests.TestClasses;
 using System.Collections.Generic;
 using ObjectsComparer.Exceptions;
 using System;
+using ObjectsComparer.Utils;
 
 namespace ObjectsComparer.Tests
 {
@@ -31,7 +32,7 @@ namespace ObjectsComparer.Tests
 
             var settings = new ComparisonSettings();
 
-            settings.ConfigureList(listOptions => listOptions.CompareElementsByKey(opt => opt.UseKey("MyKey")));
+            settings.ConfigureList(listOptions => listOptions.CompareElementsByKey());
 
             var comparer = new Comparer<A>(settings);
 
@@ -1231,7 +1232,7 @@ namespace ObjectsComparer.Tests
         [Test]
         public void DictionaryEqualitySameOrder_CompareByKey()
         {
-            var a1 = new Dictionary<int, string> { { 1, "One" }, { 2, "TwoXXX" } };
+            var a1 = new Dictionary<int, string> { { 1, "One" }, { 2, "Two" } };
             var a2 = new Dictionary<int, string> { { 1, "One" }, { 2, "Two" } };
 
             var settings = new ComparisonSettings();
@@ -1244,7 +1245,7 @@ namespace ObjectsComparer.Tests
 
             Assert.IsTrue(isEqual);
         }
-
+        
         [Test]
         public void DictionaryInequalityDifferentOrder()
         {
@@ -1255,6 +1256,22 @@ namespace ObjectsComparer.Tests
             var isEqual = comparer.Compare(a1, a2);
 
             Assert.IsFalse(isEqual);
+        }
+
+        [Test]
+        public void DictionaryEqualityDifferentOrder_CompareByKey()
+        {
+            var a1 = new Dictionary<int, string> { { 1, "One" }, { 2, "Two" } };
+            var a2 = new Dictionary<int, string> { { 2, "Two" }, { 1, "One" } };
+
+            var settings = new ComparisonSettings();
+            settings.ConfigureList(listOptions => listOptions.CompareElementsByKey());
+
+            var comparer = new Comparer<Dictionary<int, string>>(settings);
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsTrue(isEqual);
         }
 
         [Test]

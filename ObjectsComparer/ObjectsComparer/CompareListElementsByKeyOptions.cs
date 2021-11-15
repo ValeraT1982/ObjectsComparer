@@ -20,16 +20,42 @@ namespace ObjectsComparer
         /// <summary>
         /// Max. length of the formatted key of the element. See <see cref="FormatElementKey(Func{int, object, string})"/>.
         /// </summary>
-        const int FormattedKeyMaxLength = 50;
+        const int FormattedElementKeyMaxLength = 50;
 
         /// <summary>
         /// Max. length of the identifier of the element that refers to null value. See <see cref="FormatNullElementIdentifier(Func{int, string})"/>.
         /// </summary>
         const int NullElementIdentifierMaxLength = 20;
+        
+        /// <summary>
+        /// Element keys supported by <see cref="DefaultElementKeyProviderAction"/>.
+        /// </summary>
+        static readonly string[] DefaultElementKeys = new string[] { "Id", "Key", "Name"};
+
+        /// <summary>
+        /// 
+        /// </summary>
+        const bool DefaultElementKeyCaseSensitivity = false;
 
         CompareListElementsByKeyOptions()
         {
-            Initialize();
+            DefaultElementKeyProviderAction = args =>
+            {
+                if (TryGetPropertyValue(args.Element, caseSensitive: DefaultElementKeyCaseSensitivity, out var keyValue, DefaultElementKeys))
+                {
+                    return keyValue;
+                }
+
+                if (TryGetKeyValueFromElement(args.Element, out var keyValue2))
+                {
+                    return keyValue2;
+                }
+
+                return null;
+
+            };
+
+            UseKey(DefaultElementKeyProviderAction);
         }
 
         /// <summary>
@@ -66,24 +92,12 @@ namespace ObjectsComparer
         /// </summary>
         internal Func<ListElementKeyProviderArgs, object> KeyProviderAction { get; private set; } = null;
 
-        public Func<ListElementKeyProviderArgs, object> DefaultKeyProvider { get; private set; } = args =>
-        {
-            if (TryGetPropertyValue(args.Element, caseSensitive: false, out var keyValue, "Id", "Name"))
-            {
-                return keyValue;
-            }
-
-            return args.Element;
-
-        };
+        /// <summary>
+        /// 
+        /// </summary>
+        public Func<ListElementKeyProviderArgs, object> DefaultElementKeyProviderAction { get; private set; } = null;
 
         internal static CompareListElementsByKeyOptions Default() => new CompareListElementsByKeyOptions();
-
-        void Initialize()
-        {
-            KeyProviderAction = DefaultKeyProvider;
-            //UseKey(new string[] { "Id", "Name" }, caseSensitive: false);
-        }
 
         /// <summary>
         /// Key identification. It attempts to find the key using the property specified by the <paramref name="key"/> parameter.
@@ -145,7 +159,7 @@ namespace ObjectsComparer
         /// It will try to find one of the public properties specified by the <paramref name="properties"/> parameter, then it returns its value.
         /// </summary>
         /// <returns>Returns the value of the property that corresponds to the specified key. If no property matches the specified key, it returns the <paramref name="instance"/> itself.</returns>
-        static bool TryGetPropertyValue(object instance, bool caseSensitive, out object value, params string[] properties)
+        bool TryGetPropertyValue(object instance, bool caseSensitive, out object value, params string[] properties)
         {
             if (instance != null)
             {
@@ -170,6 +184,32 @@ namespace ObjectsComparer
             return false;
         }
 
+        internal static bool TryGetKeyValueFromElement(object element, out object keyValue)
+        {
+            var elementType = element.GetType();
+
+            if (elementType.InheritsFrom(typeof(System.Collections.Generic.KeyValuePair<,>)))
+            {
+                keyValue = elementType.GetTypeInfo().GetProperty("Key").GetValue(element);
+                return TryGetKeyValueFromElement(keyValue, out keyValue);
+            }
+
+            if (elementType.InheritsFrom(typeof(IEquatable<>)))
+            {
+                keyValue = element;
+                return true;
+            }
+
+            //if (elementType.InheritsFrom(Nullable.GetUnderlyingType(elementType)))
+            //{
+            //    keyValue = element;
+            //    return true;
+            //}
+
+            keyValue = null;
+            return false;
+        }
+
         /// <summary>
         /// Returns optional formatted or unformatted <paramref name="elementKey"/>. See <see cref="FormatElementKey(Func{FormatListElementKeyArgs, string})"/>
         /// </summary>
@@ -187,7 +227,7 @@ namespace ObjectsComparer
                 formattedKey = formatElementKeyArgs.ElementKey.ToString();
             }
 
-            return formattedKey.Left(FormattedKeyMaxLength);
+            return formattedKey.Left(FormattedElementKeyMaxLength);
         }
 
         /// <summary>
