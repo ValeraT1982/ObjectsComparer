@@ -70,7 +70,7 @@ namespace ObjectsComparer
         internal Action<ComparisonContext, ListComparisonOptions> ListComparisonOptionsAction { get; private set; } = null;
 
         /// <summary>
-        /// Configures list comparison behavior, especially the type of the comparison. See <see cref="ListConfigurationOptions"/>.
+        /// Configures list comparison behavior, especially the type of the comparison. For more info, see <see cref="ListConfigurationOptions"/>.
         /// </summary>
         /// <param name="comparisonOptions">First parameter: Current list comparison context.</param>
         public ComparisonSettings ConfigureListComparison(Action<ComparisonContext, ListComparisonOptions> comparisonOptions)
@@ -86,12 +86,35 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// Configures list comparison behavior, especially the type of comparison. See <see cref="ListConfigurationOptions"/>.
+        /// Configures list comparison behavior, especially the type of comparison. For more info, see <see cref="ListConfigurationOptions"/>.
         /// </summary>
         /// <param name="comparisonOptions">See <see cref="ListConfigurationOptions"/>.</param>
-        public ComparisonSettings ConfigureListComparison(Action<ListComparisonOptions> comparisonOptions)
+        public void ConfigureListComparison(Action<ListComparisonOptions> comparisonOptions)
         {
-            return ConfigureListComparison((_, options) => comparisonOptions(options));
+            ConfigureListComparison((_, options) => comparisonOptions(options));
+        }
+
+        /// <summary>
+        /// Configures the type of list comparison and whether to compare unequal lists. For more info, see <see cref="ListConfigurationOptions"/>.
+        /// </summary>
+        /// <param name="compareElementsByKey">
+        /// True value is shortcut for <see cref="ListComparisonOptions.CompareElementsByKey()"/> operation.
+        /// False value is shortcut for <see cref="ListComparisonOptions.CompareElementsByIndex()"/> operation.
+        /// </param>
+        /// <param name="compareUnequalLists">
+        /// Shortcut for <see cref="ListComparisonOptions.CompareUnequalLists(bool)"/> operation.
+        /// </param>
+        public void ConfigureListComparison(bool compareElementsByKey, bool compareUnequalLists)
+        {
+            ConfigureListComparison(options =>
+            {
+                options.CompareUnequalLists(compareUnequalLists);
+
+                if (compareElementsByKey)
+                {
+                    options.CompareElementsByKey();
+                }
+            });
         }
     }
 }

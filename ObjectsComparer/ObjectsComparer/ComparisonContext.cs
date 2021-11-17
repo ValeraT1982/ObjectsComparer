@@ -140,18 +140,17 @@ namespace ObjectsComparer
             {
                 List<ComparisonContext> removeDescendants = new List<ComparisonContext>();
 
-                _descendants.ForEach(d =>
+                _descendants.ForEach(descendantContext =>
                 {
-                    d.Shrink();
+                    descendantContext.Shrink();
 
-                    if (d.HasDifferences(true) == false)
+                    if (descendantContext.HasDifferences(true) == false)
                     {
-                        removeDescendants.Add(d);
+                        removeDescendants.Add(descendantContext);
                     }
                 });
 
                 _descendants.RemoveAll(ctx => removeDescendants.Contains(ctx));
-                //removeDescendants.ForEach(d => _descendants.Remove(d));
             }
         }
     }

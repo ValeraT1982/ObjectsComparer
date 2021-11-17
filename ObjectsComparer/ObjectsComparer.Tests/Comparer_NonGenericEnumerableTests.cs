@@ -38,9 +38,27 @@ namespace ObjectsComparer.Tests
             settings.ConfigureListComparison(listOptions => listOptions.CompareElementsByKey(keyOptions => keyOptions.UseKey("Property1")));
             var comparer = new Comparer<A>(settings);
 
-            var isEqual = comparer.Compare(a1, a2);
+            var isEqual = comparer.Compare(a1, a2, out _);
 
             Assert.IsTrue(isEqual);
+        }
+
+        [Test]
+        [TestCase(true, 0)]
+        [TestCase(false, 4)]
+        public void ShortcutConfigureListComparison(bool compareElementsByKey, int expectedDiffsCount)
+        {
+            var a1 = new int?[] { 1, 2, 3, null };
+            var a2 = new int?[] { null, 3, 2, 1 };
+
+            var settings = new ComparisonSettings();
+            settings.ConfigureListComparison(compareElementsByKey, false);
+
+            var comparer = new Comparer<int?[]>(settings);
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            Assert.IsTrue(differences.Count == expectedDiffsCount);
         }
 
         [Test]
