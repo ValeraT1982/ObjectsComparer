@@ -23,7 +23,7 @@ namespace ObjectsComparer
             }
             else if (listComparisonOptions.ElementSearchMode == ListElementSearchMode.Index)
             {
-                return CalculateDifferencesByIndex(list1, list2, listComparisonContext);
+                return CalculateDifferencesByIndex(list1, list2, listComparisonContext, listComparisonOptions);
             }
             else
             {
@@ -132,7 +132,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Calculates differences using <see cref="ListElementSearchMode.Index"/> comparison mode.
         /// </summary>
-        protected virtual IEnumerable<Difference> CalculateDifferencesByIndex<T>(IList<T> array1, IList<T> array2, ComparisonContext listComparisonContext)
+        protected virtual IEnumerable<Difference> CalculateDifferencesByIndex<T>(IList<T> array1, IList<T> array2, ComparisonContext listComparisonContext, ListComparisonOptions listComparisonOptions)
         {
             Debug.WriteLine($"{GetType().Name}.{nameof(CalculateDifferencesByIndex)}: {array1?.GetType().Name}");
 
