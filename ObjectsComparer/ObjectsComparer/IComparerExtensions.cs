@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ObjectsComparer.Exceptions;
+using System;
 using System.Collections.Generic;
 
 namespace ObjectsComparer
@@ -18,24 +19,52 @@ namespace ObjectsComparer
         /// <param name="obj2">Object 2.</param>
         /// <param name="comparisonContext">Current comparison context. For more info see <see cref="ComparisonContext"/> class.</param>
         /// <returns>List of differences between objects.</returns>
+        /// <exception cref="ContextableComparerNotImplementedException">If <paramref name="comparer"/> does not implement <see cref="IContextableComparer"/>.</exception>
         public static IEnumerable<Difference> CalculateDifferences(this IComparer comparer, Type type, object obj1, object obj2, ComparisonContext comparisonContext)
         {
+            if (comparer is null)
+            {
+                throw new ArgumentNullException(nameof(comparer));
+            }
+
+            if (type is null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            if (comparisonContext is null)
+            {
+                throw new ArgumentNullException(nameof(comparisonContext));
+            }
+
             if (comparer is IContextableComparer contextableComparer)
             {
                 return contextableComparer.CalculateDifferences(type, obj1, obj2, comparisonContext);
             }
 
-            return comparer.CalculateDifferences(type, obj1, obj2);
+            throw new ContextableComparerNotImplementedException(comparer);
+            //return comparer.CalculateDifferences(type, obj1, obj2);
         }
 
         public static IEnumerable<Difference> CalculateDifferences<T>(this IComparer<T> comparer, T obj1, T obj2, ComparisonContext comparisonContext)
         {
+            if (comparer is null)
+            {
+                throw new ArgumentNullException(nameof(comparer));
+            }
+
+            if (comparisonContext is null)
+            {
+                throw new ArgumentNullException(nameof(comparisonContext));
+            }
+
             if (comparer is IContextableComparer<T> contextableComparer)
             {
                 return contextableComparer.CalculateDifferences(obj1, obj2, comparisonContext);
             }
 
-            return comparer.CalculateDifferences(obj1, obj2);
+            throw new ContextableComparerNotImplementedException(comparer);
+            //return comparer.CalculateDifferences(obj1, obj2);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 using NSubstitute;
+using System.Collections.Generic;
 
 namespace ObjectsComparer.Tests
 {
@@ -58,6 +59,36 @@ namespace ObjectsComparer.Tests
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Field1" && d.Value1 == "A" && d.Value2 == "B"));
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Field2" && d.Value1 == "5" && d.Value2 == "8"));
             Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.MissedMemberInFirstObject && d.MemberPath == "Field3" && d.Value2 == "False"));
+        }
+
+        [Test]
+        public void MissedFields_CheckComparisonContext()
+        {
+            dynamic a1 = new
+            {
+                Field1 = "A",
+                Field2 = 5
+            };
+
+            dynamic a2 = new
+            {
+                Field1 = "B",
+                Field2 = 8,
+                Field3 = false
+            };
+
+            var comparer = new Comparer();
+
+            var comparisonContext = ComparisonContext.CreateRoot();
+            IEnumerable<Difference> calculateDifferences = comparer.CalculateDifferences(typeof(object), (object)a1, (object)a2, comparisonContext).ToArray();
+            var comparisonContextDifferences = comparisonContext.GetDifferences(true).ToArray();
+
+            Assert.AreEqual(3, calculateDifferences.Count());
+            Assert.IsTrue(calculateDifferences.Any(d => d.MemberPath == "Field1" && d.Value1 == "A" && d.Value2 == "B"));
+            Assert.IsTrue(calculateDifferences.Any(d => d.MemberPath == "Field2" && d.Value1 == "5" && d.Value2 == "8"));
+            Assert.IsTrue(calculateDifferences.Any(d => d.DifferenceType == DifferenceTypes.MissedMemberInFirstObject && d.MemberPath == "Field3" && d.Value2 == "False"));
+
+            CollectionAssert.AreEquivalent(calculateDifferences, comparisonContextDifferences);
         }
 
         [Test]
@@ -169,6 +200,33 @@ namespace ObjectsComparer.Tests
                 d => d.MemberPath == "Field1" && d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject));
             Assert.IsTrue(differences.Any(
                 d => d.MemberPath == "Field2" && d.DifferenceType == DifferenceTypes.MissedMemberInFirstObject));
+        }
+
+        [Test]
+        public void NullAndMissedMemberAreNotEqual_CheckComparisonContext()
+        {
+            dynamic a1 = new
+            {
+                Field1 = (object)null
+            };
+            dynamic a2 = new
+            {
+                Field2 = (object)null
+            };
+            var comparer = new Comparer();
+
+            var comparisonContext = ComparisonContext.CreateRoot();
+            var calculateDifferences = comparer.CalculateDifferences(typeof(object), (object)a1, (object)a2, comparisonContext).ToArray();
+            var comparisonContextDifferences = comparisonContext.GetDifferences(true).ToArray();
+
+            Assert.IsTrue(calculateDifferences.Any());
+            Assert.AreEqual(2, calculateDifferences.Count());
+            Assert.IsTrue(calculateDifferences.Any(
+                d => d.MemberPath == "Field1" && d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject));
+            Assert.IsTrue(calculateDifferences.Any(
+                d => d.MemberPath == "Field2" && d.DifferenceType == DifferenceTypes.MissedMemberInFirstObject));
+
+            CollectionAssert.AreEquivalent(calculateDifferences, comparisonContextDifferences);
         }
 
         [Test]

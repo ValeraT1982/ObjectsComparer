@@ -6,13 +6,23 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    internal abstract class AbstractDynamicObjectsComprer<T>: AbstractComparer, IComparerWithCondition
+    internal abstract class AbstractDynamicObjectsComprer<T>: AbstractComparer, IComparerWithCondition, IContextableComparer, IContextableComparer<T>
     {
         protected AbstractDynamicObjectsComprer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory) : base(settings, parentComparer, factory)
         {
         }
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
+        {
+            return CalculateDifferences(type, obj1, obj2, ComparisonContext.CreateRoot());
+        }
+
+        public virtual IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, ComparisonContext comparisonContext)
+        {
+            return CalculateDifferences(typeof(T), obj1, obj2, ComparisonContext.CreateRoot());
+        }
+
+        public virtual IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, ComparisonContext comparisonContext)
         {
             var castedObject1 = (T)obj1;
             var castedObject2 = (T)obj2;
@@ -59,15 +69,21 @@ namespace ObjectsComparer
                 {
                     if (!existsInObject1)
                     {
-                        yield return new Difference(propertyKey, string.Empty, valueComparer.ToString(value2),
-                            DifferenceTypes.MissedMemberInFirstObject);
+                        var difference = AddDifferenceToComparisonContext(
+                            new Difference(propertyKey, string.Empty, valueComparer.ToString(value2), DifferenceTypes.MissedMemberInFirstObject),
+                            comparisonContext);
+
+                        yield return difference;
                         continue;
                     }
 
                     if (!existsInObject2)
                     {
-                        yield return new Difference(propertyKey, valueComparer.ToString(value1), string.Empty,
-                            DifferenceTypes.MissedMemberInSecondObject);
+                        var difference = AddDifferenceToComparisonContext(
+                            new Difference(propertyKey, valueComparer.ToString(value1), string.Empty, DifferenceTypes.MissedMemberInSecondObject),
+                            comparisonContext);
+
+                        yield return difference;
                         continue;
                     }
                 }
@@ -77,8 +93,12 @@ namespace ObjectsComparer
                     var valueComparer2 = OverridesCollection.GetComparer(value2.GetType()) ??
                         OverridesCollection.GetComparer(propertyKey) ?? 
                         DefaultValueComparer;
-                    yield return new Difference(propertyKey, valueComparer.ToString(value1), valueComparer2.ToString(value2),
-                        DifferenceTypes.TypeMismatch);
+
+                    var difference = AddDifferenceToComparisonContext(
+                        new Difference(propertyKey, valueComparer.ToString(value1), valueComparer2.ToString(value2), DifferenceTypes.TypeMismatch),
+                        comparisonContext);
+
+                    yield return difference;
                     continue;
                 }
 
@@ -89,8 +109,12 @@ namespace ObjectsComparer
                     var valueComparer2 = value2 != null ? 
                         OverridesCollection.GetComparer(value2.GetType()) ?? OverridesCollection.GetComparer(propertyKey) ?? DefaultValueComparer :
                         DefaultValueComparer;
-                    yield return new Difference(propertyKey, valueComparer.ToString(value1), valueComparer2.ToString(value2),
-                        DifferenceTypes.TypeMismatch);
+
+                    var difference = AddDifferenceToComparisonContext(
+                        new Difference(propertyKey, valueComparer.ToString(value1), valueComparer2.ToString(value2), DifferenceTypes.TypeMismatch), 
+                        comparisonContext);
+
+                    yield return difference;
                     continue;
                 }
 
@@ -98,19 +122,23 @@ namespace ObjectsComparer
                 {
                     if (!customComparer.Compare(value1, value2, Settings))
                     {
-                        yield return new Difference(propertyKey, customComparer.ToString(value1), customComparer.ToString(value2));
+                        var difference = AddDifferenceToComparisonContext(
+                            new Difference(propertyKey, customComparer.ToString(value1), customComparer.ToString(value2)), 
+                            comparisonContext);
+
+                        yield return difference;
                     }
 
                     continue;
                 }
 
                 var comparer = Factory.GetObjectsComparer(propertyType, Settings, this);
-                foreach (var failure in comparer.CalculateDifferences(propertyType, value1, value2))
+                foreach (var failure in comparer.CalculateDifferences(propertyType, value1, value2, comparisonContext))
                 {
                     yield return failure.InsertPath(propertyKey);
                 }
             }
-        }
+        }              
 
         public abstract bool IsMatch(Type type, object obj1, object obj2);
 

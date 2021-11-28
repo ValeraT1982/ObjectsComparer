@@ -7,6 +7,8 @@ using ObjectsComparer.Tests.TestClasses;
 
 namespace ObjectsComparer.Tests
 {
+    //NullAndMissedMemberAreNotEqual_CheckComparisonContext
+
     [TestFixture]
     public class ComparisonSettingsTests
     {

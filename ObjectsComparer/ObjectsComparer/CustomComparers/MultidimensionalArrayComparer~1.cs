@@ -5,7 +5,7 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    internal class MultidimensionalArrayComparer<T> : AbstractComparer
+    internal class MultidimensionalArrayComparer<T> : AbstractComparer, IContextableComparer, IContextableComparer<T>
     {
         private readonly IComparer<T> _comparer;
 
@@ -17,6 +17,21 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
+            return CalculateDifferences(type, obj1, obj2, ComparisonContext.CreateRoot());
+        }
+
+        public IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, ComparisonContext comparisonContext)
+        {
+            return CalculateDifferences(typeof(T), obj1, obj2, comparisonContext);
+        }
+
+        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, ComparisonContext comparisonContext)
+        {
+            if (comparisonContext is null)
+            {
+                throw new ArgumentNullException(nameof(comparisonContext));
+            }
+
             if (!type.InheritsFrom(typeof(Array)))
             {
                 throw new ArgumentException("Invalid type");
@@ -43,7 +58,8 @@ namespace ObjectsComparer
 
             if (array1.Rank != array2.Rank)
             {
-                yield return new Difference("Rank", array1.Rank.ToString(), array2.Rank.ToString());
+                var difference = AddDifferenceToComparisonContext(new Difference("Rank", array1.Rank.ToString(), array2.Rank.ToString()), comparisonContext);
+                yield return difference;
                 yield break;
             }
 
@@ -57,7 +73,8 @@ namespace ObjectsComparer
                 if (length1 != length2)
                 {
                     dimensionsFailure = true;
-                    yield return new Difference($"Dimension{i}", length1.ToString(), length2.ToString());
+                    var difference = AddDifferenceToComparisonContext(new Difference($"Dimension{i}", length1.ToString(), length2.ToString()), comparisonContext);
+                    yield return difference;
                 }
             }
 
@@ -70,7 +87,7 @@ namespace ObjectsComparer
             {
                 var indecies = IndexToCoordinates(array1, i);
 
-                foreach (var failure in _comparer.CalculateDifferences((T)array1.GetValue(indecies), (T)array2.GetValue(indecies)))
+                foreach (var failure in _comparer.CalculateDifferences((T)array1.GetValue(indecies), (T)array2.GetValue(indecies), comparisonContext))
                 {
                     yield return failure.InsertPath($"[{string.Join(",", indecies)}]");
                 }

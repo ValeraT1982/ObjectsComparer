@@ -5,7 +5,7 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    internal class TypesComparer : AbstractComparer, IComparerWithCondition
+    internal class TypesComparer : AbstractComparer, IComparerWithCondition, IContextableComparer
     {
         public TypesComparer(ComparisonSettings settings, BaseComparer parentComparer,
             IComparersFactory factory)
@@ -15,6 +15,16 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
+            return CalculateDifferences(type, obj1, obj2, ComparisonContext.CreateRoot());
+        }
+
+        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, ComparisonContext comparisonContext)
+        {
+            if (comparisonContext is null)
+            {
+                throw new ArgumentNullException(nameof(comparisonContext));
+            }
+
             if (obj1 == null && obj2 == null)
             {
                 yield break;
@@ -35,7 +45,8 @@ namespace ObjectsComparer
 
             if (type1Str != type2Str)
             {
-                yield return new Difference(string.Empty, type1Str, type2Str);
+                //yield return new Difference(string.Empty, type1Str, type2Str);
+                yield return AddDifferenceToComparisonContext(new Difference(string.Empty, type1Str, type2Str), comparisonContext);
             }
         }
 

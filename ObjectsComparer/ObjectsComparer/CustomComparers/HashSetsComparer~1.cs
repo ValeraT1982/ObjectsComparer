@@ -5,15 +5,30 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    internal class HashSetsComparer<T> : AbstractComparer
+    internal class HashSetsComparer<T> : AbstractComparer, IContextableComparer, IContextableComparer<T>
     {
         public HashSetsComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory)
             :base(settings, parentComparer, factory)
         {
         }
 
+        public IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, ComparisonContext comparisonContext)
+        {
+            return CalculateDifferences(typeof(T), obj1, obj2, comparisonContext);
+        }
+
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
+            return CalculateDifferences(type, obj1, obj2, ComparisonContext.CreateRoot());
+        }
+
+        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, ComparisonContext comparisonContext)
+        {
+            if (comparisonContext is null)
+            {
+                throw new ArgumentNullException(nameof(comparisonContext));
+            }
+
             if (!type.InheritsFrom(typeof(HashSet<>)))
             {
                 throw new ArgumentException("Invalid type");
@@ -46,8 +61,11 @@ namespace ObjectsComparer
             {
                 if (!hashSet2.Contains(element))
                 {
-                    yield return new Difference("", valueComparer.ToString(element), string.Empty,
-                        DifferenceTypes.MissedElementInSecondObject);
+                    var difference = AddDifferenceToComparisonContext(
+                        new Difference("", valueComparer.ToString(element), string.Empty, DifferenceTypes.MissedElementInSecondObject), 
+                        comparisonContext);
+
+                    yield return difference;
                 }
             }
             
@@ -55,11 +73,14 @@ namespace ObjectsComparer
             {
                 if (!hashSet1.Contains(element))
                 {
-                    yield return new Difference("", string.Empty, valueComparer.ToString(element),
-                        DifferenceTypes.MissedElementInFirstObject);
+                    var difference = AddDifferenceToComparisonContext(new Difference("", string.Empty, valueComparer.ToString(element),
+                        DifferenceTypes.MissedElementInFirstObject), comparisonContext);
+
+                    yield return difference;
                 }
             }
         }
+              
 
         public bool IsMatch(Type type, object obj1, object obj2)
         {

@@ -256,6 +256,26 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
+        public void UseDefaultValuesWhenSubclassNotSpecified_CheckComparisonContext()
+        {
+            dynamic a1 = new ExpandoObject();
+            a1.Field1 = new ExpandoObject();
+            a1.Field1.SubField1 = 0;
+            a1.Field1.SubField2 = null;
+            a1.Field1.SubField3 = 0.0;
+            dynamic a2 = new ExpandoObject();
+            var comparer = new Comparer(new ComparisonSettings { UseDefaultIfMemberNotExist = true });
+
+            var rootComparisonContext = ComparisonContext.CreateRoot();
+            IEnumerable<Difference> diffs = comparer.CalculateDifferences(((object)a1).GetType(), a1, a2, rootComparisonContext);
+            var differences = diffs.ToArray();
+            var comparisonContextDifferences = rootComparisonContext.GetDifferences(recursive: true).ToList();
+
+            CollectionAssert.IsEmpty(differences);
+            CollectionAssert.IsEmpty(comparisonContextDifferences);
+        }
+
+        [Test]
         public void DifferenceWhenSubclassNotSpecified()
         {
             dynamic a1 = new ExpandoObject();
@@ -273,6 +293,40 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual(1, differences.Count);
             Assert.IsTrue(differences.Any(
                 d => d.MemberPath == "Field1" && d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject));
+        }
+
+        [Test]
+        public void DifferenceWhenSubclassNotSpecified_CheckComparisonContext()
+        {
+            dynamic a1 = new ExpandoObject();
+            a1.Field1 = new ExpandoObject();
+            a1.Field1.SubField1 = 0;
+            a1.Field1.SubField2 = null;
+            a1.Field1.SubField3 = 0.0;
+            dynamic a2 = new ExpandoObject();
+            var comparer = new Comparer();
+
+            var isEqual = comparer.Compare(a1, a2, out IEnumerable<Difference> differencesEnum);
+            var compareDifferences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            Assert.AreEqual(1, compareDifferences.Count);
+            Assert.IsTrue(compareDifferences.Any(
+                d => d.MemberPath == "Field1" && d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject));
+
+            var rootComparisonContext = ComparisonContext.CreateRoot();
+            IEnumerable<Difference> calculateDiffs = comparer.CalculateDifferences(((object)a1).GetType(), a1, a2, rootComparisonContext);
+            var calculateDifferences = calculateDiffs.ToList();
+            var comparisonContextDifferences = rootComparisonContext.GetDifferences(recursive: true).ToList();
+
+            Assert.IsTrue(comparisonContextDifferences.Any(
+                d => d.MemberPath == "Field1" && d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject));
+
+            Assert.IsTrue(calculateDifferences.Any(
+                d => d.MemberPath == "Field1" && d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject));
+
+            comparisonContextDifferences.ForEach(ctxDiff => CollectionAssert.Contains(calculateDifferences, ctxDiff));
+            calculateDifferences.ForEach(calculateDiff => CollectionAssert.Contains(comparisonContextDifferences, calculateDiff));
         }
 
         [Test]

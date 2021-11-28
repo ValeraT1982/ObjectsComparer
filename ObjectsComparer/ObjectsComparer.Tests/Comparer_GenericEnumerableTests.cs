@@ -1305,6 +1305,83 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
+        public void DictionaryInequalityDifferentNumberOfElements_CompareByKey_CompareUnequalLists()
+        {
+            var a1 = new Dictionary<int, string> { { 1, "One" }, { 2, "Two" } };
+            var a2 = new Dictionary<int, string> { { 1, "One" }, { 2, "Two" }, { 3, "Three" } };
+
+            var settings = new ComparisonSettings();
+            settings.ConfigureListComparison(compareElementsByKey: true, compareUnequalLists: true);
+
+            var comparer = new Comparer<Dictionary<int, string>>(settings);
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            Assert.AreEqual(2, differences.Count);
+
+            Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences[0].DifferenceType);
+            Assert.AreEqual("2", differences[0].Value1);
+            Assert.AreEqual("3", differences[0].Value2);
+
+            Assert.AreEqual(DifferenceTypes.MissedElementInFirstObject, differences[1].DifferenceType);
+            Assert.AreEqual("[3]", differences[1].MemberPath);
+            Assert.AreEqual("", differences[1].Value1);
+            Assert.AreEqual("[3, Three]", differences[1].Value2);
+        }
+
+        [Test]
+        public void DictionaryInequalityDifferentNumberOfElements_CompareByKey_CompareUnequalLists_FormatKey()
+        {
+            var a1 = new Dictionary<int, string> { { 1, "One" }, { 2, "Two" } };
+            var a2 = new Dictionary<int, string> { { 1, "One" }, { 2, "Two" }, { 3, "Three" } };
+
+            var settings = new ComparisonSettings();
+            settings.ConfigureListComparison(listOptions => listOptions
+                .CompareUnequalLists(true)
+                .CompareElementsByKey(keyOptions => keyOptions.FormatElementKey(keyArgs => $"Key={keyArgs.ElementKey}")));
+
+            var comparer = new Comparer<Dictionary<int, string>>(settings);
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            Assert.AreEqual(2, differences.Count);
+
+            Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences[0].DifferenceType);
+            Assert.AreEqual("2", differences[0].Value1);
+            Assert.AreEqual("3", differences[0].Value2);
+
+            Assert.AreEqual(DifferenceTypes.MissedElementInFirstObject, differences[1].DifferenceType);
+            Assert.AreEqual("[Key=3]", differences[1].MemberPath);
+            Assert.AreEqual("", differences[1].Value1);
+            Assert.AreEqual("[3, Three]", differences[1].Value2);
+        }
+
+        [Test]
+        public void DictionaryInequalityDifferentNumberOfElements_CompareByIndex_CompareUnequalLists()
+        {
+            var a1 = new Dictionary<int, string> { { 1, "One" }, { 2, "Two" } };
+            var a2 = new Dictionary<int, string> { { 1, "One" }, { 2, "Two" }, { 3, "Three" } };
+
+            var settings = new ComparisonSettings();
+            settings.ConfigureListComparison(compareElementsByKey: false, compareUnequalLists: true);
+
+            var comparer = new Comparer<Dictionary<int, string>>(settings);
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            Assert.AreEqual(2, differences.Count);
+
+            Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences[0].DifferenceType);
+            Assert.AreEqual("2", differences[0].Value1);
+            Assert.AreEqual("3", differences[0].Value2);
+
+            Assert.AreEqual(DifferenceTypes.MissedElementInFirstObject, differences[1].DifferenceType);
+            Assert.AreEqual("[2]", differences[1].MemberPath);
+            Assert.AreEqual("", differences[1].Value1);
+            Assert.AreEqual("[3, Three]", differences[1].Value2);
+        }
+
+        [Test]
         public void DictionaryInequalityDifferentValue()
         {
             var a1 = new Dictionary<int, string> { { 1, "One" }, { 2, "Two" } };

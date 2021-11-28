@@ -406,6 +406,29 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
+        public void IntIntInequality7_CheckComparisonContext()
+        {
+            var a1 = new MultidimensionalArrays { IntInt = new int[0, 0] };
+            var a2 = new MultidimensionalArrays { IntInt = null };
+            var comparer = new Comparer<MultidimensionalArrays>();
+
+            var rootComparisonContext = ComparisonContext.CreateRoot();
+            var differences = comparer.CalculateDifferences(a1, a2, rootComparisonContext).ToList();
+            
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual(1, differences.Count());
+            Assert.AreEqual("IntInt", differences[0].MemberPath);
+            Assert.AreEqual(typeof(int[,]).FullName, differences[0].Value1);
+            Assert.AreEqual(string.Empty, differences[0].Value2);
+
+            var comparisonContextDifferences = rootComparisonContext.GetDifferences(recursive: true).ToList();
+
+            comparisonContextDifferences.ForEach(ctxDiff => CollectionAssert.Contains(differences, ctxDiff));
+
+            differences.ForEach(diff => CollectionAssert.Contains(comparisonContextDifferences, diff));
+        }
+
+        [Test]
         public void IntIntEquality1()
         {
             var a1 = new MultidimensionalArrays { IntInt = new[,] { { 1, 2 }, { 3, 4 } } };
