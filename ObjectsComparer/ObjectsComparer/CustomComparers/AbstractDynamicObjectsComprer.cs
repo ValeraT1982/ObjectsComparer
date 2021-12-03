@@ -149,5 +149,7 @@ namespace ObjectsComparer
         protected abstract IList<string> GetProperties(T obj);
         
         protected abstract bool TryGetMemberValue(T obj, string propertyName, out object value);
+
+        protected abstract bool TryGetMember(T obj, string propertyName, out MemberInfo value);
     }
 }

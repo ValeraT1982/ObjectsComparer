@@ -213,7 +213,12 @@ namespace ObjectsComparer.Tests
             {
                 Field2 = (object)null
             };
+
+            var t = (a1 as object).GetType();
+            var members = t.GetMembers();
+
             var comparer = new Comparer();
+            
 
             var comparisonContext = ComparisonContext.CreateRoot();
             var calculateDifferences = comparer.CalculateDifferences(typeof(object), (object)a1, (object)a2, comparisonContext).ToArray();

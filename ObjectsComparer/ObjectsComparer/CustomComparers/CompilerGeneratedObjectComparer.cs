@@ -58,5 +58,24 @@ namespace ObjectsComparer
             return true;
 
         }
+
+        protected override bool TryGetMember(object obj, string propertyName, out MemberInfo value)
+        {
+            value = null;
+
+            if (obj == null)
+            {
+                return false;
+            }
+
+            value = obj.GetType().GetTypeInfo().GetProperty(propertyName);
+
+            if (value == null)
+            {
+                return false;
+            }
+
+            return false;
+        }
     }
 }
