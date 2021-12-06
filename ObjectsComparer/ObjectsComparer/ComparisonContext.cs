@@ -6,6 +6,28 @@ using System.Reflection;
 
 namespace ObjectsComparer
 {
+    public abstract class ComparisonContextMemberBase
+    {
+        public abstract string Name { get; }
+    }
+
+    public class MemberInfoComparisonContextMember : ComparisonContextMemberBase
+    {
+        private MemberInfoComparisonContextMember(MemberInfo member)
+        {
+            Member = member ?? throw new ArgumentNullException(nameof(member));
+        }
+
+        public override string Name => throw new NotImplementedException();
+
+        public MemberInfo Member { get; }
+
+        public static MemberInfoComparisonContextMember Create(MemberInfo member)
+        {
+            return new MemberInfoComparisonContextMember(member);
+        }
+    }
+
     /// <summary>
     /// Information about the <see cref="Member"/>, which is typically a property or field, in comparison process. It has its ancestor and descendant <see cref="ComparisonContext"/> objects in the same way as its <see cref="Member"/> has its ancestor and descendant members in an object graph. <see cref="ComparisonContext"/> contains all possible member differences.
     /// Once the comparison is completed, it is possible to traverse the object graph and see differences at particular members.
@@ -18,7 +40,7 @@ namespace ObjectsComparer
         /// Creates comparison context root.
         /// </summary>
         /// <returns></returns>
-        public static ComparisonContext CreateRoot() => new ComparisonContext();
+        public static ComparisonContext CreateRoot() => Create();
 
         readonly List<ComparisonContext> _descendants = new List<ComparisonContext>();
 
@@ -60,7 +82,7 @@ namespace ObjectsComparer
         /// <param name="member">See <see cref="Member"/>.</param>
         /// <param name="ancestor">See <see cref="Ancestor"/>.</param>
         /// <returns></returns>
-        internal static ComparisonContext Create(MemberInfo member = null, ComparisonContext ancestor = null)
+        public static ComparisonContext Create(MemberInfo member = null, ComparisonContext ancestor = null)
         {
             var context = new ComparisonContext(member);
 
