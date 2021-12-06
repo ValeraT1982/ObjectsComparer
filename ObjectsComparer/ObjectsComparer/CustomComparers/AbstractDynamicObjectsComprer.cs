@@ -33,6 +33,9 @@ namespace ObjectsComparer
 
             foreach (var propertyKey in propertyKeys)
             {
+                //TODO: MemberInfo >> ComparsionContextMemberInfo { MemberInfo: Member }
+                var keyComparisonContext = ComparisonContext.Create(null, comparisonContext);
+
                 var existsInObject1 = propertyKeys1.Contains(propertyKey);
                 var existsInObject2 = propertyKeys2.Contains(propertyKey);
                 object value1 = null;
@@ -71,7 +74,7 @@ namespace ObjectsComparer
                     {
                         var difference = AddDifferenceToComparisonContext(
                             new Difference(propertyKey, string.Empty, valueComparer.ToString(value2), DifferenceTypes.MissedMemberInFirstObject),
-                            comparisonContext);
+                            keyComparisonContext);
 
                         yield return difference;
                         continue;
@@ -81,7 +84,7 @@ namespace ObjectsComparer
                     {
                         var difference = AddDifferenceToComparisonContext(
                             new Difference(propertyKey, valueComparer.ToString(value1), string.Empty, DifferenceTypes.MissedMemberInSecondObject),
-                            comparisonContext);
+                            keyComparisonContext);
 
                         yield return difference;
                         continue;
@@ -96,7 +99,7 @@ namespace ObjectsComparer
 
                     var difference = AddDifferenceToComparisonContext(
                         new Difference(propertyKey, valueComparer.ToString(value1), valueComparer2.ToString(value2), DifferenceTypes.TypeMismatch),
-                        comparisonContext);
+                        keyComparisonContext);
 
                     yield return difference;
                     continue;
@@ -111,8 +114,8 @@ namespace ObjectsComparer
                         DefaultValueComparer;
 
                     var difference = AddDifferenceToComparisonContext(
-                        new Difference(propertyKey, valueComparer.ToString(value1), valueComparer2.ToString(value2), DifferenceTypes.TypeMismatch), 
-                        comparisonContext);
+                        new Difference(propertyKey, valueComparer.ToString(value1), valueComparer2.ToString(value2), DifferenceTypes.TypeMismatch),
+                        keyComparisonContext);
 
                     yield return difference;
                     continue;
@@ -123,8 +126,8 @@ namespace ObjectsComparer
                     if (!customComparer.Compare(value1, value2, Settings))
                     {
                         var difference = AddDifferenceToComparisonContext(
-                            new Difference(propertyKey, customComparer.ToString(value1), customComparer.ToString(value2)), 
-                            comparisonContext);
+                            new Difference(propertyKey, customComparer.ToString(value1), customComparer.ToString(value2)),
+                            keyComparisonContext);
 
                         yield return difference;
                     }
