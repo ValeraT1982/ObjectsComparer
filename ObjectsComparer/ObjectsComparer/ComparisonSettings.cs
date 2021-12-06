@@ -99,12 +99,12 @@ namespace ObjectsComparer
         /// </summary>
         /// <param name="compareElementsByKey">
         /// True value is shortcut for <see cref="ListComparisonOptions.CompareElementsByKey()"/> operation.
-        /// False value is shortcut for <see cref="ListComparisonOptions.CompareElementsByIndex()"/> operation.
+        /// False value is shortcut for <see cref="ListComparisonOptions.CompareElementsByIndex()"/> operation. Default value = false.
         /// </param>
         /// <param name="compareUnequalLists">
-        /// Shortcut for <see cref="ListComparisonOptions.CompareUnequalLists(bool)"/> operation.
+        /// Shortcut for <see cref="ListComparisonOptions.CompareUnequalLists(bool)"/> operation. Default value = false.
         /// </param>
-        public void ConfigureListComparison(bool compareElementsByKey, bool compareUnequalLists)
+        public void ConfigureListComparison(bool compareElementsByKey = false, bool compareUnequalLists = false)
         {
             ConfigureListComparison(options =>
             {

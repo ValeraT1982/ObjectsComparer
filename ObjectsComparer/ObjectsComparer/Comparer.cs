@@ -43,13 +43,21 @@ namespace ObjectsComparer
             var getObjectsComparerGenericMethod = getObjectsComparerMethod.MakeGenericMethod(type);
             var comparer = getObjectsComparerGenericMethod.Invoke(Factory, new object[] { Settings, this });
 
-            bool comparerIsContextable = comparer.GetType().GetTypeInfo().GetInterfaces()
+            bool comparerIsIContextableComparerT = comparer.GetType().GetTypeInfo().GetInterfaces()
                 .Any(intft => intft.GetTypeInfo().IsGenericType && intft.GetGenericTypeDefinition() == typeof(IContextableComparer<>));
 
-            var genericType = comparerIsContextable ? typeof(IContextableComparer<>).MakeGenericType(type) : typeof(IComparer<>).MakeGenericType(type);
-            var genericMethodParameterTypes = comparerIsContextable ? new[] { type, type, typeof(ComparisonContext) } : new[] { type, type };
+            if (comparerIsIContextableComparerT == false)
+            {
+                if (comparer is IContextableComparer contextableComparer)
+                {
+                    return contextableComparer.CalculateDifferences(type, obj1, obj2, comparisonContext);
+                }
+            }
+
+            var genericType = comparerIsIContextableComparerT ? typeof(IContextableComparer<>).MakeGenericType(type) : typeof(IComparer<>).MakeGenericType(type);
+            var genericMethodParameterTypes = comparerIsIContextableComparerT ? new[] { type, type, typeof(ComparisonContext) } : new[] { type, type };
             var genericMethod = genericType.GetTypeInfo().GetMethod(CalculateDifferencesMethodName, genericMethodParameterTypes);
-            var genericMethodParameters = comparerIsContextable ? new[] { obj1, obj2, comparisonContext } : new[] { obj1, obj2 };
+            var genericMethodParameters = comparerIsIContextableComparerT ? new[] { obj1, obj2, comparisonContext } : new[] { obj1, obj2 };
 
             // ReSharper disable once PossibleNullReferenceException
             return (IEnumerable<Difference>)genericMethod.Invoke(comparer, genericMethodParameters);
