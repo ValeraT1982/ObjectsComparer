@@ -6,28 +6,6 @@ using System.Reflection;
 
 namespace ObjectsComparer
 {
-    public abstract class ComparisonContextMemberBase
-    {
-        public abstract string Name { get; }
-    }
-
-    public class MemberInfoComparisonContextMember : ComparisonContextMemberBase
-    {
-        private MemberInfoComparisonContextMember(MemberInfo member)
-        {
-            Member = member ?? throw new ArgumentNullException(nameof(member));
-        }
-
-        public override string Name => throw new NotImplementedException();
-
-        public MemberInfo Member { get; }
-
-        public static MemberInfoComparisonContextMember Create(MemberInfo member)
-        {
-            return new MemberInfoComparisonContextMember(member);
-        }
-    }
-
     /// <summary>
     /// Information about the <see cref="Member"/>, which is typically a property or field, in comparison process. It has its ancestor and descendant <see cref="ComparisonContext"/> objects in the same way as its <see cref="Member"/> has its ancestor and descendant members in an object graph. <see cref="ComparisonContext"/> contains all possible member differences.
     /// Once the comparison is completed, it is possible to traverse the object graph and see differences at particular members.
@@ -50,7 +28,7 @@ namespace ObjectsComparer
         {
         }
 
-        private ComparisonContext(MemberInfo currentMember)
+        private ComparisonContext(IComparisonContextMember currentMember)
         {
             Member = currentMember;
         }
@@ -59,7 +37,7 @@ namespace ObjectsComparer
         /// Typically a property or field in comparison process.
         /// It is always null for the root context (the starting point of the comparison) and always null for the list element. A list element never has a member, but it has an ancestor context which is the list and that list has its member.
         /// </summary>
-        public MemberInfo Member { get; }
+        public IComparisonContextMember Member { get; }
 
         /// <summary>
         /// Ancestor context.
@@ -82,7 +60,7 @@ namespace ObjectsComparer
         /// <param name="member">See <see cref="Member"/>.</param>
         /// <param name="ancestor">See <see cref="Ancestor"/>.</param>
         /// <returns></returns>
-        public static ComparisonContext Create(MemberInfo member = null, ComparisonContext ancestor = null)
+        public static ComparisonContext Create(IComparisonContextMember member = null, ComparisonContext ancestor = null)
         {
             var context = new ComparisonContext(member);
 
@@ -90,7 +68,7 @@ namespace ObjectsComparer
             {
                 ancestor.AddDescendant(context);
             }
-            
+
             return context;
         }
 
