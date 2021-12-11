@@ -6,6 +6,9 @@ namespace ObjectsComparer
     {
         string Name { get; }
 
-        MemberInfo Member { get; }
+        /// <summary>
+        /// Optional. 
+        /// </summary>
+        MemberInfo Info { get; }
     }
 }
