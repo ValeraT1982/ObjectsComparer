@@ -62,7 +62,8 @@ namespace ObjectsComparer
 
         protected override bool TryGetMember(DynamicObject obj, string propertyName, out MemberInfo value)
         {
-            throw new NotImplementedException();
+            value = null;
+            return false;
         }
     }
 }

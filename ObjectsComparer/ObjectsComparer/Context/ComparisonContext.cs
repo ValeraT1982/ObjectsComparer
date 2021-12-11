@@ -182,14 +182,14 @@ namespace ObjectsComparer
             return Create(member, ancestor);
         }
 
-        internal static ComparisonContext ForPropertyKey(string propertyKey, ComparisonContext ancestor)
+        internal static ComparisonContext ForPropertyKey(ComparisonContext ancestor, string propertyKey, MemberInfo info = null)
         {
             if (propertyKey is null)
             {
                 throw new ArgumentNullException(nameof(propertyKey));
             }
 
-            var member = new PropertyKeyComparisonContextMember(propertyKey);
+            var member = new PropertyKeyComparisonContextMember(propertyKey, info);
 
             return Create(member, ancestor);
         }

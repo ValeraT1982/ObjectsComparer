@@ -33,22 +33,26 @@ namespace ObjectsComparer
 
             foreach (var propertyKey in propertyKeys)
             {
-                //TODO: MemberInfo >> ComparsionContextMemberInfo { MemberInfo: Member }
-                var keyComparisonContext = ComparisonContext.Create(null, comparisonContext);
-
                 var existsInObject1 = propertyKeys1.Contains(propertyKey);
                 var existsInObject2 = propertyKeys2.Contains(propertyKey);
                 object value1 = null;
+                MemberInfo member1 = null;
                 if (existsInObject1)
                 {
                     TryGetMemberValue(castedObject1, propertyKey, out value1);
+                    TryGetMember(castedObject1, propertyKey, out member1);
                 }
 
                 object value2 = null;
+                MemberInfo member2 = null;
                 if (existsInObject2)
                 {
                     TryGetMemberValue(castedObject2, propertyKey, out value2);
+                    TryGetMember(castedObject1, propertyKey, out member2);
                 }
+
+                //var keyComparisonContext = ComparisonContext.Create(null, comparisonContext);
+                var keyComparisonContext = ComparisonContext.ForPropertyKey(ancestor: comparisonContext, propertyKey, info: member1 ?? member2);
 
                 var propertyType = (value1 ?? value2)?.GetType() ?? typeof(object);
                 var customComparer = OverridesCollection.GetComparer(propertyType) ??

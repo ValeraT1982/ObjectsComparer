@@ -34,7 +34,8 @@ namespace ObjectsComparer
 
         protected override bool TryGetMember(ExpandoObject obj, string propertyName, out MemberInfo value)
         {
-            throw new NotImplementedException();
+            value = null;
+            return false;
         }
 
         protected override bool TryGetMemberValue(ExpandoObject obj, string propertyName, out object value)
