@@ -18,6 +18,7 @@ namespace ObjectsComparer
         /// Creates comparison context root.
         /// </summary>
         /// <returns></returns>
+        [Obsolete("", true)]
         public static ComparisonContext CreateRoot() => Create();
 
         readonly List<ComparisonContext> _descendants = new List<ComparisonContext>();
@@ -152,46 +153,6 @@ namespace ObjectsComparer
 
                 _descendants.RemoveAll(ctx => removeDescendants.Contains(ctx));
             }
-        }
-
-        public static ComparisonContext ForListElement(ComparisonContext ancestor)
-        {
-            if (ancestor is null)
-            {
-                throw new ArgumentNullException(nameof(ancestor));
-            }
-
-            if (ancestor.Member is ListComparisonContextMember memberInfoMember)
-            {
-                var member = new ListElementComparisonContextMember(memberInfoMember);
-                return Create(member, ancestor);
-            }
-
-            throw new ArgumentException("Ancestor's member must be ListComparisonContextMember.", nameof(ancestor));
-        }
-
-        public static ComparisonContext ForMemberInfo(MemberInfo memberInfo, ComparisonContext ancestor)
-        {
-            if (ancestor is null)
-            {
-                throw new ArgumentNullException(nameof(ancestor));
-            }
-
-            var member = new MemberInfoComparisonContextMember(memberInfo);
-
-            return Create(member, ancestor);
-        }
-
-        internal static ComparisonContext ForPropertyKey(ComparisonContext ancestor, string propertyKey, MemberInfo info = null)
-        {
-            if (propertyKey is null)
-            {
-                throw new ArgumentNullException(nameof(propertyKey));
-            }
-
-            var member = new PropertyKeyComparisonContextMember(propertyKey, info);
-
-            return Create(member, ancestor);
         }
     }
 }

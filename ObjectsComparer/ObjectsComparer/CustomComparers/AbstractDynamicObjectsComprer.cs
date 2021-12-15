@@ -52,7 +52,8 @@ namespace ObjectsComparer
                 }
 
                 //var keyComparisonContext = ComparisonContext.Create(null, comparisonContext);
-                var keyComparisonContext = ComparisonContext.ForPropertyKey(ancestor: comparisonContext, propertyKey, info: member1 ?? member2);
+                var keyComparisonContextMember = (member1 ?? member2) != null ? new ComparisonContextMember(member1 ?? member2) : new ComparisonContextMember(propertyKey);
+                var keyComparisonContext = ComparisonContext.Create(keyComparisonContextMember, comparisonContext);
 
                 var propertyType = (value1 ?? value2)?.GetType() ?? typeof(object);
                 var customComparer = OverridesCollection.GetComparer(propertyType) ??
