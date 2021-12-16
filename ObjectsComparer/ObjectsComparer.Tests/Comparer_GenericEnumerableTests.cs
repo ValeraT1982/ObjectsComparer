@@ -67,7 +67,7 @@ namespace ObjectsComparer.Tests
             settings.ConfigureListComparison(listOptions => listOptions.CompareUnequalLists(true));
 
             var comparer = new Comparer<A>(settings);
-            var rootCtx = ComparisonContext.CreateRoot();
+            var rootCtx = new ComparisonContext();
             var differences = comparer.CalculateDifferences(a1, a2, rootCtx).ToList();
 
             CollectionAssert.IsNotEmpty(differences);

@@ -14,20 +14,31 @@ namespace ObjectsComparer
     {
         object _shrinkLock = new object();
 
-        /// <summary>
-        /// Creates comparison context root.
-        /// </summary>
-        /// <returns></returns>
-        [Obsolete("", true)]
-        public static ComparisonContext CreateRoot() => Create();
-
         readonly List<ComparisonContext> _descendants = new List<ComparisonContext>();
 
         readonly List<Difference> _differences = new List<Difference>();
 
-        private ComparisonContext()
+        public ComparisonContext(IComparisonContextMember member = null, ComparisonContext ancestor = null)
         {
+            Member = member;
+
+            if (ancestor != null) 
+            {
+                ancestor.AddDescendant(this);
+            }
         }
+
+        //public static ComparisonContext Create(IComparisonContextMember member = null, ComparisonContext ancestor = null)
+        //{
+        //    var context = new ComparisonContext(member);
+
+        //    if (ancestor != null)
+        //    {
+        //        ancestor.AddDescendant(context);
+        //    }
+
+        //    return context;
+        //}
 
         private ComparisonContext(IComparisonContextMember currentMember)
         {
@@ -54,25 +65,7 @@ namespace ObjectsComparer
         /// A list of differences directly related to this context.
         /// </summary>
         public ReadOnlyCollection<Difference> Differences => _differences.AsReadOnly();
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="member">See <see cref="Member"/>.</param>
-        /// <param name="ancestor">See <see cref="Ancestor"/>.</param>
-        /// <returns></returns>
-        public static ComparisonContext Create(IComparisonContextMember member = null, ComparisonContext ancestor = null)
-        {
-            var context = new ComparisonContext(member);
-
-            if (ancestor != null)
-            {
-                ancestor.AddDescendant(context);
-            }
-
-            return context;
-        }
-
+        
         void AddDescendant(ComparisonContext descendant)
         {
             _descendants.Add(descendant);

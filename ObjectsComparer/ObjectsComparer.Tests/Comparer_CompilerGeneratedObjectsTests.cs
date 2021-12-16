@@ -79,7 +79,7 @@ namespace ObjectsComparer.Tests
 
             var comparer = new Comparer();
 
-            var comparisonContext = ComparisonContext.CreateRoot();
+            var comparisonContext = new ComparisonContext();
             IEnumerable<Difference> calculateDifferences = comparer.CalculateDifferences(typeof(object), (object)a1, (object)a2, comparisonContext).ToArray();
             var comparisonContextDifferences = comparisonContext.GetDifferences(true).ToArray();
 
@@ -220,7 +220,7 @@ namespace ObjectsComparer.Tests
             var comparer = new Comparer();
             
 
-            var comparisonContext = ComparisonContext.CreateRoot();
+            var comparisonContext = new ComparisonContext();
             var calculateDifferences = comparer.CalculateDifferences(typeof(object), (object)a1, (object)a2, comparisonContext).ToArray();
             var comparisonContextDifferences = comparisonContext.GetDifferences(true).ToArray();
 

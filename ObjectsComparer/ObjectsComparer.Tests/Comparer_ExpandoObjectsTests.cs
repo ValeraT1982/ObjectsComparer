@@ -266,7 +266,7 @@ namespace ObjectsComparer.Tests
             dynamic a2 = new ExpandoObject();
             var comparer = new Comparer(new ComparisonSettings { UseDefaultIfMemberNotExist = true });
 
-            var rootComparisonContext = ComparisonContext.CreateRoot();
+            var rootComparisonContext = new ComparisonContext();
             IEnumerable<Difference> diffs = comparer.CalculateDifferences(((object)a1).GetType(), a1, a2, rootComparisonContext);
             var differences = diffs.ToArray();
             var comparisonContextDifferences = rootComparisonContext.GetDifferences(recursive: true).ToList();
@@ -314,7 +314,7 @@ namespace ObjectsComparer.Tests
             Assert.IsTrue(compareDifferences.Any(
                 d => d.MemberPath == "Field1" && d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject));
 
-            var rootComparisonContext = ComparisonContext.CreateRoot();
+            var rootComparisonContext = new ComparisonContext();
             IEnumerable<Difference> calculateDiffs = comparer.CalculateDifferences(((object)a1).GetType(), a1, a2, rootComparisonContext);
             var calculateDifferences = calculateDiffs.ToList();
             var comparisonContextDifferences = rootComparisonContext.GetDifferences(recursive: true).ToList();

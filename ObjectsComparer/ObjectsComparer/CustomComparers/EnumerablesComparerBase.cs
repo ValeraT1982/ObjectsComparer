@@ -44,8 +44,7 @@ namespace ObjectsComparer
             for (int element1Index = 0; element1Index < array1.Count(); element1Index++)
             {
                 var element1 = array1[element1Index];
-                //var elementComparisonContext = ComparisonContext.Create(ancestor: listComparisonContext);
-                var elementComparisonContext = ComparisonContext.Create(new ComparisonContextMember(), listComparisonContext);
+                var elementComparisonContext = new ComparisonContext(new ComparisonContextMember(), listComparisonContext);
 
                 if (element1 == null)
                 {
@@ -94,8 +93,7 @@ namespace ObjectsComparer
             for (int element2Index = 0; element2Index < array2.Count(); element2Index++)
             {
                 var element2 = array2[element2Index];
-                //var elementComparisonContext = ComparisonContext.Create(ancestor: listComparisonContext);
-                var elementComparisonContext = ComparisonContext.Create(new ComparisonContextMember(), listComparisonContext);
+                var elementComparisonContext = new ComparisonContext(new ComparisonContextMember(), listComparisonContext);
 
                 if (element2 == null)
                 {
@@ -145,8 +143,7 @@ namespace ObjectsComparer
             //ToDo Extract type
             for (var i = 0; i < smallerCount; i++)
             {
-                //var elementComparisonContext = ComparisonContext.Create(ancestor: listComparisonContext);
-                var elementComparisonContext = ComparisonContext.Create(new ComparisonContextMember(), listComparisonContext);
+                var elementComparisonContext = new ComparisonContext(new ComparisonContextMember(), listComparisonContext);
 
                 if (array1[i] == null && array2[i] == null)
                 {
@@ -197,7 +194,7 @@ namespace ObjectsComparer
                         value2: array2Count > array1Count ? valueComparer.ToString(largerArray[i]) : string.Empty,
                         differenceType: array1Count > array2Count ? DifferenceTypes.MissedElementInSecondObject : DifferenceTypes.MissedElementInFirstObject);
 
-                    yield return AddDifferenceToComparisonContext(difference, ComparisonContext.Create(ancestor: listComparisonContext));
+                    yield return AddDifferenceToComparisonContext(difference, new ComparisonContext(ancestor: listComparisonContext));
                 }
             }
         }

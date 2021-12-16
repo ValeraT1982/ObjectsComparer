@@ -11,7 +11,7 @@ namespace ObjectsComparer
     {
         /// <summary>
         /// Calculates list of differences between objects. Accepts comparison context.
-        /// At the beginning of the comparison you can create <see cref="ComparisonContext"/> instance using the <see cref="ComparisonContext.CreateRoot"/> operation and pass it as a parameter.
+        /// At the beginning of the comparison you can create <see cref="ComparisonContext"/> instance using the <see cref="new ComparisonContext"/> operation and pass it as a parameter.
         /// For more info about comparison context see <see cref="ComparisonContext"/> class.
         /// </summary>
         /// <param name="type">Type.</param>

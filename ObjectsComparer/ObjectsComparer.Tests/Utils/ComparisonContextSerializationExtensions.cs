@@ -121,7 +121,7 @@ namespace ObjectsComparer.Tests.Utils
         //    public object GetValue(object target)
         //    {
         //        var ancestor = (target as ComparisonContext).Ancestor;
-        //        var newAncestor = ComparisonContext.Create(member: ancestor?.Member);
+        //        var newAncestor = new ComparisonContext(member: ancestor?.Member);
         //        return newAncestor;
         //    }
 

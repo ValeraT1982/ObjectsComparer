@@ -187,7 +187,7 @@ namespace ObjectsComparer.Tests
 
             var comparer = new Comparer<A>(settings);
 
-            var rootCtx = ComparisonContext.CreateRoot();
+            var rootCtx = new ComparisonContext();
             var differences = comparer.CalculateDifferences(a1, a2, rootCtx).ToList();
 
             CollectionAssert.IsNotEmpty(differences);

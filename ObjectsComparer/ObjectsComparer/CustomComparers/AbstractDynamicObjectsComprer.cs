@@ -14,12 +14,12 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return CalculateDifferences(type, obj1, obj2, ComparisonContext.CreateRoot());
+            return CalculateDifferences(type, obj1, obj2, new ComparisonContext());
         }
 
         public virtual IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, ComparisonContext comparisonContext)
         {
-            return CalculateDifferences(typeof(T), obj1, obj2, ComparisonContext.CreateRoot());
+            return CalculateDifferences(typeof(T), obj1, obj2, new ComparisonContext());
         }
 
         public virtual IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, ComparisonContext comparisonContext)
@@ -51,9 +51,8 @@ namespace ObjectsComparer
                     TryGetMember(castedObject1, propertyKey, out member2);
                 }
 
-                //var keyComparisonContext = ComparisonContext.Create(null, comparisonContext);
                 var keyComparisonContextMember = (member1 ?? member2) != null ? new ComparisonContextMember(member1 ?? member2) : new ComparisonContextMember(propertyKey);
-                var keyComparisonContext = ComparisonContext.Create(keyComparisonContextMember, comparisonContext);
+                var keyComparisonContext = new ComparisonContext(keyComparisonContextMember, comparisonContext);
 
                 var propertyType = (value1 ?? value2)?.GetType() ?? typeof(object);
                 var customComparer = OverridesCollection.GetComparer(propertyType) ??
