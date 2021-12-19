@@ -1,9 +1,12 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 
 namespace ObjectsComparer
 {
     internal class ComparisonContextMember : IComparisonContextMember
     {
+        readonly string _name;
+
         public ComparisonContextMember()
         {
         }
@@ -15,15 +18,15 @@ namespace ObjectsComparer
                 throw new System.ArgumentException($"'{nameof(name)}' cannot be null or whitespace.", nameof(name));
             }
 
-            Name = name;
+            _name = name;
         }
 
         public ComparisonContextMember(MemberInfo info)
         {
-            Info = info ?? throw new System.ArgumentNullException(nameof(info));
+            Info = info ?? throw new ArgumentNullException(nameof(info));
         }
 
-        public string Name { get; }
+        public string Name => _name ?? Info?.Name;
 
         public MemberInfo Info { get; }
     }

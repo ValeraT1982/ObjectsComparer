@@ -70,7 +70,7 @@ namespace ObjectsComparer
         internal Action<ComparisonContext, ListComparisonOptions> ListComparisonOptionsAction { get; private set; } = null;
 
         /// <summary>
-        /// Configures list comparison behavior, especially the type of the comparison. For more info, see <see cref="ListConfigurationOptions"/>.
+        /// Configures list comparison behavior, especially the type of the comparison. For more info, see <see cref="ListComparisonOptions"/>.
         /// </summary>
         /// <param name="comparisonOptions">First parameter: Current list comparison context.</param>
         public ComparisonSettings ConfigureListComparison(Action<ComparisonContext, ListComparisonOptions> comparisonOptions)

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using NUnit.Framework;
 using ObjectsComparer.Tests.TestClasses;
+using ObjectsComparer.Tests.Utils;
 
 namespace ObjectsComparer.Tests
 {
@@ -106,10 +107,11 @@ namespace ObjectsComparer.Tests
             var a2 = new int[] { 1, 2, 3, 4 };
 
             var settings = new ComparisonSettings();
-            settings.ConfigureListComparison(listOptions => listOptions.CompareUnequalLists(true));
+            settings.ConfigureListComparison(compareUnequalLists: true);
 
             var comparer = new Comparer(settings);
-            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+            var ctx = new ComparisonContext();
+            var differences = comparer.CalculateDifferences(a1.GetType(), a1, a2, ctx).ToList();
 
             Assert.AreEqual(4, differences.Count);
 
@@ -132,19 +134,24 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual("Length", differences[3].MemberPath);
             Assert.AreEqual("3", differences[3].Value1);
             Assert.AreEqual("4", differences[3].Value2);
+            
+            Assert.IsTrue(differences.AreEquivalent(ctx.GetDifferences(true)));
+
+            var ctxJson = ctx.Shrink().ToJson();
         }
 
         [Test]
-        public void FluentTest_CompareUnequalLists_CompareElementsByKey()
+        public void FluentTest_CompareUnequalLists_ByKey()
         {
             var a1 = new int[] { 3, 2, 1 };
             var a2 = new int[] { 1, 2, 3, 4 };
 
             var settings = new ComparisonSettings();
-            settings.ConfigureListComparison(listOptions => listOptions.CompareUnequalLists(true).CompareElementsByKey());
+            settings.ConfigureListComparison(compareUnequalLists: true, compareElementsByKey: true);
 
             var comparer = new Comparer(settings);
-            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+            var ctx = new ComparisonContext();
+            var differences = comparer.CalculateDifferences(a1.GetType(), a1, a2, ctx).ToList();
 
             Assert.AreEqual(2, differences.Count);
 
@@ -157,10 +164,12 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual("Length", differences[1].MemberPath);
             Assert.AreEqual("3", differences[1].Value1);
             Assert.AreEqual("4", differences[1].Value2);
+
+            Assert.IsTrue(differences.AreEquivalent(ctx.GetDifferences(true)));
         }
 
         [Test]
-        public void FluentTest_CompareUnequalLists_CompareElementsByKey_FormatKey()
+        public void FluentTest_CompareUnequalLists_ByKey_FormatKey()
         {
             var a1 = new int[] { 3, 2, 1 };
             var a2 = new int[] { 1, 2, 3, 4 };

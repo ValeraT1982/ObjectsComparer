@@ -194,7 +194,7 @@ namespace ObjectsComparer
                         value2: array2Count > array1Count ? valueComparer.ToString(largerArray[i]) : string.Empty,
                         differenceType: array1Count > array2Count ? DifferenceTypes.MissedElementInSecondObject : DifferenceTypes.MissedElementInFirstObject);
 
-                    yield return AddDifferenceToComparisonContext(difference, new ComparisonContext(ancestor: listComparisonContext));
+                    yield return AddDifferenceToComparisonContext(difference, new ComparisonContext(new ComparisonContextMember(), listComparisonContext));
                 }
             }
         }

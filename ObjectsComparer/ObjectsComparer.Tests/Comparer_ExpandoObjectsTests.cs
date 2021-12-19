@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Dynamic;
 using Newtonsoft.Json;
 using NSubstitute;
+using System.Diagnostics.CodeAnalysis;
+using ObjectsComparer.Tests.Utils;
 
 namespace ObjectsComparer.Tests
 {
@@ -98,6 +100,34 @@ namespace ObjectsComparer.Tests
             Assert.IsTrue(differences.Any(d => d.MemberPath == "FieldSub1.Field1" && d.Value1 == "10" && d.Value2 == "8"));
         }
 
+        [Test]
+        public void Hierarchy_CheckComparisonContext()
+        {
+            dynamic a1Sub1 = new ExpandoObject();
+            a1Sub1.Field1 = 10;
+            dynamic a1 = new ExpandoObject();
+            a1.FieldSub1 = a1Sub1;
+            dynamic a2Sub1 = new ExpandoObject();
+            a2Sub1.Field1 = 8;
+            dynamic a2 = new ExpandoObject();
+            a2.FieldSub1 = a2Sub1;
+            var comparer = new Comparer();
+
+            var isEqual = comparer.Compare(a1, a2, out IEnumerable<Difference> differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            Assert.AreEqual(1, differences.Count);
+            Assert.IsTrue(differences.Any(d => d.MemberPath == "FieldSub1.Field1" && d.Value1 == "10" && d.Value2 == "8"));
+
+            var ctx = new ComparisonContext();
+            var calcDifferences = comparer.CalculateDifferences(typeof(object), (object)a1, (object)a2, ctx).ToArray();
+            var ctxDifferences = ctx.GetDifferences(true).ToArray();
+
+            Assert.IsTrue(differences.AreEquivalent(calcDifferences));
+            Assert.IsTrue(differences.AreEquivalent(ctxDifferences));
+        }
+        
         [Test]
         public void DifferentTypes()
         {
@@ -319,14 +349,7 @@ namespace ObjectsComparer.Tests
             var calculateDifferences = calculateDiffs.ToList();
             var comparisonContextDifferences = rootComparisonContext.GetDifferences(recursive: true).ToList();
 
-            Assert.IsTrue(comparisonContextDifferences.Any(
-                d => d.MemberPath == "Field1" && d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject));
-
-            Assert.IsTrue(calculateDifferences.Any(
-                d => d.MemberPath == "Field1" && d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject));
-
-            comparisonContextDifferences.ForEach(ctxDiff => CollectionAssert.Contains(calculateDifferences, ctxDiff));
-            calculateDifferences.ForEach(calculateDiff => CollectionAssert.Contains(comparisonContextDifferences, calculateDiff));
+            CollectionAssert.AreEquivalent(calculateDifferences, comparisonContextDifferences);
         }
 
         [Test]

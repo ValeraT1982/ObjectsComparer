@@ -128,7 +128,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Removes all <see cref="Descendants"/> which have no <see cref="Differences"/> directly or indirectly in their <see cref="Descendants"/>.
         /// </summary>
-        public void Shrink()
+        public ComparisonContext Shrink()
         {
             lock (_shrinkLock)
             {
@@ -146,6 +146,8 @@ namespace ObjectsComparer
 
                 _descendants.RemoveAll(ctx => removeDescendants.Contains(ctx));
             }
+
+            return this;
         }
     }
 }
