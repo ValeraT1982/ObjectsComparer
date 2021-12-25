@@ -28,23 +28,6 @@ namespace ObjectsComparer
             }
         }
 
-        //public static ComparisonContext Create(IComparisonContextMember member = null, ComparisonContext ancestor = null)
-        //{
-        //    var context = new ComparisonContext(member);
-
-        //    if (ancestor != null)
-        //    {
-        //        ancestor.AddDescendant(context);
-        //    }
-
-        //    return context;
-        //}
-
-        private ComparisonContext(IComparisonContextMember currentMember)
-        {
-            Member = currentMember;
-        }
-
         /// <summary>
         /// Typically a property or field in comparison process.
         /// It is always null for the root context (the starting point of the comparison) and always null for the list element. A list element never has a member, but it has an ancestor context which is the list and that list has its member.
@@ -88,17 +71,7 @@ namespace ObjectsComparer
         /// <param name="recursive">If value is true, it also looks for <see cref="Differences"/> in <see cref="Descendants"/>.</param>
         public bool HasDifferences(bool recursive)
         {
-            if (_differences.Any())
-            {
-                return true;
-            }
-
-            if (recursive)
-            {
-                return _descendants.Any(d => d.HasDifferences(true));
-            }
-
-            return false;
+            return GetDifferences(recursive).Any();
         }
 
         /// <summary>
