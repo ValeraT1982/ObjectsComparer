@@ -65,7 +65,7 @@ namespace ObjectsComparer.Tests
             //Client side.
             var settings = new ComparisonSettings();
 
-            settings.ConfigureListComparison((comparisonContext, listOptions) =>
+            settings.ConfigureListComparison((curentContext, listOptions) =>
             {
                 listOptions.CompareUnequalLists(true);
 
@@ -74,12 +74,15 @@ namespace ObjectsComparer.Tests
                     keyOptions.UseKey("Key");
                     keyOptions.ThrowKeyNotFound(false);
                 });
+
+                var currentMember = curentContext.Member;
             });
 
             //Component side.
             var listComparisonOptions = ListComparisonOptions.Default();
             var ctx = new ComparisonContext();
-            settings.ListComparisonOptionsAction(ctx, listComparisonOptions);
+            var listComparisonContextInfo = new ListComparisonContextInfo(ctx);
+            settings.ListComparisonOptionsAction(listComparisonContextInfo, listComparisonOptions);
             var listElementComparisonByKeyOptions = ListElementComparisonByKeyOptions.Default();
             listComparisonOptions.KeyOptionsAction(listElementComparisonByKeyOptions);
 
@@ -137,7 +140,7 @@ namespace ObjectsComparer.Tests
             
             Assert.IsTrue(differences.AreEquivalent(ctx.GetDifferences(true)));
 
-            var ctxJson = ctx.Shrink().ToJson();
+            var ctxJson = (ctx.Shrink() as ComparisonContext).ToJson();
         }
 
         [Test]
@@ -313,6 +316,16 @@ namespace ObjectsComparer.Tests
         // 3 is greater than 5: False
         // Another lambda observes a new value of captured variable: True
 
+        [Test]
+        public void TestListComparisonContextInfo()
+        {
+            var ancestorMember = new ComparisonContextMember("Property1");
+            var ancestorCtx = new ComparisonContext(ancestorMember);
+            var member = new ComparisonContextMember("Property2");
+            var ctx = new ComparisonContext(member, ancestorCtx);
+            var listCtxInfo = new ListComparisonContextInfo(ctx);
+            Assert.AreEqual("Property1.Property2", $"{listCtxInfo.Ancestor.Member.Name}.{listCtxInfo.Member.Name}");
+        }
     }
 
     public class VariableCaptureGame

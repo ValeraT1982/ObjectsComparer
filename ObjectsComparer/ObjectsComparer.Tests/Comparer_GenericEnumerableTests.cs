@@ -88,7 +88,7 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual(differences[0], diffsFromCtx[0]);
             Assert.AreEqual(differences[1], diffsFromCtx[1]);
 
-            var ctxjson = rootCtx.Shrink().ToJson(skipNullReference: false);
+            var ctxjson = (rootCtx.Shrink() as ComparisonContext).ToJson(skipNullReference: false);
         }
 
         [Test]

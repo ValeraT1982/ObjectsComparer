@@ -58,7 +58,8 @@ namespace ObjectsComparer
             var array2 = ((IEnumerable)obj2).Cast<object>().ToArray();
 
             var listComparisonOptions = ListComparisonOptions.Default();
-            Settings.ListComparisonOptionsAction?.Invoke(listComparisonContext, listComparisonOptions);
+            var listComparisonContextInfo = new ListComparisonContextInfo(listComparisonContext);
+            Settings.ListComparisonOptionsAction?.Invoke(listComparisonContextInfo, listComparisonOptions);
 
             if (array1.Length != array2.Length)
             {

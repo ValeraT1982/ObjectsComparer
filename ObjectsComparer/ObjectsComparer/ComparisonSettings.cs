@@ -67,13 +67,13 @@ namespace ObjectsComparer
             throw new KeyNotFoundException();
         }
 
-        internal Action<ComparisonContext, ListComparisonOptions> ListComparisonOptionsAction { get; private set; } = null;
+        internal Action<IListComparisonContextInfo, ListComparisonOptions> ListComparisonOptionsAction { get; private set; } = null;
 
         /// <summary>
         /// Configures list comparison behavior, especially the type of the comparison. For more info, see <see cref="ListComparisonOptions"/>.
         /// </summary>
         /// <param name="comparisonOptions">First parameter: Current list comparison context.</param>
-        public ComparisonSettings ConfigureListComparison(Action<ComparisonContext, ListComparisonOptions> comparisonOptions)
+        public ComparisonSettings ConfigureListComparison(Action<IListComparisonContextInfo, ListComparisonOptions> comparisonOptions)
         {
             if (comparisonOptions is null)
             {
