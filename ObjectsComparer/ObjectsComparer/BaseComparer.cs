@@ -201,6 +201,7 @@ namespace ObjectsComparer
             }
 
             comparisonContext.AddDifference(difference);
+
             return difference;
         }
     }

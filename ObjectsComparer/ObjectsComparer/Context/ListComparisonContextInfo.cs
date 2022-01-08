@@ -4,11 +4,11 @@ namespace ObjectsComparer
 {
     internal class ListComparisonContextInfo : IListComparisonContextInfo
     {
-        readonly ComparisonContext _comparisonContext;
+        readonly IComparisonContext _comparisonContext;
 
         readonly IListComparisonContextInfo _ancestor;
 
-        public ListComparisonContextInfo(ComparisonContext comparisonContext)
+        public ListComparisonContextInfo(IComparisonContext comparisonContext)
         {
             _comparisonContext = comparisonContext ?? throw new ArgumentNullException(nameof(comparisonContext));
             _ancestor = _comparisonContext.Ancestor == null ? null : new ListComparisonContextInfo(_comparisonContext.Ancestor);
