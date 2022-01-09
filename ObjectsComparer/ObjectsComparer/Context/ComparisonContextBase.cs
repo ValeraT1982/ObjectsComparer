@@ -41,7 +41,7 @@ namespace ObjectsComparer
             descendant.Ancestor = this;
         }
 
-        public void AddDifference(Difference difference)
+        public virtual void AddDifference(Difference difference)
         {
             if (difference is null)
             {
