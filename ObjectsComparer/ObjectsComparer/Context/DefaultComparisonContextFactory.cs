@@ -4,9 +4,14 @@ namespace ObjectsComparer
 {
     internal class DefaultComparisonContextFactory : IComparisonContextFactory
     {
-        public IComparisonContext CreateContext(IComparisonContext ancestor = null, MemberInfo member = null, string memberName = null)
+        public IComparisonContext CreateContext(IComparisonContext ancestor = null, string memberName = null)
         {
-            return new ComparisonContext(CreateMember(memberName, member), ancestor);
+            return new ComparisonContext(CreateMember(memberName, null), ancestor);
+        }
+
+        public IComparisonContext CreateContext(IComparisonContext ancestor = null, MemberInfo member = null)
+        {
+            return new ComparisonContext(CreateMember(null, member), ancestor);
         }
 
         internal static IComparisonContextMember CreateMember(string memberName, MemberInfo member)

@@ -4,7 +4,9 @@ namespace ObjectsComparer
 {
     public interface IComparisonContextFactory
     {
-        IComparisonContext CreateContext(IComparisonContext ancestor = null, MemberInfo member = null, string memberName = null);
+        IComparisonContext CreateContext(IComparisonContext ancestor = null, string memberName = null);
+
+        IComparisonContext CreateContext(IComparisonContext ancestor = null, MemberInfo member = null);
     }
 
     public class CreateComparisonContextArgs
