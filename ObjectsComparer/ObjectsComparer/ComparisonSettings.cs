@@ -6,7 +6,7 @@ namespace ObjectsComparer
     /// <summary>
     /// Configuration for Objects Comparer.
     /// </summary>
-    public class ComparisonSettings
+    public partial class ComparisonSettings
     {
         /// <summary>
         /// If true, all members which are not primitive types, do not have custom comparison rule and 
@@ -86,16 +86,16 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// Configures list comparison behavior, especially the type of comparison. For more info, see <see cref="ListConfigurationOptions"/>.
+        /// Configures list comparison behavior, especially the type of comparison. For more info, see <see cref="ListComparisonOptions"/>.
         /// </summary>
-        /// <param name="comparisonOptions">See <see cref="ListConfigurationOptions"/>.</param>
+        /// <param name="comparisonOptions">See <see cref="ListComparisonOptions"/>.</param>
         public void ConfigureListComparison(Action<ListComparisonOptions> comparisonOptions)
         {
             ConfigureListComparison((_, options) => comparisonOptions(options));
         }
 
         /// <summary>
-        /// Configures the type of list comparison and whether to compare unequal lists. For more info, see <see cref="ListConfigurationOptions"/>.
+        /// Configures the type of list comparison and whether to compare unequal lists. For more info, see <see cref="ListComparisonOptions"/>.
         /// </summary>
         /// <param name="compareElementsByKey">
         /// True value is shortcut for <see cref="ListComparisonOptions.CompareElementsByKey()"/> operation.
@@ -115,6 +115,18 @@ namespace ObjectsComparer
                     options.CompareElementsByKey();
                 }
             });
+        }
+
+        internal Action<ComparisonContextOptions> ComparisonContextOptionsAction;
+
+        public void ConfigureComparisonContext(Action<ComparisonContextOptions> comparisonContextOptions)
+        {
+            if (comparisonContextOptions is null)
+            {
+                throw new ArgumentNullException(nameof(comparisonContextOptions));
+            }
+
+            ComparisonContextOptionsAction = comparisonContextOptions;
         }
     }
 }
