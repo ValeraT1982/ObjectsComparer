@@ -29,7 +29,7 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return CalculateDifferences(type, obj1, obj2, new NullComparisonContext(member: null, ancestor: null));
+            return CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateNullContext());
         }
 
         public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, ComparisonContext comparisonContext)

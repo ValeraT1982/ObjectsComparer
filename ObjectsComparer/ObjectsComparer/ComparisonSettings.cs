@@ -117,7 +117,7 @@ namespace ObjectsComparer
             });
         }
 
-        internal Action<ComparisonContextOptions> ComparisonContextOptionsAction;
+        internal Action<ComparisonContextOptions> ComparisonContextOptionsAction { get; private set; }
 
         public void ConfigureComparisonContext(Action<ComparisonContextOptions> comparisonContextOptions)
         {

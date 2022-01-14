@@ -2,18 +2,19 @@
 
 namespace ObjectsComparer
 {
+    //public interface IComparisonContextFactory
+    //{
+    //    IComparisonContext CreateContext(IComparisonContext ancestor = null, string memberName = null);
+
+    //    IComparisonContext CreateContext(IComparisonContext ancestor = null, MemberInfo member = null);
+    //}
+
     public interface IComparisonContextFactory
     {
-        IComparisonContext CreateContext(IComparisonContext ancestor = null, string memberName = null);
+        IComparisonContext CreateContext(IComparisonContextInfo ancestor = null);
 
-        IComparisonContext CreateContext(IComparisonContext ancestor = null, MemberInfo member = null);
-    }
+        IComparisonContext CreateContext(string memberName, IComparisonContextInfo ancestor = null);
 
-    public class CreateComparisonContextArgs
-    {
-        internal CreateComparisonContextArgs(IComparisonContext ancestor, string memberName, MemberInfo member)
-        {
-
-        }
+        IComparisonContext CreateContext(MemberInfo member, IComparisonContextInfo ancestor = null);
     }
 }
