@@ -124,7 +124,7 @@ namespace ObjectsComparer
                     continue;
                 }
 
-                var memberContext = new ComparisonContext(comparisonContext, new ComparisonContextMember(member));
+                var memberContext = new ComparisonContext(new ComparisonContextMember(member), comparisonContext);
 
                 var valueComparer = DefaultValueComparer;
                 var hasCustomComparer = false;

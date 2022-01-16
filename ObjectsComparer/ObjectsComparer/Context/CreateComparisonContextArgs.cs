@@ -16,8 +16,8 @@ namespace ObjectsComparer
 
         public IComparisonContext Ancestor { get; }
 
-        public MemberInfo Member { get; set; }
+        public MemberInfo Member { get; }
 
-        public string MemberName { get; set; }
+        public string MemberName { get; }
     }
 }

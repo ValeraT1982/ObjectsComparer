@@ -26,7 +26,7 @@ namespace ObjectsComparer
             }
             else
             {
-                return new ComparisonContext(createContextArgs.Ancestor, CreateComparisonContextMember(createContextArgs.Member, createContextArgs.MemberName));
+                return new ComparisonContext(CreateComparisonContextMember(createContextArgs.Member, createContextArgs.MemberName), createContextArgs.Ancestor);
             }
         }
 
