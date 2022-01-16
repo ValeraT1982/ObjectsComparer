@@ -14,11 +14,11 @@ namespace ObjectsComparer
             return new ComparisonContextOptions();
         }
 
-        internal IComparisonContextFactory CustomComparisonContextFactory { get; private set; }
+        internal Func<CreateComparisonContextArgs, IComparisonContext> ComparisonContextFactory { get; private set; }
 
-        public void UseComparisonContextFactory(IComparisonContextFactory comparisonContextFactory)
+        public void UseComparisonContextFactory(Func<CreateComparisonContextArgs, IComparisonContext> factory)
         {
-            CustomComparisonContextFactory = comparisonContextFactory ?? throw new ArgumentNullException(nameof(comparisonContextFactory));
+            ComparisonContextFactory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
     }
 }

@@ -10,39 +10,24 @@ namespace ObjectsComparer
             return new NullComparisonContext();
         }
 
-        /// <summary>
-        /// <paramref name="member"/> takes precedence over <paramref name="memberName"/>.
-        /// </summary>
-        public static IComparisonContext CreateContext(ComparisonContextOptions options, IComparisonContext ancestor, MemberInfo member, string memberName)
+        public static IComparisonContext CreateContext(ComparisonSettings comparisonSettings, CreateComparisonContextArgs createContextArgs)
         {
-            if (options is null)
+            if (comparisonSettings is null)
             {
-                throw new ArgumentNullException(nameof(options));
+                throw new ArgumentNullException(nameof(comparisonSettings));
             }
 
-            if (ShouldCreateNullContext(ancestor))
+            ComparisonContextOptions options = ComparisonContextOptions.Default();
+            comparisonSettings.ComparisonContextOptionsAction?.Invoke(options);
+
+            if (options.ComparisonContextFactory != null)
             {
-                return new NullComparisonContext(null, null);
+                return options.ComparisonContextFactory(createContextArgs);
             }
-
-            var ancestorInfo = ancestor != null ? new ComparisonContextInfo(ancestor) : null;
-
-            if (options.CustomComparisonContextFactory != null)
+            else
             {
-                if (member != null)
-                {
-                    return options.CustomComparisonContextFactory.CreateContext(member, ancestorInfo);
-                }
-
-                if (string.IsNullOrWhiteSpace(memberName))
-                {
-                    return options.CustomComparisonContextFactory.CreateContext(memberName, ancestorInfo);
-                }
-
-                return options.CustomComparisonContextFactory.CreateContext(ancestorInfo);
+                return new ComparisonContext(createContextArgs.Ancestor, CreateComparisonContextMember(createContextArgs.Member, createContextArgs.MemberName));
             }
-
-            return new ComparisonContext(CreateComparisonContextMember(memberName, member), ancestor);
         }
 
         static bool ShouldCreateNullContext(IComparisonContext ancestor)
@@ -61,7 +46,7 @@ namespace ObjectsComparer
             return false;
         }
 
-        static IComparisonContextMember CreateComparisonContextMember(string memberName, MemberInfo member)
+        static IComparisonContextMember CreateComparisonContextMember(MemberInfo member, string memberName)
         {
             if (member != null)
             {

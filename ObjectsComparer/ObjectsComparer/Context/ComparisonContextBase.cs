@@ -15,11 +15,10 @@ namespace ObjectsComparer
 
         readonly List<Difference> _differences = new List<Difference>();
 
-        public ComparisonContextBase(IComparisonContextMember member = null, IComparisonContext ancestor = null)
+        public ComparisonContextBase(IComparisonContext ancestor = null, IComparisonContextMember member = null)
         {
-            Ancestor = ancestor;
-            ancestor?.AddDescendant(this);
-            Member = member;
+            ancestor.AddDescendant(this);
+            Member = member ?? throw new ArgumentNullException(nameof(member));
         }
 
         public IComparisonContext Ancestor { get; set; }
