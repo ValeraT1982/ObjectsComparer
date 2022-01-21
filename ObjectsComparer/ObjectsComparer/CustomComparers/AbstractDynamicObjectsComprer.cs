@@ -14,15 +14,15 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return CalculateDifferences(type, obj1, obj2, new ComparisonContext());
+            return CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings));
         }
 
-        public virtual IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, ComparisonContext comparisonContext)
+        public virtual IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, IComparisonContext comparisonContext)
         {
-            return CalculateDifferences(typeof(T), obj1, obj2, new ComparisonContext());
+            return CalculateDifferences(typeof(T), obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings));
         }
 
-        public virtual IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, ComparisonContext comparisonContext)
+        public virtual IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext)
         {
             var castedObject1 = (T)obj1;
             var castedObject2 = (T)obj2;
@@ -51,8 +51,9 @@ namespace ObjectsComparer
                     TryGetMember(castedObject1, propertyKey, out member2);
                 }
 
-                var keyComparisonContextMember = (member1 ?? member2) != null ? new ComparisonContextMember(member1 ?? member2) : new ComparisonContextMember(propertyKey);
-                var keyComparisonContext = new ComparisonContext(keyComparisonContextMember, comparisonContext);
+                //var keyComparisonContextMember = (member1 ?? member2) != null ? new ComparisonContextMember(member1 ?? member2) : new ComparisonContextMember(propertyKey);
+                //var keyComparisonContext = new ComparisonContext(keyComparisonContextMember, comparisonContext);
+                var keyComparisonContext = ComparisonContextProvider.CreateMemberOrMemberNameContext(Settings, comparisonContext, member1 ?? member2, propertyKey);
 
                 var propertyType = (value1 ?? value2)?.GetType() ?? typeof(object);
                 var customComparer = OverridesCollection.GetComparer(propertyType) ??

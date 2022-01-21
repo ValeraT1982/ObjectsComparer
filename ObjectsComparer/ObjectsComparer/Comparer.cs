@@ -29,10 +29,10 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateNullContext());
+            return CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings));
         }
 
-        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, ComparisonContext comparisonContext)
+        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext)
         {
             if (comparisonContext is null)
             {
@@ -55,7 +55,7 @@ namespace ObjectsComparer
             }
 
             var genericType = comparerIsIContextableComparerT ? typeof(IContextableComparer<>).MakeGenericType(type) : typeof(IComparer<>).MakeGenericType(type);
-            var genericMethodParameterTypes = comparerIsIContextableComparerT ? new[] { type, type, typeof(ComparisonContext) } : new[] { type, type };
+            var genericMethodParameterTypes = comparerIsIContextableComparerT ? new[] { type, type, typeof(IComparisonContext) } : new[] { type, type };
             var genericMethod = genericType.GetTypeInfo().GetMethod(CalculateDifferencesMethodName, genericMethodParameterTypes);
             var genericMethodParameters = comparerIsIContextableComparerT ? new[] { obj1, obj2, comparisonContext } : new[] { obj1, obj2 };
 

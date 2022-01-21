@@ -121,12 +121,7 @@ namespace ObjectsComparer
 
         public void ConfigureComparisonContext(Action<ComparisonContextOptions> comparisonContextOptions)
         {
-            if (comparisonContextOptions is null)
-            {
-                throw new ArgumentNullException(nameof(comparisonContextOptions));
-            }
-
-            ComparisonContextOptionsAction = comparisonContextOptions;
+            ComparisonContextOptionsAction = comparisonContextOptions ?? throw new ArgumentNullException(nameof(comparisonContextOptions));
         }
     }
 }

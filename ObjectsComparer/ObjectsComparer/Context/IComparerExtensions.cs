@@ -20,7 +20,7 @@ namespace ObjectsComparer
         /// <param name="comparisonContext">Current comparison context. For more info see <see cref="ComparisonContext"/> class.</param>
         /// <returns>List of differences between objects.</returns>
         /// <exception cref="ContextableComparerNotImplementedException">If <paramref name="comparer"/> does not implement <see cref="IContextableComparer"/>.</exception>
-        public static IEnumerable<Difference> CalculateDifferences(this IComparer comparer, Type type, object obj1, object obj2, ComparisonContext comparisonContext)
+        public static IEnumerable<Difference> CalculateDifferences(this IComparer comparer, Type type, object obj1, object obj2, IComparisonContext comparisonContext)
         {
             if (comparer is null)
             {
@@ -46,7 +46,7 @@ namespace ObjectsComparer
             //return comparer.CalculateDifferences(type, obj1, obj2);
         }
 
-        public static IEnumerable<Difference> CalculateDifferences<T>(this IComparer<T> comparer, T obj1, T obj2, ComparisonContext comparisonContext)
+        public static IEnumerable<Difference> CalculateDifferences<T>(this IComparer<T> comparer, T obj1, T obj2, IComparisonContext comparisonContext)
         {
             if (comparer is null)
             {

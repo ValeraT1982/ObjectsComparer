@@ -17,10 +17,10 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return CalculateDifferences(type, obj1, obj2, new ComparisonContext());
+            return CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings));
         }
 
-        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, ComparisonContext listComparisonContext)
+        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext listComparisonContext)
         {
             Debug.WriteLine($"{GetType().Name}.{nameof(CalculateDifferences)}: {type.Name}");
 

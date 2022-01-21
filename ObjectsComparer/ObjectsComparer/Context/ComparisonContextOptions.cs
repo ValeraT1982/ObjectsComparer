@@ -16,6 +16,11 @@ namespace ObjectsComparer
 
         internal Func<CreateComparisonContextArgs, IComparisonContext> ComparisonContextFactory { get; private set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="factory">If factory returns null, the default comparison context will be used.</param>
+        /// <exception cref="ArgumentNullException"></exception>
         public void UseComparisonContextFactory(Func<CreateComparisonContextArgs, IComparisonContext> factory)
         {
             ComparisonContextFactory = factory ?? throw new ArgumentNullException(nameof(factory));

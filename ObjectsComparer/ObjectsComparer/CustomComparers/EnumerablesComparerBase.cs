@@ -15,7 +15,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Selects calculation operation based on the current value of the <see cref="ListComparisonOptions.ElementSearchMode"/> property.
         /// </summary>
-        protected virtual IEnumerable<Difference> CalculateDifferences<T>(IList<T> list1, IList<T> list2, ComparisonContext listComparisonContext, ListComparisonOptions listComparisonOptions)
+        protected virtual IEnumerable<Difference> CalculateDifferences<T>(IList<T> list1, IList<T> list2, IComparisonContext listComparisonContext, ListComparisonOptions listComparisonOptions)
         {
             if (listComparisonOptions.ElementSearchMode == ListElementSearchMode.Key)
             {
@@ -34,7 +34,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Calculates differences using <see cref="ListElementSearchMode.Key"/> comparison mode.
         /// </summary>
-        protected virtual IEnumerable<Difference> CalculateDifferencesByKey<T>(IList<T> array1, IList<T> array2, ComparisonContext listComparisonContext, ListComparisonOptions listComparisonOptions)
+        protected virtual IEnumerable<Difference> CalculateDifferencesByKey<T>(IList<T> array1, IList<T> array2, IComparisonContext listComparisonContext, ListComparisonOptions listComparisonOptions)
         {
             Debug.WriteLine($"{GetType().Name}.{nameof(CalculateDifferencesByKey)}: {array1?.GetType().Name}");
 
@@ -44,7 +44,8 @@ namespace ObjectsComparer
             for (int element1Index = 0; element1Index < array1.Count(); element1Index++)
             {
                 var element1 = array1[element1Index];
-                var elementComparisonContext = new ComparisonContext(new ComparisonContextMember(), listComparisonContext);
+                //var elementComparisonContext = new ComparisonContext(new ComparisonContextMember(), listComparisonContext);
+                var elementComparisonContext = ComparisonContextProvider.CreateListElementContext(Settings, listComparisonContext);
 
                 if (element1 == null)
                 {
@@ -93,7 +94,8 @@ namespace ObjectsComparer
             for (int element2Index = 0; element2Index < array2.Count(); element2Index++)
             {
                 var element2 = array2[element2Index];
-                var elementComparisonContext = new ComparisonContext(new ComparisonContextMember(), listComparisonContext);
+                //var elementComparisonContext = new ComparisonContext(new ComparisonContextMember(), listComparisonContext);
+                var elementComparisonContext = ComparisonContextProvider.CreateListElementContext(Settings, listComparisonContext);
 
                 if (element2 == null)
                 {
@@ -132,7 +134,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Calculates differences using <see cref="ListElementSearchMode.Index"/> comparison mode.
         /// </summary>
-        protected virtual IEnumerable<Difference> CalculateDifferencesByIndex<T>(IList<T> array1, IList<T> array2, ComparisonContext listComparisonContext, ListComparisonOptions listComparisonOptions)
+        protected virtual IEnumerable<Difference> CalculateDifferencesByIndex<T>(IList<T> array1, IList<T> array2, IComparisonContext listComparisonContext, ListComparisonOptions listComparisonOptions)
         {
             Debug.WriteLine($"{GetType().Name}.{nameof(CalculateDifferencesByIndex)}: {array1?.GetType().Name}");
 

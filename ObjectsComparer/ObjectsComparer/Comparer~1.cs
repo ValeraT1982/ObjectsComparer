@@ -56,17 +56,17 @@ namespace ObjectsComparer
             return CalculateDifferences(obj1, obj2, memberInfo: null);
         }
 
-        public IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, ComparisonContext comparisonContext)
+        public IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, IComparisonContext comparisonContext)
         {
             return CalculateDifferences(obj1, obj2, memberInfo: null, comparisonContext);
         }
 
         internal IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo)
         {
-            return CalculateDifferences(obj1, obj2, memberInfo, new ComparisonContext());
+            return CalculateDifferences(obj1, obj2, memberInfo, ComparisonContextProvider.CreateImplicitRootContext(Settings));
         }
 
-        IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo, ComparisonContext comparisonContext)
+        IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo, IComparisonContext comparisonContext)
         {
             var comparer = memberInfo != null
                 ? OverridesCollection.GetComparer(memberInfo)
@@ -124,7 +124,8 @@ namespace ObjectsComparer
                     continue;
                 }
 
-                var memberContext = new ComparisonContext(new ComparisonContextMember(member), comparisonContext);
+                var memberContext = ComparisonContextProvider.CreateMemberContext(Settings, comparisonContext, member);
+                //var memberContext = new ComparisonContext(new ComparisonContextMember(member), comparisonContext);
 
                 var valueComparer = DefaultValueComparer;
                 var hasCustomComparer = false;

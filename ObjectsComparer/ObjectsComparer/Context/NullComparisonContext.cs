@@ -8,7 +8,7 @@ namespace ObjectsComparer
     /// </summary>
     internal class NullComparisonContext : ComparisonContextBase
     {
-        public NullComparisonContext(IComparisonContextMember member = null, IComparisonContext ancestor = null) : base(ancestor, member)
+        public NullComparisonContext(IComparisonContextMember member = null, IComparisonContext ancestor = null) : base(member, ancestor)
         {
         }
 

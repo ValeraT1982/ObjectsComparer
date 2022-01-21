@@ -15,7 +15,7 @@ namespace ObjectsComparer
 
         readonly List<Difference> _differences = new List<Difference>();
 
-        public ComparisonContextBase(IComparisonContext ancestor = null, IComparisonContextMember member = null)
+        public ComparisonContextBase(IComparisonContextMember member = null, IComparisonContext ancestor = null)
         {
             ancestor.AddDescendant(this);
             Member = member ?? throw new ArgumentNullException(nameof(member));
