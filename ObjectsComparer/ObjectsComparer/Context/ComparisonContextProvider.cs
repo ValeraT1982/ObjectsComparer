@@ -15,12 +15,12 @@ namespace ObjectsComparer
         /// <summary>
         /// Context without ancestor and without member.
         /// </summary>
-        public static IComparisonContext CreateRootContext(ComparisonSettings comparisonSettings)
-        {
-            _ = comparisonSettings ?? throw new ArgumentNullException(nameof(comparisonSettings));
+        //public static IComparisonContext CreateRootContext(ComparisonSettings comparisonSettings)
+        //{
+        //    _ = comparisonSettings ?? throw new ArgumentNullException(nameof(comparisonSettings));
 
-            return CreateContext(comparisonSettings, new CreateComparisonContextArgs());
-        }
+        //    return CreateContext(comparisonSettings, new CreateComparisonContextArgs());
+        //}
 
         /// <summary>
         /// Context with ancestor but without a member.
@@ -68,7 +68,7 @@ namespace ObjectsComparer
                 return CreateListElementContext(comparisonSettings, ancestor);
             }
 
-            return CreateRootContext(comparisonSettings);
+            return CreateImplicitRootContext(comparisonSettings);
         }
 
         static IComparisonContext CreateContext(ComparisonSettings comparisonSettings, CreateComparisonContextArgs createContextArgs)

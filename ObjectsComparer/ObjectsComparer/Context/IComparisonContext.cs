@@ -36,8 +36,8 @@ namespace ObjectsComparer
         /// <summary>
         /// Adds descendant to the context.
         /// </summary>
-        /// <param name="comparisonContext"></param>
-        void AddDescendant(IComparisonContext comparisonContext);
+        /// <param name="descendant"></param>
+        void AddDescendant(IComparisonContext descendant);
 
         /// <summary>
         /// Adds the difference to the context.

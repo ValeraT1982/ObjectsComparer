@@ -11,7 +11,7 @@ namespace ObjectsComparer
     /// </summary>
     public sealed class ComparisonContext : ComparisonContextBase
     {
-        public ComparisonContext(IComparisonContextMember member = null, IComparisonContext ancestor = null) : base(member, ancestor)
+        private ComparisonContext(IComparisonContextMember member = null, IComparisonContext ancestor = null) : base(member, ancestor)
         {
 
         }
