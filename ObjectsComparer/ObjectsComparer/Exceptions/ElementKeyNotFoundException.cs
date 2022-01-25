@@ -28,7 +28,7 @@ namespace ObjectsComparer.Exceptions
         public object KeylessElement { get; }
 
         /// <summary>
-        /// The current <see cref="ComparisonContext"/> in which the exception occurred.
+        /// The current <see cref="IComparisonContext"/> in which the exception occurred.
         /// </summary>
         public IComparisonContext KeylessElementComparisonContext { get; }
     }

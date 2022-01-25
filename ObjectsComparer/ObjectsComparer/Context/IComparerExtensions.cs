@@ -5,19 +5,19 @@ using System.Collections.Generic;
 namespace ObjectsComparer
 {
     /// <summary>
-    /// Extends interface <see cref="IComparer"/> with an overloaded operation CalculateDifferences, that accepts <see cref="ComparisonContext"/> parameter.
+    /// Extends interface <see cref="IComparer"/>.
     /// </summary>
     public static class IComparerExtensions
     {
         /// <summary>
         /// Calculates list of differences between objects. Accepts comparison context.
-        /// At the beginning of the comparison you can create <see cref="ComparisonContext"/> instance using the <see cref="new ComparisonContext"/> operation and pass it as a parameter.
-        /// For more info about comparison context see <see cref="ComparisonContext"/> class.
+        /// At the beginning of the comparison you can create <see cref="IComparisonContext"/> instance using the <see cref="new ComparisonContext"/> operation and pass it as a parameter.
+        /// For more info about comparison context see <see cref="IComparisonContext"/> class.
         /// </summary>
         /// <param name="type">Type.</param>
         /// <param name="obj1">Object 1.</param>
         /// <param name="obj2">Object 2.</param>
-        /// <param name="comparisonContext">Current comparison context. For more info see <see cref="ComparisonContext"/> class.</param>
+        /// <param name="comparisonContext">Current comparison context. For more info see <see cref="IComparisonContext"/> class.</param>
         /// <returns>List of differences between objects.</returns>
         /// <exception cref="ContextableComparerNotImplementedException">If <paramref name="comparer"/> does not implement <see cref="IContextableComparer"/>.</exception>
         public static IEnumerable<Difference> CalculateDifferences(this IComparer comparer, Type type, object obj1, object obj2, IComparisonContext comparisonContext)

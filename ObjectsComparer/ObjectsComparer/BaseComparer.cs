@@ -185,7 +185,7 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// Adds an <paramref name="difference"/> to the end of the <paramref name="comparisonContext"/>'s <see cref="ComparisonContext.Differences"/>.
+        /// Adds an <paramref name="difference"/> to the end of the <paramref name="comparisonContext"/>'s <see cref="IComparisonContext.Differences"/>.
         /// </summary>
         /// <returns>The <paramref name="difference"/> argument.</returns>
         protected virtual Difference AddDifferenceToComparisonContext(Difference difference, IComparisonContext comparisonContext)
