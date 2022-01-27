@@ -310,6 +310,14 @@ namespace ObjectsComparer.Tests
                 .CompareUnequalLists(true)
                 .CompareElementsByKey(keyOptions => keyOptions.ThrowKeyNotFound(false)));
 
+            settings.ConfigureListComparison((ctx, options) => 
+            {
+                if (ctx.Member.Name == "TrvaleAdresy") 
+                {
+                    options.CompareElementsByKey();
+                }
+            });
+
             var comparer = new Comparer<A>(settings);
 
             List<Difference> differences = null;

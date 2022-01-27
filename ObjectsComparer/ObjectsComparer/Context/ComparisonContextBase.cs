@@ -17,8 +17,8 @@ namespace ObjectsComparer
 
         public ComparisonContextBase(IComparisonContextMember member = null, IComparisonContext ancestor = null)
         {
-            ancestor.AddDescendant(this);
-            Member = member ?? throw new ArgumentNullException(nameof(member));
+            ancestor?.AddDescendant(this);
+            Member = member;
         }
 
         public IComparisonContext Ancestor { get; set; }

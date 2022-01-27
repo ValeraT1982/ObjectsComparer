@@ -11,14 +11,7 @@ namespace ObjectsComparer
     {
         /// <summary>
         /// Calculates list of differences between objects. Accepts comparison context.
-        /// At the beginning of the comparison you can create <see cref="IComparisonContext"/> instance using the <see cref="new ComparisonContext"/> operation and pass it as a parameter.
-        /// For more info about comparison context see <see cref="IComparisonContext"/> class.
         /// </summary>
-        /// <param name="type">Type.</param>
-        /// <param name="obj1">Object 1.</param>
-        /// <param name="obj2">Object 2.</param>
-        /// <param name="comparisonContext">Current comparison context. For more info see <see cref="IComparisonContext"/> class.</param>
-        /// <returns>List of differences between objects.</returns>
         /// <exception cref="ContextableComparerNotImplementedException">If <paramref name="comparer"/> does not implement <see cref="IContextableComparer"/>.</exception>
         public static IEnumerable<Difference> CalculateDifferences(this IComparer comparer, Type type, object obj1, object obj2, IComparisonContext comparisonContext)
         {
@@ -42,8 +35,12 @@ namespace ObjectsComparer
                 return contextableComparer.CalculateDifferences(type, obj1, obj2, comparisonContext);
             }
 
+            if (HasComparisonContextImplicitRoot(comparisonContext))
+            {
+                return comparer.CalculateDifferences(type, obj1, obj2);
+            }
+
             throw new ContextableComparerNotImplementedException(comparer);
-            //return comparer.CalculateDifferences(type, obj1, obj2);
         }
 
         public static IEnumerable<Difference> CalculateDifferences<T>(this IComparer<T> comparer, T obj1, T obj2, IComparisonContext comparisonContext)
@@ -63,8 +60,35 @@ namespace ObjectsComparer
                 return contextableComparer.CalculateDifferences(obj1, obj2, comparisonContext);
             }
 
+            if (HasComparisonContextImplicitRoot(comparisonContext))
+            {
+                return comparer.CalculateDifferences(obj1, obj2);
+            }
+
             throw new ContextableComparerNotImplementedException(comparer);
-            //return comparer.CalculateDifferences(obj1, obj2);
+        }
+
+        static bool HasComparisonContextImplicitRoot(IComparisonContext comparisonContext)
+        {
+            if (comparisonContext is null)
+            {
+                throw new ArgumentNullException(nameof(comparisonContext));
+            }
+
+            do
+            {
+                if (comparisonContext.Ancestor == null && comparisonContext is NullComparisonContext) 
+                {
+                    return true;
+                }
+                else
+                {
+                    comparisonContext = comparisonContext.Ancestor;
+                }
+
+            } while (comparisonContext != null);
+
+            return false;
         }
     }
 }
