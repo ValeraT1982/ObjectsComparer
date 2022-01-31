@@ -11,4 +11,14 @@ namespace ObjectsComparer.Exceptions
 
         public object Comparer { get; }
     }
+
+    public class ContextableComparerNotImplementedException<T> : NotImplementedException
+    {
+        internal ContextableComparerNotImplementedException(IComparer<T> comparer) : base(message: $"The comparer argument of type {comparer?.GetType()?.FullName} does not implement IContextableComparer<T> interface.")
+        {
+            Comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
+        }
+
+        public IComparer<T> Comparer { get; }
+    }
 }

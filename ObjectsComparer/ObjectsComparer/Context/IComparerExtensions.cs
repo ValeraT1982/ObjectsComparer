@@ -40,6 +40,7 @@ namespace ObjectsComparer
                 return comparer.CalculateDifferences(type, obj1, obj2);
             }
 
+            //The caller passed on the root context, but did not provide an contextable comparer. The component guarantees that all its own comparers are contextable.
             throw new ContextableComparerNotImplementedException(comparer);
         }
 
@@ -65,6 +66,7 @@ namespace ObjectsComparer
                 return comparer.CalculateDifferences(obj1, obj2);
             }
 
+            //The caller passed on the root context, but did not provide an contextable comparer. The component guarantees that all its own comparers are contextable.
             throw new ContextableComparerNotImplementedException(comparer);
         }
 
@@ -81,10 +83,8 @@ namespace ObjectsComparer
                 {
                     return true;
                 }
-                else
-                {
-                    comparisonContext = comparisonContext.Ancestor;
-                }
+
+                comparisonContext = comparisonContext.Ancestor;
 
             } while (comparisonContext != null);
 

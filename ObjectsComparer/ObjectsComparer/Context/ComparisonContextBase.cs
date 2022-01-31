@@ -21,7 +21,24 @@ namespace ObjectsComparer
             Member = member;
         }
 
-        public IComparisonContext Ancestor { get; set; }
+        IComparisonContext _ancestor;
+
+        public virtual IComparisonContext Ancestor
+        {
+            get
+            {
+                return _ancestor; 
+            }
+            set
+            {
+                if (_ancestor != null)
+                {
+                    throw new InvalidOperationException("The ancestor already exists.");
+                }
+
+                _ancestor = value;
+            } 
+        }
 
         public IEnumerable<IComparisonContext> Descendants => _descendants.AsReadOnly();
 
