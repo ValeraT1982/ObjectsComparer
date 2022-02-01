@@ -312,7 +312,7 @@ namespace ObjectsComparer.Tests
 
             settings.ConfigureListComparison((ctx, options) => 
             {
-                if (ctx.Member.Name == "TrvaleAdresy") 
+                if (ctx.Member.MemberName == "TrvaleAdresy") 
                 {
                     options.CompareElementsByKey();
                 }

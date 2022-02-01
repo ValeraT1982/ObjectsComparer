@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using ObjectsComparer.Tests.TestClasses;
 using ObjectsComparer.Tests.Utils;
+using System.Reflection;
 
 namespace ObjectsComparer.Tests
 {
@@ -319,12 +320,12 @@ namespace ObjectsComparer.Tests
         [Test]
         public void TestListComparisonContextInfo()
         {
-            var ancestorMember = new ComparisonContextMember("Property1");
+            var ancestorMember = ComparisonContextMember.Create(memberName: "Property1");
             var ancestorCtx = new ComparisonContext(ancestorMember);
-            var member = new ComparisonContextMember("Property2");
+            var member = ComparisonContextMember.Create(memberName: "Property2");
             var ctx = new ComparisonContext(member, ancestorCtx);
             var listCtxInfo = new ListComparisonContextInfo(ctx);
-            Assert.AreEqual("Property1.Property2", $"{listCtxInfo.Ancestor.Member.Name}.{listCtxInfo.Member.Name}");
+            Assert.AreEqual("Property1.Property2", $"{listCtxInfo.Ancestor.Member.MemberName}.{listCtxInfo.Member.MemberName}");
         }
     }
 

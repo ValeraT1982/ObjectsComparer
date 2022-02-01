@@ -3,31 +3,40 @@ using System.Reflection;
 
 namespace ObjectsComparer
 {
-    internal class ComparisonContextMember : IComparisonContextMember
+    public class ComparisonContextMember : IComparisonContextMember
     {
-        readonly string _name;
-
-        public ComparisonContextMember()
+        ComparisonContextMember() 
         {
         }
 
-        public ComparisonContextMember(string name)
+        public static ComparisonContextMember Create()
         {
-            if (string.IsNullOrWhiteSpace(name))
+            return new ComparisonContextMember();
+        }
+
+        public static ComparisonContextMember Create(MemberInfo member)
+        {
+            return new ComparisonContextMember { Member = member ?? throw new ArgumentNullException(nameof(member)) };
+        }
+        public static ComparisonContextMember Create(string memberName)
+        {
+            return new ComparisonContextMember { MemberName = memberName ?? throw new ArgumentNullException(nameof(memberName)) };
+        }
+
+        string _memberName;
+
+        public string MemberName 
+        {
+            get
             {
-                throw new System.ArgumentException($"'{nameof(name)}' cannot be null or whitespace.", nameof(name));
+                return Member?.Name ?? _memberName;    
+            } 
+            private set
+            {
+                _memberName = value;
             }
-
-            _name = name;
         }
 
-        public ComparisonContextMember(MemberInfo info)
-        {
-            Info = info ?? throw new ArgumentNullException(nameof(info));
-        }
-
-        public string Name => _name ?? Info?.Name;
-
-        public MemberInfo Info { get; }
+        public MemberInfo Member { get; private set; }
     }
 }

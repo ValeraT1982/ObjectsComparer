@@ -14,16 +14,22 @@ namespace ObjectsComparer
             return new ComparisonContextOptions();
         }
 
-        internal Func<CreateComparisonContextArgs, IComparisonContext> ComparisonContextFactory { get; private set; }
+        internal Func<IComparisonContextMember, IComparisonContext> ComparisonContextFactory { get; private set; }
 
-        /// <summary>
-        /// Creates <see cref="IComparisonContext"/>.
-        /// </summary>
-        /// <param name="factory">If factory returns null, the default comparison context will be used.</param>
-        /// <exception cref="ArgumentNullException"></exception>
-        public void UseComparisonContextFactory(Func<CreateComparisonContextArgs, IComparisonContext> factory)
+        internal Func<IComparisonContextMember, IComparisonContextMember> ComparisonContextMemberFactory { get; private set; }
+        
+
+        public void UseComparisonContextFactory(Func<IComparisonContextMember, IComparisonContext> factory)
         {
             ComparisonContextFactory = factory ?? throw new ArgumentNullException(nameof(factory));
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="factory">First parameter type: Default member.</param>
+        public void UseComparisonContextMemberFactory(Func<IComparisonContextMember, IComparisonContextMember> factory)
+        {
+            ComparisonContextMemberFactory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
     }
 }

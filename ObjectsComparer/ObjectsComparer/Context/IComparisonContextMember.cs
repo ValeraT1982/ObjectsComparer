@@ -3,18 +3,18 @@
 namespace ObjectsComparer
 {
     /// <summary>
-    /// Compared member in comparison process, typically the property.
+    /// The member being compared in the comparison process, usually a property.
     /// </summary>
     public interface IComparisonContextMember
     {
         /// <summary>
-        /// Compared member name.
+        /// Member.
         /// </summary>
-        string Name { get; }
+        string MemberName { get; }
 
         /// <summary>
-        /// Compared member. May be null for dynamic properties unknown at compile time.
+        /// Member. May be null for dynamic properties unknown at compile time.
         /// </summary>
-        MemberInfo Info { get; }
+        MemberInfo Member { get; }
     }
 }

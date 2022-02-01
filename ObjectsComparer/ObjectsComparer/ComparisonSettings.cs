@@ -117,11 +117,11 @@ namespace ObjectsComparer
             });
         }
 
-        internal Action<ComparisonContextOptions> ComparisonContextOptionsAction { get; private set; }
+        internal Action<IComparisonContext, ComparisonContextOptions> ComparisonContextOptionsAction { get; private set; }
 
-        public void ConfigureComparisonContext(Action<ComparisonContextOptions> comparisonContextOptions)
+        public void ConfigureComparisonContext(Action<IComparisonContext, ComparisonContextOptions> options)
         {
-            ComparisonContextOptionsAction = comparisonContextOptions ?? throw new ArgumentNullException(nameof(comparisonContextOptions));
+            ComparisonContextOptionsAction = options ?? throw new ArgumentNullException(nameof(options));
         }
     }
 }
