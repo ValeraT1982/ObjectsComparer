@@ -45,7 +45,7 @@ namespace ObjectsComparer
             {
                 var element1 = array1[element1Index];
                 //var elementComparisonContext = new ComparisonContext(new ComparisonContextMember(), listComparisonContext);
-                var elementComparisonContext = ComparisonContextProvider.CreateListElementContext(Settings, listComparisonContext);
+                var elementComparisonContext = ComparisonContextProvider.CreateContext(Settings, listComparisonContext);
 
                 if (element1 == null)
                 {
@@ -95,7 +95,7 @@ namespace ObjectsComparer
             {
                 var element2 = array2[element2Index];
                 //var elementComparisonContext = new ComparisonContext(new ComparisonContextMember(), listComparisonContext);
-                var elementComparisonContext = ComparisonContextProvider.CreateListElementContext(Settings, listComparisonContext);
+                var elementComparisonContext = ComparisonContextProvider.CreateContext(Settings, listComparisonContext);
 
                 if (element2 == null)
                 {
@@ -146,7 +146,7 @@ namespace ObjectsComparer
             for (var i = 0; i < smallerCount; i++)
             {
                 //var elementComparisonContext = new ComparisonContext(new ComparisonContextMember(), listComparisonContext);
-                var elementComparisonContext = ComparisonContextProvider.CreateListElementContext(Settings, listComparisonContext);
+                var elementComparisonContext = ComparisonContextProvider.CreateContext(Settings, listComparisonContext);
 
                 if (array1[i] == null && array2[i] == null)
                 {
@@ -198,7 +198,7 @@ namespace ObjectsComparer
                         differenceType: array1Count > array2Count ? DifferenceTypes.MissedElementInSecondObject : DifferenceTypes.MissedElementInFirstObject);
 
                     //yield return AddDifferenceToComparisonContext(difference, new ComparisonContext(new ComparisonContextMember(), listComparisonContext));
-                    yield return AddDifferenceToComparisonContext(difference, ComparisonContextProvider.CreateListElementContext(Settings, listComparisonContext));
+                    yield return AddDifferenceToComparisonContext(difference, ComparisonContextProvider.CreateContext(Settings, listComparisonContext));
                 }
             }
         }

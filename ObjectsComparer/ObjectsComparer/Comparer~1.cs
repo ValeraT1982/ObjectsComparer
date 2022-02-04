@@ -124,7 +124,7 @@ namespace ObjectsComparer
                     continue;
                 }
 
-                var memberContext = ComparisonContextProvider.CreateMemberContext(Settings, comparisonContext, member);
+                var memberContext = ComparisonContextProvider.CreateContext(Settings, comparisonContext, member);
                 //var memberContext = new ComparisonContext(new ComparisonContextMember(member), comparisonContext);
 
                 var valueComparer = DefaultValueComparer;

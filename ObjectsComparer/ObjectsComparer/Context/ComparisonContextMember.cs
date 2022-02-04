@@ -16,20 +16,20 @@ namespace ObjectsComparer
 
         public static ComparisonContextMember Create(MemberInfo member)
         {
-            return new ComparisonContextMember { Member = member ?? throw new ArgumentNullException(nameof(member)) };
+            return new ComparisonContextMember { Info = member ?? throw new ArgumentNullException(nameof(member)) };
         }
         public static ComparisonContextMember Create(string memberName)
         {
-            return new ComparisonContextMember { MemberName = memberName ?? throw new ArgumentNullException(nameof(memberName)) };
+            return new ComparisonContextMember { Name = memberName ?? throw new ArgumentNullException(nameof(memberName)) };
         }
 
         string _memberName;
 
-        public string MemberName 
+        public string Name 
         {
             get
             {
-                return Member?.Name ?? _memberName;    
+                return Info?.Name ?? _memberName;    
             } 
             private set
             {
@@ -37,6 +37,6 @@ namespace ObjectsComparer
             }
         }
 
-        public MemberInfo Member { get; private set; }
+        public MemberInfo Info { get; private set; }
     }
 }

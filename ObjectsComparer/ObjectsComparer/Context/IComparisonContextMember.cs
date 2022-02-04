@@ -10,11 +10,11 @@ namespace ObjectsComparer
         /// <summary>
         /// Member.
         /// </summary>
-        string MemberName { get; }
+        string Name { get; }
 
         /// <summary>
         /// Member. May be null for dynamic properties unknown at compile time.
         /// </summary>
-        MemberInfo Member { get; }
+        MemberInfo Info { get; }
     }
 }

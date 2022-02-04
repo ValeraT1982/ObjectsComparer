@@ -325,7 +325,7 @@ namespace ObjectsComparer.Tests
             var member = ComparisonContextMember.Create(memberName: "Property2");
             var ctx = new ComparisonContext(member, ancestorCtx);
             var listCtxInfo = new ListComparisonContextInfo(ctx);
-            Assert.AreEqual("Property1.Property2", $"{listCtxInfo.Ancestor.Member.MemberName}.{listCtxInfo.Member.MemberName}");
+            Assert.AreEqual("Property1.Property2", $"{listCtxInfo.Ancestor.Member.Name}.{listCtxInfo.Member.Name}");
         }
     }
 
