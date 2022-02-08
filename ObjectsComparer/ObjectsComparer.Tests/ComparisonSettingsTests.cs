@@ -82,7 +82,7 @@ namespace ObjectsComparer.Tests
             //Component side.
             var listComparisonOptions = ListComparisonOptions.Default();
             var ctx = new ComparisonContext();
-            var listComparisonContextInfo = new ListComparisonContextInfo(ctx);
+            var listComparisonContextInfo = new ComparisonContextInfo(ctx);
             settings.ListComparisonOptionsAction(listComparisonContextInfo, listComparisonOptions);
             var listElementComparisonByKeyOptions = ListElementComparisonByKeyOptions.Default();
             listComparisonOptions.KeyOptionsAction(listElementComparisonByKeyOptions);
@@ -320,11 +320,11 @@ namespace ObjectsComparer.Tests
         [Test]
         public void TestListComparisonContextInfo()
         {
-            var ancestorMember = ComparisonContextMember.Create(memberName: "Property1");
+            var ancestorMember = new ComparisonContextMember(name: "Property1");
             var ancestorCtx = new ComparisonContext(ancestorMember);
-            var member = ComparisonContextMember.Create(memberName: "Property2");
+            var member = new ComparisonContextMember(name: "Property2");
             var ctx = new ComparisonContext(member, ancestorCtx);
-            var listCtxInfo = new ListComparisonContextInfo(ctx);
+            var listCtxInfo = new ComparisonContextInfo(ctx);
             Assert.AreEqual("Property1.Property2", $"{listCtxInfo.Ancestor.Member.Name}.{listCtxInfo.Member.Name}");
         }
     }

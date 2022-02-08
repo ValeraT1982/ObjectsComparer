@@ -15,7 +15,7 @@ namespace ObjectsComparer.Tests
         [Test]
         public void ComparisonContextMember_Member_Correct_MemberName()
         {
-            var ctxMember = ComparisonContextMember.Create("Property1");
+            var ctxMember = new ComparisonContextMember(name: "Property1");
             Assert.AreEqual("Property1", ctxMember.Name);
             Assert.AreEqual(null, ctxMember.Info);
         }
@@ -24,7 +24,7 @@ namespace ObjectsComparer.Tests
         public void ComparisonContextMember_Member_Correct_Member()
         {
             var memberInfo = typeof(Address).GetMember(nameof(Address.Country)).Single();
-            var ctxMember = ComparisonContextMember.Create(memberInfo);
+            var ctxMember = new ComparisonContextMember(memberInfo, memberInfo.Name);
             Assert.AreEqual(nameof(Address.Country), ctxMember.Info.Name);
             Assert.AreEqual(nameof(Address.Country), ctxMember.Name);
         }
@@ -64,6 +64,41 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual(null, ctx.Member.Info);
             Assert.IsTrue(ctx.Member.GetType() == typeof(CustomComparisonContextMember));
             Assert.IsTrue(ctx.Ancestor == rootCtx);
+        }
+
+        [Test]
+        public void ComparisonContextException()
+        {
+            var factory = new CustomComparersFactory();
+            var comparer = factory.GetObjectsComparer<string>();
+            var rootCtx = ComparisonContextProvider.CreateRootContext();
+
+            var diffs =  comparer.CalculateDifferences("hello", "hi", rootCtx).ToArray();
+        }
+    }
+
+    class CustomComparersFactory : ComparersFactory
+    {
+        public override IComparer<T> GetObjectsComparer<T>(ComparisonSettings settings = null, BaseComparer parentComparer = null)
+        {
+            if (typeof(T) != typeof(string))
+            {
+                return base.GetObjectsComparer<T>(settings, parentComparer);
+            }
+
+            return (IComparer<T>)new CustomStringComparer(settings, parentComparer, this);
+        }
+    }
+
+    class CustomStringComparer : AbstractComparer<string>
+    {
+        public CustomStringComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory) : base(settings, parentComparer, factory)
+        {
+        }
+
+        public override IEnumerable<Difference> CalculateDifferences(string obj1, string obj2)
+        {
+            throw new NotImplementedException();
         }
     }
 

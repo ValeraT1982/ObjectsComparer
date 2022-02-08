@@ -51,7 +51,7 @@ namespace ObjectsComparer
                     TryGetMember(castedObject1, propertyKey, out member2);
                 }
 
-                var keyComparisonContext = CreateContextFromMemberOrMemberName(comparisonContext, member1 ?? member2, propertyKey);
+                var keyComparisonContext = ComparisonContextProvider.CreateContext(Settings, comparisonContext, member1 ?? member2, propertyKey);
 
                 var propertyType = (value1 ?? value2)?.GetType() ?? typeof(object);
                 var customComparer = OverridesCollection.GetComparer(propertyType) ??
@@ -145,27 +145,7 @@ namespace ObjectsComparer
                 }
             }
         }
-
-        /// <summary>
-        /// Creates context with ancestor and member. The <paramref name="member"/> takes precedence over <paramref name="memberName"/>.
-        /// </summary>
-        IComparisonContext CreateContextFromMemberOrMemberName(IComparisonContext ancestor, MemberInfo member, string memberName)
-        {
-            _ = ancestor ?? throw new ArgumentNullException(nameof(ancestor));
-
-            if (member != null)
-            {
-                return ComparisonContextProvider.CreateContext(Settings, ancestor, member);
-            }
-
-            if (memberName != null)
-            {
-                return ComparisonContextProvider.CreateContext(Settings, ancestor, memberName);
-            }
-
-            throw new ArgumentException();
-        }
-
+        
         public abstract bool IsMatch(Type type, object obj1, object obj2);
 
         public abstract bool IsStopComparison(Type type, object obj1, object obj2);

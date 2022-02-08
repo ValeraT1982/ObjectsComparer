@@ -7,48 +7,44 @@ namespace ObjectsComparer
     {
         public static IComparisonContext CreateRootContext()
         {
-            return new ComparisonContext(ComparisonContextMember.Create());
+            return new ComparisonContext(new ComparisonContextMember());
         }
 
         internal static IComparisonContext CreateImplicitRootContext(ComparisonSettings comparisonSettings)
         {            
-            _ = comparisonSettings ?? throw new ArgumentNullException(nameof(comparisonSettings)); //For future use.
+            _ = comparisonSettings ?? throw new ArgumentNullException(nameof(comparisonSettings));
 
-            return new NullComparisonContext(ComparisonContextMember.Create());
-        }              
+            return new ImplicitRootComparisonContext(new ComparisonContextMember());
+        }
 
-        /// <summary>
-        /// Context with ancestor but without a member, e.g. list element context.
-        /// </summary>
         public static IComparisonContext CreateContext(ComparisonSettings comparisonSettings, IComparisonContext ancestor)
         {
-            return CreateContext(comparisonSettings, ComparisonContextMember.Create(), ancestor);
+            return CreateContext(comparisonSettings, new ComparisonContextMember(), ancestor);
         }
 
-        /// <summary>
-        /// Context with ancestor and member.
-        /// </summary>
-        public static IComparisonContext CreateContext(ComparisonSettings comparisonSettings, IComparisonContext ancestor, MemberInfo member)
+        public static IComparisonContext CreateContext(ComparisonSettings comparisonSettings, IComparisonContext ancestor, MemberInfo memberInfo)
         {
-            return CreateContext(comparisonSettings, ComparisonContextMember.Create(member), ancestor);
+            return CreateContext(comparisonSettings, new ComparisonContextMember(memberInfo, memberInfo?.Name), ancestor);
         }
 
-        /// <summary>
-        /// Context with ancestor and member.
-        /// </summary>
         public static IComparisonContext CreateContext(ComparisonSettings comparisonSettings, IComparisonContext ancestor, string memberName)
         {
-            return CreateContext(comparisonSettings, ComparisonContextMember.Create(memberName), ancestor);
+            return CreateContext(comparisonSettings, new ComparisonContextMember(name: memberName), ancestor);
         }
 
-        static IComparisonContext CreateContext(ComparisonSettings comparisonSettings, IComparisonContextMember comparisonContextMember, IComparisonContext ancestor)
+        public static IComparisonContext CreateContext(ComparisonSettings comparisonSettings, IComparisonContext ancestor, MemberInfo memberInfo, string memberName)
+        {
+            return CreateContext(comparisonSettings, new ComparisonContextMember(memberInfo, memberName), ancestor);
+        }
+
+        public static IComparisonContext CreateContext(ComparisonSettings comparisonSettings, IComparisonContextMember comparisonContextMember, IComparisonContext ancestor)
         {
             _ = comparisonSettings ?? throw new ArgumentNullException(nameof(comparisonSettings));
             _ = comparisonContextMember ?? throw new ArgumentNullException(nameof(comparisonContextMember));
             _ = ancestor ?? throw new ArgumentNullException(nameof(ancestor));
 
             ComparisonContextOptions options = ComparisonContextOptions.Default();
-            comparisonSettings.ComparisonContextOptionsAction?.Invoke(ancestor, options);
+            comparisonSettings.ComparisonContextOptionsAction?.Invoke(new ComparisonContextInfo(ancestor), options);
 
             if (options.ComparisonContextMemberFactory != null)
             {

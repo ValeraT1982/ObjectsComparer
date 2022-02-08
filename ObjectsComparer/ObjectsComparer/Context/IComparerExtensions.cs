@@ -35,13 +35,9 @@ namespace ObjectsComparer
                 return contextableComparer.CalculateDifferences(type, obj1, obj2, comparisonContext);
             }
 
-            if (HasComparisonContextImplicitRoot(comparisonContext))
-            {
-                return comparer.CalculateDifferences(type, obj1, obj2);
-            }
+            ThrowContextableComparerNotImplemented(comparisonContext, comparer.Settings, comparer, nameof(IContextableComparer));
 
-            //The caller passed on the root context, but did not provide an contextable comparer. The component guarantees that all its own comparers are contextable.
-            throw new ContextableComparerNotImplementedException(comparer);
+            return comparer.CalculateDifferences(obj1, obj2);
         }
 
         public static IEnumerable<Difference> CalculateDifferences<T>(this IComparer<T> comparer, T obj1, T obj2, IComparisonContext comparisonContext)
@@ -61,13 +57,9 @@ namespace ObjectsComparer
                 return contextableComparer.CalculateDifferences(obj1, obj2, comparisonContext);
             }
 
-            if (HasComparisonContextImplicitRoot(comparisonContext))
-            {
-                return comparer.CalculateDifferences(obj1, obj2);
-            }
+            ThrowContextableComparerNotImplemented(comparisonContext, comparer.Settings, comparer, $"{nameof(IContextableComparer)}<{typeof(T).FullName}>");
 
-            //The caller passed on the root context, but did not provide an contextable comparer. The component guarantees that all its own comparers are contextable.
-            throw new ContextableComparerNotImplementedException(comparer);
+            return comparer.CalculateDifferences(obj1, obj2);
         }
 
         static bool HasComparisonContextImplicitRoot(IComparisonContext comparisonContext)
@@ -79,7 +71,7 @@ namespace ObjectsComparer
 
             do
             {
-                if (comparisonContext.Ancestor == null && comparisonContext is NullComparisonContext) 
+                if (comparisonContext.Ancestor == null && comparisonContext is ImplicitRootComparisonContext) 
                 {
                     return true;
                 }
@@ -89,6 +81,47 @@ namespace ObjectsComparer
             } while (comparisonContext != null);
 
             return false;
+        }
+
+        static void ThrowContextableComparerNotImplemented(IComparisonContext comparisonContext, ComparisonSettings comparisonSettings, object comparer, string unImplementedInterface)
+        {
+            if (comparisonContext is null)
+            {
+                throw new ArgumentNullException(nameof(comparisonContext));
+            }
+
+            if (comparisonSettings is null)
+            {
+                throw new ArgumentNullException(nameof(comparisonSettings));
+            }
+
+            var options = ComparisonContextOptions.Default();
+            comparisonSettings.ComparisonContextOptionsAction?.Invoke(null, options);
+
+            if (options.ThrowContextableComparerNotImplementedEnabled == false)
+            {
+                return;
+            }
+
+            if (comparisonSettings.ComparisonContextOptionsAction != null)
+            {
+                var message = $"Because the comparison context was passed to the comparison, the {comparer.GetType().FullName} must implement {unImplementedInterface} interface. If you do not want to implement this interface, you must not pass a comparison context or you must disable the ThrowContextableException.";
+                throw new ContextableComparerNotImplementedException(message);
+            }
+
+            if (comparisonSettings.ListComparisonOptionsAction != null)
+            {
+                var message = $"Because the comparison context was passed to the comparison, the {comparer.GetType().FullName} must implement {unImplementedInterface} interface. If you do not want to implement this interface, you must not pass a comparison context or you must disable the ThrowContextableException.";
+                throw new ContextableComparerNotImplementedException(message);
+            }
+
+            //TODO: Check DifferenceOptionsAction
+
+            if (HasComparisonContextImplicitRoot(comparisonContext) == false) 
+            {
+                var message = $"Because the comparison context was passed to the comparison, the {comparer.GetType().FullName} must implement {unImplementedInterface} interface. If you do not want to implement that interface, you must not pass a comparison context or you must disable the ThrowContextableException.";
+                throw new ContextableComparerNotImplementedException(message);
+            }
         }
     }
 }

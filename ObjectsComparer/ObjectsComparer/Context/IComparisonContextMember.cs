@@ -3,12 +3,12 @@
 namespace ObjectsComparer
 {
     /// <summary>
-    /// The member being compared in the comparison process, usually a property.
+    /// The member in the comparison process, usually a property.
     /// </summary>
     public interface IComparisonContextMember
     {
         /// <summary>
-        /// Member.
+        /// Member. It should never be empty.
         /// </summary>
         string Name { get; }
 
