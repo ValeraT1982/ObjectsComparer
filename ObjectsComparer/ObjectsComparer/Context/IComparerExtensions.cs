@@ -12,7 +12,6 @@ namespace ObjectsComparer
         /// <summary>
         /// Calculates list of differences between objects. Accepts comparison context.
         /// </summary>
-        /// <exception cref="ContextableComparerNotImplementedException">If <paramref name="comparer"/> does not implement <see cref="IContextableComparer"/>.</exception>
         public static IEnumerable<Difference> CalculateDifferences(this IComparer comparer, Type type, object obj1, object obj2, IComparisonContext comparisonContext)
         {
             if (comparer is null)
@@ -40,6 +39,9 @@ namespace ObjectsComparer
             return comparer.CalculateDifferences(obj1, obj2);
         }
 
+        /// <summary>
+        /// Calculates list of differences between objects. Accepts comparison context.
+        /// </summary>
         public static IEnumerable<Difference> CalculateDifferences<T>(this IComparer<T> comparer, T obj1, T obj2, IComparisonContext comparisonContext)
         {
             if (comparer is null)
@@ -105,13 +107,15 @@ namespace ObjectsComparer
 
             if (comparisonSettings.ComparisonContextOptionsAction != null)
             {
-                var message = $"Because the comparison context was passed to the comparison, the {comparer.GetType().FullName} must implement {unImplementedInterface} interface. If you do not want to implement this interface, you must not pass a comparison context or you must disable the ThrowContextableException.";
+                var message = $"Because the comparison context was explicitly configured, the {comparer.GetType().FullName} must implement {unImplementedInterface} interface " +
+                    "or throwing the ContextableComparerNotImplementedException must be disabled.";
                 throw new ContextableComparerNotImplementedException(message);
             }
 
             if (comparisonSettings.ListComparisonOptionsAction != null)
             {
-                var message = $"Because the comparison context was passed to the comparison, the {comparer.GetType().FullName} must implement {unImplementedInterface} interface. If you do not want to implement this interface, you must not pass a comparison context or you must disable the ThrowContextableException.";
+                var message = $"Because the list comparison was explicitly configured, the {comparer.GetType().FullName} must implement {unImplementedInterface} interface " +
+                    "or throwing the ContextableComparerNotImplementedException must be disabled.";
                 throw new ContextableComparerNotImplementedException(message);
             }
 
@@ -119,7 +123,8 @@ namespace ObjectsComparer
 
             if (HasComparisonContextImplicitRoot(comparisonContext) == false) 
             {
-                var message = $"Because the comparison context was passed to the comparison, the {comparer.GetType().FullName} must implement {unImplementedInterface} interface. If you do not want to implement that interface, you must not pass a comparison context or you must disable the ThrowContextableException.";
+                var message = $"Because the comparison context was explicitly passed, the {comparer.GetType().FullName} must implement {unImplementedInterface} interface " +
+                    "or throwing the ContextableComparerNotImplementedException must be disabled.";
                 throw new ContextableComparerNotImplementedException(message);
             }
         }

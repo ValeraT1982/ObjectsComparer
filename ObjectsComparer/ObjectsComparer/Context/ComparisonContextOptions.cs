@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using ObjectsComparer.Exceptions;
 
 namespace ObjectsComparer
 {
@@ -38,11 +39,12 @@ namespace ObjectsComparer
         public bool ThrowContextableComparerNotImplementedEnabled { get; private set; } = true;
 
         /// <summary>
-        /// Whether to throw an <see cref="Exceptions.ContextableComparerNotImplementedException"/> if the custom comparer does not implement <see cref="IContextableComparer"/> or <see cref="IContextableComparer{T}"/>.
+        /// Whether to throw the <see cref="ContextableComparerNotImplementedException"/> when the user requires comparison context but has a comparer that does not implement <see cref="IContextableComparer"/> or <see cref="IContextableComparer{T}"/>.
+        /// Default = true.
         /// </summary>
         public ComparisonContextOptions ThrowContextableComparerNotImplemented(bool value)
         {
-            ThrowContextableComparerNotImplementedEnabled = false;
+            ThrowContextableComparerNotImplementedEnabled = value;
 
             return this;
         }

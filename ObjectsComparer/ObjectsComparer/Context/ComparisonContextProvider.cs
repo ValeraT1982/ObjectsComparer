@@ -14,7 +14,7 @@ namespace ObjectsComparer
         {            
             _ = comparisonSettings ?? throw new ArgumentNullException(nameof(comparisonSettings));
 
-            return new ImplicitRootComparisonContext(new ComparisonContextMember());
+            return new ImplicitComparisonContext(new ComparisonContextMember());
         }
 
         public static IComparisonContext CreateContext(ComparisonSettings comparisonSettings, IComparisonContext ancestor)
