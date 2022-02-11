@@ -73,7 +73,7 @@ namespace ObjectsComparer
 
             do
             {
-                if (comparisonContext.Ancestor == null && comparisonContext is ImplicitRootComparisonContext) 
+                if (comparisonContext.Ancestor == null && comparisonContext is ImplicitComparisonContext) 
                 {
                     return true;
                 }
