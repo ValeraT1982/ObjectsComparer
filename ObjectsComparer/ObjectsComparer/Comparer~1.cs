@@ -4,6 +4,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using ObjectsComparer.Utils;
+using ObjectsComparer.Attributes;
+using ObjectsComparer.Enums;
 
 namespace ObjectsComparer
 {
@@ -26,7 +28,9 @@ namespace ObjectsComparer
         {
             var properties = GetProperties(typeof(T), new List<Type>());
             var fields = typeof(T).GetTypeInfo().GetFields().Where(f =>
-                f.IsPublic && !f.IsStatic).ToList();
+                f.IsPublic 
+                && !f.IsStatic 
+                && !f.GetCustomAttributes(true).Any(c=> c is ComparisonAttribute a && a.ComparisonStatus == ComparisonStatus.ExcludeFromComparison)).ToList();
             _members = properties.Union(fields.Cast<MemberInfo>()).ToList();
             _conditionalComparers = new List<IComparerWithCondition>
             {
@@ -152,6 +156,7 @@ namespace ObjectsComparer
                 p.CanRead
                 && p.GetGetMethod(true).IsPublic
                 && p.GetGetMethod(true).GetParameters().Length == 0
+                && !p.GetCustomAttributes(true).Any(c=> c is ComparisonAttribute a && a.ComparisonStatus == ComparisonStatus.ExcludeFromComparison)
                 && !p.GetGetMethod(true).IsStatic).ToList();
             processedTypes.Add(type);
 
