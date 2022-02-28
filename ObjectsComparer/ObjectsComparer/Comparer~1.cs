@@ -30,7 +30,7 @@ namespace ObjectsComparer
             var fields = typeof(T).GetTypeInfo().GetFields().Where(f =>
                 f.IsPublic 
                 && !f.IsStatic 
-                && !f.GetCustomAttributes(true).Any(c=> c is ComparisonAttribute a && a.ComparisonStatus == ComparisonStatus.ExcludeFromComparison)).ToList();
+                && !f.GetCustomAttributes(true).Any(c=> c is ComparisonAttribute a && a.ComparisonStatus == ComparisonStatus.IgnoreInComparison)).ToList();
             _members = properties.Union(fields.Cast<MemberInfo>()).ToList();
             _conditionalComparers = new List<IComparerWithCondition>
             {
@@ -156,7 +156,7 @@ namespace ObjectsComparer
                 p.CanRead
                 && p.GetGetMethod(true).IsPublic
                 && p.GetGetMethod(true).GetParameters().Length == 0
-                && !p.GetCustomAttributes(true).Any(c=> c is ComparisonAttribute a && a.ComparisonStatus == ComparisonStatus.ExcludeFromComparison)
+                && !p.GetCustomAttributes(true).Any(c=> c is ComparisonAttribute a && a.ComparisonStatus == ComparisonStatus.IgnoreInComparison)
                 && !p.GetGetMethod(true).IsStatic).ToList();
             processedTypes.Add(type);
 

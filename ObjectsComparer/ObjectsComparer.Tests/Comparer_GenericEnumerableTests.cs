@@ -188,6 +188,45 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
+        public void IgnoreAttributeComparisonEquality()
+        {
+            var a1 = new Parent();
+            a1.Child1.Add(new ParentChild(a1, "Child1"));
+            a1.Child1.Add(new ParentChild(a1, "Child2"));
+
+            var a2 = new Parent();
+            a2.Child1.Add(new ParentChild(a2, "Child1"));
+            a2.Child1.Add(new ParentChild(a2, "Child2"));
+
+            var comparer = new Comparer<Parent>();
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsTrue(isEqual);
+        }
+
+        [Test]
+        public void IgnoreAttributeComparisonInEquality()
+        {
+            var a1 = new Parent();
+            a1.Child1.Add(new ParentChild(a1, "Child1"));
+            a1.Child1.Add(new ParentChild(a1, "Child2"));
+
+            var a2 = new Parent();
+            a2.Child1.Add(new ParentChild(a2, "Child1"));
+            a2.Child1.Add(new ParentChild(a2, "Child3"));
+
+            var comparer = new Comparer<Parent>();
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual("Child1[1].Property1", differences.First().MemberPath);
+            Assert.AreEqual("Child2", differences.First().Value1);
+            Assert.AreEqual("Child3", differences.First().Value2);
+        }
+
+        [Test]
         public void CollectionInequalityProperty()
         {
             var a1 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };

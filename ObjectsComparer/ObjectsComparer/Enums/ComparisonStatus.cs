@@ -12,8 +12,8 @@ namespace ObjectsComparer.Enums
   public enum ComparisonStatus
   {
     /// <summary>
-    /// Specifies that the element on which it is applied has to be excluded from comparison
+    /// Specifies that the element on which it is applied has to be ignored in comparison
     /// </summary>
-    ExcludeFromComparison
+    IgnoreInComparison
   }
 }
