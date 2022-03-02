@@ -6,6 +6,7 @@ using NUnit.Framework;
 using ObjectsComparer.Tests.TestClasses;
 using ObjectsComparer.Tests.Utils;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace ObjectsComparer.Tests
 {
@@ -74,6 +75,40 @@ namespace ObjectsComparer.Tests
             var rootCtx = ComparisonContextProvider.CreateRootContext();
 
             var diffs =  comparer.CalculateDifferences("hello", "hi", rootCtx).ToArray();
+        }
+
+        [Test]
+        public void EnumerateConditional()
+        {
+            var list = new List<int> { 6, 8, 79, 3, 45, 9 };
+
+            var enumerateConditional = EnumerateConditionalExt(
+                list,
+                moveNextItem: () => true,
+                completed: () => Debug.WriteLine("Completed"));
+
+            foreach (var item in enumerateConditional)
+            {
+                Debug.WriteLine(item);
+            }
+        }
+
+        protected IEnumerable<T> EnumerateConditionalExt<T>(IEnumerable<T> enumerable, Func<bool> moveNextItem, Action completed = null)
+        {
+            var enumerator = enumerable.GetEnumerator();
+
+            while (moveNextItem())
+            {
+                if (enumerator.MoveNext())
+                {
+                    yield return enumerator.Current;
+                }
+                else
+                {
+                    completed?.Invoke();
+                    break;
+                }
+            }
         }
     }
 
