@@ -1,7 +1,6 @@
 ﻿namespace ObjectsComparer.Tests.TestClasses
 {
   using ObjectsComparer.Attributes;
-  using ObjectsComparer.Enums;
 
   public class ParentChild
   {
@@ -20,7 +19,7 @@
 
     public string Property1 { get; set; }
 
-    [Comparison(ComparisonStatus.IgnoreInComparison)]
+    [IgnoreInComparison]
     public Parent MyParent { get; set; }
 
     #endregion

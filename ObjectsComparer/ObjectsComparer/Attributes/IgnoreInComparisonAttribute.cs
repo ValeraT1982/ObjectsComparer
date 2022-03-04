@@ -4,16 +4,16 @@
 // Created          : 24-Feb-2022
 // ***********************************************************************
 
-namespace ObjectsComparer.Enums
+namespace ObjectsComparer.Attributes
 {
+  using System;
+
   /// <summary>
-  /// Specifies the status of comparison i.e. whether to include in comparison or not
+  /// Class is used to specify whether the element on which it is applied will have comparison effect
   /// </summary>
-  public enum ComparisonStatus
+  [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field)]
+  public sealed class IgnoreInComparisonAttribute : Attribute
   {
-    /// <summary>
-    /// Specifies that the element on which it is applied has to be ignored in comparison
-    /// </summary>
-    IgnoreInComparison
+
   }
 }
