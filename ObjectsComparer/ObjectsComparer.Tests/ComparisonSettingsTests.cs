@@ -139,8 +139,6 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual("4", differences[3].Value2);
             
             Assert.IsTrue(differences.AreEquivalent(ctx.GetDifferences(true)));
-
-            var ctxJson = (ctx.Shrink() as ComparisonContext).ToJson();
         }
 
         [Test]

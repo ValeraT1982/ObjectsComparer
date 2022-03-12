@@ -9,8 +9,6 @@ namespace ObjectsComparer
     /// </summary>
     public abstract class ComparisonContextBase : IComparisonContext
     {
-        object _shrinkLock = new object();
-
         readonly List<IComparisonContext> _descendants = new List<IComparisonContext>();
 
         readonly List<Difference> _differences = new List<Difference>();
@@ -94,22 +92,19 @@ namespace ObjectsComparer
                 
         public IComparisonContext Shrink()
         {
-            lock (_shrinkLock)
+            List<IComparisonContext> removeDescendants = new List<IComparisonContext>();
+
+            _descendants.ForEach(descendantContext =>
             {
-                List<IComparisonContext> removeDescendants = new List<IComparisonContext>();
+                descendantContext.Shrink();
 
-                _descendants.ForEach(descendantContext =>
+                if (descendantContext.HasDifferences(true) == false)
                 {
-                    descendantContext.Shrink();
+                    removeDescendants.Add(descendantContext);
+                }
+            });
 
-                    if (descendantContext.HasDifferences(true) == false)
-                    {
-                        removeDescendants.Add(descendantContext);
-                    }
-                });
-
-                _descendants.RemoveAll(ctx => removeDescendants.Contains(ctx));
-            }
+            _descendants.RemoveAll(ctx => removeDescendants.Contains(ctx));
 
             return this;
         }
