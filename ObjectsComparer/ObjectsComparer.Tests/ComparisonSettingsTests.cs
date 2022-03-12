@@ -82,8 +82,7 @@ namespace ObjectsComparer.Tests
             //Component side.
             var listComparisonOptions = ListComparisonOptions.Default();
             var ctx = new ComparisonContext();
-            var listComparisonContextInfo = new ComparisonContextInfo(ctx);
-            settings.ListComparisonOptionsAction(listComparisonContextInfo, listComparisonOptions);
+            settings.ListComparisonOptionsAction(ctx, listComparisonOptions);
             var listElementComparisonByKeyOptions = ListElementComparisonByKeyOptions.Default();
             listComparisonOptions.KeyOptionsAction(listElementComparisonByKeyOptions);
 
@@ -316,17 +315,6 @@ namespace ObjectsComparer.Tests
         // Captured local variable is equal to 10: True
         // 3 is greater than 5: False
         // Another lambda observes a new value of captured variable: True
-
-        [Test]
-        public void TestListComparisonContextInfo()
-        {
-            var ancestorMember = new ComparisonContextMember(name: "Property1");
-            var ancestorCtx = new ComparisonContext(ancestorMember);
-            var member = new ComparisonContextMember(name: "Property2");
-            var ctx = new ComparisonContext(member, ancestorCtx);
-            var listCtxInfo = new ComparisonContextInfo(ctx);
-            Assert.AreEqual("Property1.Property2", $"{listCtxInfo.Ancestor.Member.Name}.{listCtxInfo.Member.Name}");
-        }
     }
 
     public class VariableCaptureGame

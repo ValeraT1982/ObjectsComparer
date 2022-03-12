@@ -58,8 +58,7 @@ namespace ObjectsComparer
             var list2 = ((IEnumerable<T>)obj2).ToList();
 
             var listComparisonOptions = ListComparisonOptions.Default();
-            var listComparisonContextInfo = new ComparisonContextInfo(listComparisonContext);
-            Settings.ListComparisonOptionsAction?.Invoke(listComparisonContextInfo, listComparisonOptions);
+            Settings.ListComparisonOptionsAction?.Invoke(listComparisonContext, listComparisonOptions);
 
             if (list1.Count != list2.Count)
             {
