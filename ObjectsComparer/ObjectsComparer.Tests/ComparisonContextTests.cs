@@ -67,15 +67,15 @@ namespace ObjectsComparer.Tests
             Assert.IsTrue(ctx.Ancestor == rootCtx);
         }
 
-        [Test]
-        public void ComparisonContextException()
-        {
-            var factory = new CustomComparersFactory();
-            var comparer = factory.GetObjectsComparer<string>();
-            var rootCtx = ComparisonContextProvider.CreateRootContext();
+        //[Test]
+        //public void ComparisonContextException()
+        //{
+        //    var factory = new CustomComparersFactory();
+        //    var comparer = factory.GetObjectsComparer<string>();
+        //    var rootCtx = ComparisonContextProvider.CreateRootContext();
 
-            var diffs =  comparer.CalculateDifferences("hello", "hi", rootCtx).ToArray();
-        }
+        //    var diffs =  comparer.CalculateDifferences("hello", "hi", rootCtx).ToArray();
+        //}
 
         [Test]
         public void EnumerateConditional()
