@@ -41,7 +41,7 @@ namespace ObjectsComparer
         {
             _ = comparisonSettings ?? throw new ArgumentNullException(nameof(comparisonSettings));
             _ = comparisonContextMember ?? throw new ArgumentNullException(nameof(comparisonContextMember));
-            _ = ancestor ?? throw new ArgumentNullException(nameof(ancestor));
+            //_ = ancestor ?? throw new ArgumentNullException(nameof(ancestor));
 
             ComparisonContextOptions options = ComparisonContextOptions.Default();
             comparisonSettings.ComparisonContextOptionsAction?.Invoke(ancestor, options);

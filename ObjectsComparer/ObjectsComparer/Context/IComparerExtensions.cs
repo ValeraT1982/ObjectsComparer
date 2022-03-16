@@ -128,5 +128,23 @@ namespace ObjectsComparer
                 throw new ContextableComparerNotImplementedException(message);
             }
         }
+
+        public static IComparisonContext CalculateDifferences(this IComparer comparer, Type type, object obj1, object obj2, Func<IComparisonContext, Difference> findNextDifference = null, Action contextCompleted = null)
+        {
+            if (comparer is null)
+            {
+                throw new ArgumentNullException(nameof(comparer));
+            }
+
+            if (type is null)
+            {
+                throw new ArgumentNullException(nameof(type));
+            }
+
+            var rootCtx = ComparisonContextProvider.CreateContext(comparer.Settings, null);
+            var differences = comparer.CalculateDifferences(type, obj1, obj2, rootCtx);
+
+            return rootCtx;
+        }
     }
 }
