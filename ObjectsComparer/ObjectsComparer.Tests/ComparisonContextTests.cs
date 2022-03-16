@@ -93,6 +93,44 @@ namespace ObjectsComparer.Tests
             }
         }
 
+        [Test]
+        public void EnumerateConditional_Completed()
+        {
+            var list = new List<int> { 6, 8, 79, 3, 45, 9 };
+            bool completed = false;
+            int? lastElement = null;
+
+            list.EnumerateConditional(
+                element =>
+                {
+                    lastElement = element;
+                    return true;
+                },
+                () => completed = true);
+
+            Assert.AreEqual(9, lastElement);
+            Assert.AreEqual(true, completed);
+        }
+        
+        [Test]
+        public void EnumerateConditional_FetchOne_NotCompleted()
+        {
+            var list = new List<int> { 6, 8, 79, 3, 45, 9 };
+            bool completed = false;
+            int? firstElement = null;
+
+            list.EnumerateConditional(
+                element => 
+                {
+                    firstElement = element;
+                    return false; 
+                },
+                () => completed = true);
+
+            Assert.AreEqual(6, firstElement);
+            Assert.AreEqual(false, completed);
+        }
+
         protected IEnumerable<T> EnumerateConditionalExt<T>(IEnumerable<T> enumerable, Func<bool> moveNextItem, Action completed = null)
         {
             var enumerator = enumerable.GetEnumerator();
