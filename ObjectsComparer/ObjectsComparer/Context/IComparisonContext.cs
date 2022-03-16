@@ -6,6 +6,8 @@ using System.Text;
 
 namespace ObjectsComparer
 {
+    //TODO: Edit "Once the comparison process is completed, it is possible to traverse "
+
     /// <summary>
     /// Context of comparison process. Each <see cref="IComparisonContext"/> instance wraps compared <see cref="Member"/>, which is typically property. Each context has its ancestor and descendants the same way as its compared <see cref="Member"/> has its ancestor and descendant members.
     /// Once the comparison process is completed, it is possible to traverse the comparison context graph and see differences at particular members.
