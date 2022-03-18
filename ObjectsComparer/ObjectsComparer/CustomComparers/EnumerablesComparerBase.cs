@@ -1,4 +1,5 @@
-﻿using ObjectsComparer.Exceptions;
+﻿using ObjectsComparer.ContextExtensions;
+using ObjectsComparer.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

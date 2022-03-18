@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using ObjectsComparer.ContextExtensions;
 using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
