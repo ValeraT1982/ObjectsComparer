@@ -100,8 +100,8 @@ namespace ObjectsComparer.Examples.Example4
                 }
             };
 
-            var ctx = new ComparisonContext();
-            var differences = _comparer.CalculateDifferences(formula1, formula2, ctx).ToArray();
+            var rootContext = _comparer.CalculateContextableDifferences(formula1, formula2);
+            var differences = rootContext.GetDifferences(true);
 
             Assert.AreEqual(3, differences.Count());
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Items[Id=1].Delay" && d.Value1 == "60" && d.Value2 == "80"));
