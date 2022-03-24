@@ -110,6 +110,11 @@ namespace ObjectsComparer
 
             foreach (var member in _members)
             {
+                if (member.GetCustomAttributes(true).Any(c => c is IgnoreInComparisonAttribute))
+                {
+                  continue;
+                }
+
                 var value1 = member.GetMemberValue(obj1);
                 var value2 = member.GetMemberValue(obj2);
                 var type = member.GetMemberType();
