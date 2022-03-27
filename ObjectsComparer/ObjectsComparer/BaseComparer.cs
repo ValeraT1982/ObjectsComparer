@@ -2,6 +2,7 @@ using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using ObjectsComparer.Utils;
+using ObjectsComparer.ContextExtensions;
 
 namespace ObjectsComparer
 {
@@ -188,7 +189,7 @@ namespace ObjectsComparer
         /// Adds an <paramref name="difference"/> to the end of the <paramref name="comparisonContext"/>'s <see cref="IComparisonContext.Differences"/>.
         /// </summary>
         /// <returns>The <paramref name="difference"/> argument.</returns>
-        protected virtual Difference AddDifferenceToComparisonContext(Difference difference, IComparisonContext comparisonContext)
+        protected virtual DifferenceTreeNodeInfo AddDifferenceToComparisonContext(Difference difference, IComparisonContext comparisonContext)
         {
             if (difference is null)
             {
@@ -202,7 +203,7 @@ namespace ObjectsComparer
 
             comparisonContext.AddDifference(difference);
 
-            return difference;
+            return new DifferenceTreeNodeInfo(difference, comparisonContext);
         }
     }
 }

@@ -59,15 +59,17 @@ namespace ObjectsComparer
 
         public IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, IComparisonContext comparisonContext)
         {
-            return CalculateDifferences(obj1, obj2, memberInfo: null, comparisonContext);
+            return CalculateDifferences(obj1, obj2, memberInfo: null, comparisonContext)
+                .Select(differenceTreeNodeInfo => differenceTreeNodeInfo.Difference); 
         }
 
         internal IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo)
         {
-            return CalculateDifferences(obj1, obj2, memberInfo, ComparisonContextProvider.CreateImplicitRootContext(Settings));
+            return CalculateDifferences(obj1, obj2, memberInfo, ComparisonContextProvider.CreateImplicitRootContext(Settings))
+                .Select(differenceTreeNodeInfo => differenceTreeNodeInfo.Difference);
         }
 
-        IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo, IComparisonContext comparisonContext)
+        IEnumerable<DifferenceTreeNodeInfo> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo, IComparisonContext comparisonContext)
         {
             var comparer = memberInfo != null
                 ? OverridesCollection.GetComparer(memberInfo)
@@ -144,7 +146,8 @@ namespace ObjectsComparer
 
                     foreach (var failure in objectDataComparer.CalculateDifferences(type, value1, value2, memberContext))
                     {
-                        yield return failure.InsertPath(member.Name);
+                        failure.Difference.InsertPath(member.Name);
+                        yield return failure;
                     }
 
                     continue;

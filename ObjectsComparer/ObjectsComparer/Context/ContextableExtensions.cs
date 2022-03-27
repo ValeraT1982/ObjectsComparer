@@ -1,5 +1,6 @@
 ﻿using ObjectsComparer.Exceptions;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace ObjectsComparer.ContextExtensions
@@ -10,7 +11,7 @@ namespace ObjectsComparer.ContextExtensions
         /// Calculates list of differences between objects. Accepts comparison context.
         /// </summary>
         /// <remarks>The method is intended for IContextableComparer implementers.</remarks>
-        public static IEnumerable<Difference> CalculateDifferences(this IComparer comparer, Type type, object obj1, object obj2, IComparisonContext comparisonContext)
+        public static IEnumerable<DifferenceTreeNodeInfo> CalculateDifferences(this IComparer comparer, Type type, object obj1, object obj2, IComparisonContext comparisonContext)
         {
             if (comparer is null)
             {
@@ -29,19 +30,30 @@ namespace ObjectsComparer.ContextExtensions
 
             if (comparer is IContextableComparer contextableComparer)
             {
-                return contextableComparer.CalculateDifferences(type, obj1, obj2, comparisonContext);
+                var differenceTreeNodeInfoList = contextableComparer.CalculateDifferences(type, obj1, obj2, comparisonContext);
+
+                foreach (var differenceTreeNodeInfo in differenceTreeNodeInfoList)
+                {
+                    yield return differenceTreeNodeInfo;
+                }
             }
 
             ThrowContextableComparerNotImplemented(comparisonContext, comparer.Settings, comparer, nameof(IContextableComparer));
 
-            return comparer.CalculateDifferences(obj1, obj2);
+            var differences = comparer.CalculateDifferences(type, obj1, obj2);
+
+            foreach (var difference in differences)
+            {
+                yield return new DifferenceTreeNodeInfo(difference);
+            }
+
         }
 
         /// <summary>
         /// Calculates list of differences between objects. Accepts comparison context.
         /// </summary>
         /// <remarks>The method is intended for IContextableComparer implementers.</remarks>
-        public static IEnumerable<Difference> CalculateDifferences<T>(this IComparer<T> comparer, T obj1, T obj2, IComparisonContext comparisonContext)
+        public static IEnumerable<DifferenceTreeNodeInfo> CalculateDifferences<T>(this IComparer<T> comparer, T obj1, T obj2, IComparisonContext comparisonContext)
         {
             if (comparer is null)
             {
@@ -55,12 +67,22 @@ namespace ObjectsComparer.ContextExtensions
 
             if (comparer is IContextableComparer<T> contextableComparer)
             {
-                return contextableComparer.CalculateDifferences(obj1, obj2, comparisonContext);
+                var differenceTreeNodeInfoList = contextableComparer.CalculateDifferences(obj1, obj2, comparisonContext);
+
+                foreach (var differenceTreeNodeInfo in differenceTreeNodeInfoList)
+                {
+                    yield return differenceTreeNodeInfo;
+                }
             }
 
             ThrowContextableComparerNotImplemented(comparisonContext, comparer.Settings, comparer, $"{nameof(IContextableComparer)}<{typeof(T).FullName}>");
 
-            return comparer.CalculateDifferences(obj1, obj2);
+            var differences = comparer.CalculateDifferences(obj1, obj2);
+
+            foreach (var difference in differences)
+            {
+                yield return new DifferenceTreeNodeInfo(difference);
+            }
         }
 
         static bool HasComparisonContextImplicitRoot(IComparisonContext comparisonContext)

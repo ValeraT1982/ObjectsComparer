@@ -52,6 +52,7 @@
                 ? path + MemberPath
                 : path + "." + MemberPath;
 
+            //This instance is probably already included in the difference tree, so I can't create a new one.
             //return new Difference(
             //    newPath,
             //    Value1,
