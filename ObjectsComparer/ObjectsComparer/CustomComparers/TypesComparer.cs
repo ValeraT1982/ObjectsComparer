@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using ObjectsComparer.ContextExtensions;
 using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
@@ -15,10 +17,11 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings));
+            return CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings))
+                .Select(differenceLocation => differenceLocation.Difference);
         }
 
-        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext)
+        public IEnumerable<DifferenceLocation> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext)
         {
             if (comparisonContext is null)
             {
@@ -46,7 +49,7 @@ namespace ObjectsComparer
             if (type1Str != type2Str)
             {
                 //yield return new Difference(string.Empty, type1Str, type2Str);
-                yield return AddDifferenceToComparisonContext(new Difference(string.Empty, type1Str, type2Str), comparisonContext);
+                yield return AddDifferenceToTree(new Difference(string.Empty, type1Str, type2Str), comparisonContext);
             }
         }
 

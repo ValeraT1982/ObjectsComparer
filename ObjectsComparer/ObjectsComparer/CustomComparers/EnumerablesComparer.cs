@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using ObjectsComparer.ContextExtensions;
 using ObjectsComparer.Exceptions;
 using ObjectsComparer.Utils;
 
@@ -17,10 +18,13 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings));
+            return AsContextable().CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings))
+                .Select(differenceLocation => differenceLocation.Difference);
         }
 
-        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext listComparisonContext)
+        IContextableComparer AsContextable() => this;
+
+        IEnumerable<DifferenceLocation> IContextableComparer.CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext listComparisonContext)
         {
             Debug.WriteLine($"{GetType().Name}.{nameof(CalculateDifferences)}: {type.Name}");
 
@@ -32,7 +36,7 @@ namespace ObjectsComparer
             if (!Settings.EmptyAndNullEnumerablesEqual &&
                 (obj1 == null || obj2 == null) && obj1 != obj2)
             {
-                yield return AddDifferenceToComparisonContext(new Difference("[]", obj1?.ToString() ?? string.Empty, obj2?.ToString() ?? string.Empty), listComparisonContext);
+                yield return AddDifferenceToTree(new Difference("[]", obj1?.ToString() ?? string.Empty, obj2?.ToString() ?? string.Empty), listComparisonContext);
                 yield break;
             }
             
@@ -62,7 +66,7 @@ namespace ObjectsComparer
 
             if (array1.Length != array2.Length)
             {
-                yield return AddDifferenceToComparisonContext(new Difference("", array1.Length.ToString(), array2.Length.ToString(), DifferenceTypes.NumberOfElementsMismatch), listComparisonContext);
+                yield return AddDifferenceToTree(new Difference("", array1.Length.ToString(), array2.Length.ToString(), DifferenceTypes.NumberOfElementsMismatch), listComparisonContext);
 
                 if (listComparisonOptions.UnequalListsComparisonEnabled == false)
                 {
@@ -70,7 +74,7 @@ namespace ObjectsComparer
                 }
             }
 
-            IEnumerable<Difference> failrues = CalculateDifferences(array1, array2, listComparisonContext, listComparisonOptions);
+            var failrues = CalculateDifferences(array1, array2, listComparisonContext, listComparisonOptions);
             
             foreach (var failrue in failrues)
             {

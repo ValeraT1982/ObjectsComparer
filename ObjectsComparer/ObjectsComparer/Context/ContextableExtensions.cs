@@ -11,7 +11,8 @@ namespace ObjectsComparer.ContextExtensions
         /// Calculates list of differences between objects. Accepts comparison context.
         /// </summary>
         /// <remarks>The method is intended for IContextableComparer implementers.</remarks>
-        public static IEnumerable<DifferenceTreeNodeInfo> CalculateDifferences(this IComparer comparer, Type type, object obj1, object obj2, IComparisonContext comparisonContext)
+        /// <returns>Current difference and its location in the difference tree.</returns>
+        public static IEnumerable<DifferenceLocation> CalculateDifferences(this IComparer comparer, Type type, object obj1, object obj2, IComparisonContext comparisonContext)
         {
             if (comparer is null)
             {
@@ -44,7 +45,7 @@ namespace ObjectsComparer.ContextExtensions
 
             foreach (var difference in differences)
             {
-                yield return new DifferenceTreeNodeInfo(difference);
+                yield return new DifferenceLocation(difference);
             }
 
         }
@@ -53,7 +54,7 @@ namespace ObjectsComparer.ContextExtensions
         /// Calculates list of differences between objects. Accepts comparison context.
         /// </summary>
         /// <remarks>The method is intended for IContextableComparer implementers.</remarks>
-        public static IEnumerable<DifferenceTreeNodeInfo> CalculateDifferences<T>(this IComparer<T> comparer, T obj1, T obj2, IComparisonContext comparisonContext)
+        public static IEnumerable<DifferenceLocation> CalculateDifferences<T>(this IComparer<T> comparer, T obj1, T obj2, IComparisonContext comparisonContext)
         {
             if (comparer is null)
             {
@@ -81,7 +82,7 @@ namespace ObjectsComparer.ContextExtensions
 
             foreach (var difference in differences)
             {
-                yield return new DifferenceTreeNodeInfo(difference);
+                yield return new DifferenceLocation(difference);
             }
         }
 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using ObjectsComparer.Utils;
 using System.Collections;
+using ObjectsComparer.ContextExtensions;
 
 namespace ObjectsComparer
 {
@@ -59,6 +60,6 @@ namespace ObjectsComparer
 
         public abstract bool IsMatch(Type type, object obj1, object obj2);
 
-        public abstract IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext);
+        public abstract IEnumerable<DifferenceLocation> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext);
     }
 }

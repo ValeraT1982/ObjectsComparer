@@ -8,6 +8,6 @@ namespace ObjectsComparer.ContextExtensions
     /// </summary>
     public interface IContextableComparer<T>
     {
-        IEnumerable<DifferenceTreeNodeInfo> CalculateDifferences(T obj1, T obj2, IComparisonContext comparisonContext);
+        IEnumerable<DifferenceLocation> CalculateDifferences(T obj1, T obj2, IComparisonContext comparisonContext);
     }
 }

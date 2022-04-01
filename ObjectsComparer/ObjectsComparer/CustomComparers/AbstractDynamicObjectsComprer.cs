@@ -15,15 +15,21 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings));
+            return AsContextableComparer().CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings))
+                .Select(differenceLocation => differenceLocation.Difference);
         }
 
-        public virtual IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, IComparisonContext comparisonContext)
+        IEnumerable<DifferenceLocation> IContextableComparer<T>.CalculateDifferences(T obj1, T obj2, IComparisonContext comparisonContext)
         {
-            return CalculateDifferences(typeof(T), obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings));
+            return AsContextableComparer().CalculateDifferences(typeof(T), obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings));
         }
 
-        public virtual IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext)
+        IContextableComparer AsContextableComparer()
+        {
+            return this;
+        }
+
+        IEnumerable<DifferenceLocation> IContextableComparer.CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext)
         {
             var castedObject1 = (T)obj1;
             var castedObject2 = (T)obj2;
@@ -76,7 +82,7 @@ namespace ObjectsComparer
                 {
                     if (!existsInObject1)
                     {
-                        var difference = AddDifferenceToComparisonContext(
+                        var difference = AddDifferenceToTree(
                             new Difference(propertyKey, string.Empty, valueComparer.ToString(value2), DifferenceTypes.MissedMemberInFirstObject),
                             keyComparisonContext);
 
@@ -86,7 +92,7 @@ namespace ObjectsComparer
 
                     if (!existsInObject2)
                     {
-                        var difference = AddDifferenceToComparisonContext(
+                        var difference = AddDifferenceToTree(
                             new Difference(propertyKey, valueComparer.ToString(value1), string.Empty, DifferenceTypes.MissedMemberInSecondObject),
                             keyComparisonContext);
 
@@ -101,7 +107,7 @@ namespace ObjectsComparer
                         OverridesCollection.GetComparer(propertyKey) ?? 
                         DefaultValueComparer;
 
-                    var difference = AddDifferenceToComparisonContext(
+                    var difference = AddDifferenceToTree(
                         new Difference(propertyKey, valueComparer.ToString(value1), valueComparer2.ToString(value2), DifferenceTypes.TypeMismatch),
                         keyComparisonContext);
 
@@ -117,7 +123,7 @@ namespace ObjectsComparer
                         OverridesCollection.GetComparer(value2.GetType()) ?? OverridesCollection.GetComparer(propertyKey) ?? DefaultValueComparer :
                         DefaultValueComparer;
 
-                    var difference = AddDifferenceToComparisonContext(
+                    var difference = AddDifferenceToTree(
                         new Difference(propertyKey, valueComparer.ToString(value1), valueComparer2.ToString(value2), DifferenceTypes.TypeMismatch),
                         keyComparisonContext);
 
@@ -129,11 +135,11 @@ namespace ObjectsComparer
                 {
                     if (!customComparer.Compare(value1, value2, Settings))
                     {
-                        var difference = AddDifferenceToComparisonContext(
+                        var differenceLocation = AddDifferenceToTree(
                             new Difference(propertyKey, customComparer.ToString(value1), customComparer.ToString(value2)),
                             keyComparisonContext);
 
-                        yield return difference;
+                        yield return differenceLocation;
                     }
 
                     continue;
@@ -142,7 +148,8 @@ namespace ObjectsComparer
                 var comparer = Factory.GetObjectsComparer(propertyType, Settings, this);
                 foreach (var failure in comparer.CalculateDifferences(propertyType, value1, value2, comparisonContext))
                 {
-                    yield return failure.InsertPath(propertyKey);
+                    failure.Difference.InsertPath(propertyKey);
+                    yield return failure;
                 }
             }
         }

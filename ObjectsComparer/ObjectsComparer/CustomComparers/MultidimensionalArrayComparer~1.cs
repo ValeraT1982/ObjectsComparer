@@ -18,15 +18,16 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings));
+            return CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings))
+                .Select(differenceLocation => differenceLocation.Difference);
         }
 
-        public IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, IComparisonContext comparisonContext)
+        public IEnumerable<DifferenceLocation> CalculateDifferences(T obj1, T obj2, IComparisonContext comparisonContext)
         {
             return CalculateDifferences(typeof(T), obj1, obj2, comparisonContext);
         }
 
-        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext)
+        public IEnumerable<DifferenceLocation> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext)
         {
             if (comparisonContext is null)
             {
@@ -59,7 +60,7 @@ namespace ObjectsComparer
 
             if (array1.Rank != array2.Rank)
             {
-                var difference = AddDifferenceToComparisonContext(new Difference("Rank", array1.Rank.ToString(), array2.Rank.ToString()), comparisonContext);
+                var difference = AddDifferenceToTree(new Difference("Rank", array1.Rank.ToString(), array2.Rank.ToString()), comparisonContext);
                 yield return difference;
                 yield break;
             }
@@ -74,7 +75,7 @@ namespace ObjectsComparer
                 if (length1 != length2)
                 {
                     dimensionsFailure = true;
-                    var difference = AddDifferenceToComparisonContext(new Difference($"Dimension{i}", length1.ToString(), length2.ToString()), comparisonContext);
+                    var difference = AddDifferenceToTree(new Difference($"Dimension{i}", length1.ToString(), length2.ToString()), comparisonContext);
                     yield return difference;
                 }
             }
@@ -90,7 +91,8 @@ namespace ObjectsComparer
 
                 foreach (var failure in _comparer.CalculateDifferences((T)array1.GetValue(indecies), (T)array2.GetValue(indecies), comparisonContext))
                 {
-                    yield return failure.InsertPath($"[{string.Join(",", indecies)}]");
+                    failure.Difference.InsertPath($"[{string.Join(",", indecies)}]");
+                    yield return failure;
                 }
             }
         }

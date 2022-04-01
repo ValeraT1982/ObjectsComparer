@@ -57,19 +57,18 @@ namespace ObjectsComparer
             return CalculateDifferences(obj1, obj2, memberInfo: null);
         }
 
-        public IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, IComparisonContext comparisonContext)
+        public IEnumerable<DifferenceLocation> CalculateDifferences(T obj1, T obj2, IComparisonContext comparisonContext)
         {
-            return CalculateDifferences(obj1, obj2, memberInfo: null, comparisonContext)
-                .Select(differenceTreeNodeInfo => differenceTreeNodeInfo.Difference); 
+            return CalculateDifferences(obj1, obj2, memberInfo: null, comparisonContext);
         }
 
         internal IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo)
         {
             return CalculateDifferences(obj1, obj2, memberInfo, ComparisonContextProvider.CreateImplicitRootContext(Settings))
-                .Select(differenceTreeNodeInfo => differenceTreeNodeInfo.Difference);
+                .Select(differenceLocation => differenceLocation.Difference);
         }
 
-        IEnumerable<DifferenceTreeNodeInfo> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo, IComparisonContext comparisonContext)
+        IEnumerable<DifferenceLocation> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo, IComparisonContext comparisonContext)
         {
             var comparer = memberInfo != null
                 ? OverridesCollection.GetComparer(memberInfo)
@@ -81,7 +80,7 @@ namespace ObjectsComparer
                 comparer = comparer ?? DefaultValueComparer;
                 if (!comparer.Compare(obj1, obj2, Settings))
                 {
-                    yield return AddDifferenceToComparisonContext(new Difference(string.Empty, comparer.ToString(obj1), comparer.ToString(obj2)), comparisonContext);
+                    yield return AddDifferenceToTree(new Difference(string.Empty, comparer.ToString(obj1), comparer.ToString(obj2)), comparisonContext);
                 }
 
                 yield break;
@@ -105,7 +104,7 @@ namespace ObjectsComparer
             {
                 if (!DefaultValueComparer.Compare(obj1, obj2, Settings))
                 {
-                    yield return AddDifferenceToComparisonContext(new Difference(string.Empty, DefaultValueComparer.ToString(obj1), DefaultValueComparer.ToString(obj2)), comparisonContext);
+                    yield return AddDifferenceToTree(new Difference(string.Empty, DefaultValueComparer.ToString(obj1), DefaultValueComparer.ToString(obj2)), comparisonContext);
                 }
 
                 yield break;
@@ -155,7 +154,7 @@ namespace ObjectsComparer
 
                 if (!valueComparer.Compare(value1, value2, Settings))
                 {
-                    yield return AddDifferenceToComparisonContext(new Difference(member.Name, valueComparer.ToString(value1), valueComparer.ToString(value2)), memberContext);
+                    yield return AddDifferenceToTree(new Difference(member.Name, valueComparer.ToString(value1), valueComparer.ToString(value2)), memberContext);
                 }
             }
         }

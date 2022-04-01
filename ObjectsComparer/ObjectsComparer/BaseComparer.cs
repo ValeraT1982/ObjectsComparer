@@ -188,8 +188,8 @@ namespace ObjectsComparer
         /// <summary>
         /// Adds an <paramref name="difference"/> to the end of the <paramref name="comparisonContext"/>'s <see cref="IComparisonContext.Differences"/>.
         /// </summary>
-        /// <returns>The <paramref name="difference"/> argument.</returns>
-        protected virtual DifferenceTreeNodeInfo AddDifferenceToComparisonContext(Difference difference, IComparisonContext comparisonContext)
+        /// <returns>The <see cref="DifferenceLocation"/> instance.</returns>
+        protected virtual DifferenceLocation AddDifferenceToTree(Difference difference, IComparisonContext comparisonContext)
         {
             if (difference is null)
             {
@@ -203,7 +203,7 @@ namespace ObjectsComparer
 
             comparisonContext.AddDifference(difference);
 
-            return new DifferenceTreeNodeInfo(difference, comparisonContext);
+            return new DifferenceLocation(difference, comparisonContext);
         }
     }
 }

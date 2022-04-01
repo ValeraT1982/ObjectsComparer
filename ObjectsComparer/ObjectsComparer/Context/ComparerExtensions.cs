@@ -10,7 +10,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Calculates list of differences between objects. Accepts comparison context.
         /// </summary>
-        public static IComparisonContext CalculateDifferences(this IComparer comparer, Type type, object obj1, object obj2, Func<IComparisonContext, Difference, bool> findNextDifference = null, Action contextCompleted = null)
+        public static IComparisonContext CalculateDifferences(this IComparer comparer, Type type, object obj1, object obj2, Func<DifferenceLocation, bool> findNextDifference = null, Action contextCompleted = null)
         {
             if (comparer is null)
             {
@@ -24,12 +24,12 @@ namespace ObjectsComparer
 
             var rootCtx = ComparisonContextProvider.CreateContext(comparer.Settings, ancestor: null);
 
-            var differences = comparer.CalculateDifferences(type, obj1, obj2, rootCtx);
+            var differenceLocationList = comparer.CalculateDifferences(type, obj1, obj2, rootCtx);
 
-            differences.EnumerateConditional(
-                currentDifference => 
+            differenceLocationList.EnumerateConditional(
+                currentLocation => 
                 {
-                    return findNextDifference(null, currentDifference);
+                    return findNextDifference(currentLocation);
                 }, 
                 contextCompleted);
 
@@ -39,23 +39,23 @@ namespace ObjectsComparer
         /// <summary>
         /// Calculates list of differences between objects. Accepts comparison context.
         /// </summary>
-        public static IComparisonContext CalculateContextableDifferences<T>(this IComparer<T> comparer, T obj1, T obj2, Func<IComparisonContext, Difference, bool> findNextDifference = null, Action contextCompleted = null)
+        public static IComparisonContext CalculateContextableDifferences<T>(this IComparer<T> comparer, T obj1, T obj2, Func<DifferenceLocation, bool> findNextDifference = null, Action contextCompleted = null)
         {
             if (comparer is null)
             {
                 throw new ArgumentNullException(nameof(comparer));
             }
 
-            findNextDifference = findNextDifference ?? ((ctx, _) => true);
+            findNextDifference = findNextDifference ?? ((_) => true);
 
             var rootCtx = ComparisonContextProvider.CreateContext(comparer.Settings, ancestor: null);
 
-            var differences = comparer.CalculateDifferences(obj1, obj2, rootCtx);
+            var differenceLocationList = comparer.CalculateDifferences(obj1, obj2, rootCtx);
 
-            differences.EnumerateConditional(
-                currentDifference =>
+            differenceLocationList.EnumerateConditional(
+                currentLocation =>
                 {
-                    return findNextDifference(null, currentDifference);
+                    return findNextDifference(currentLocation);
                 },
                 contextCompleted);
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ObjectsComparer.ContextExtensions;
 using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
@@ -12,17 +13,18 @@ namespace ObjectsComparer
         {
         }
 
-        public IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, IComparisonContext comparisonContext)
+        public IEnumerable<DifferenceLocation> CalculateDifferences(T obj1, T obj2, IComparisonContext comparisonContext)
         {
             return CalculateDifferences(typeof(T), obj1, obj2, comparisonContext);
         }
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings));
+            return CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings))
+                .Select(differenceLocation => differenceLocation.Difference);
         }
 
-        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext)
+        public IEnumerable<DifferenceLocation> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext)
         {
             if (comparisonContext is null)
             {
@@ -61,7 +63,7 @@ namespace ObjectsComparer
             {
                 if (!hashSet2.Contains(element))
                 {
-                    var difference = AddDifferenceToComparisonContext(
+                    var difference = AddDifferenceToTree(
                         new Difference("", valueComparer.ToString(element), string.Empty, DifferenceTypes.MissedElementInSecondObject), 
                         comparisonContext);
 
@@ -73,7 +75,7 @@ namespace ObjectsComparer
             {
                 if (!hashSet1.Contains(element))
                 {
-                    var difference = AddDifferenceToComparisonContext(new Difference("", string.Empty, valueComparer.ToString(element),
+                    var difference = AddDifferenceToTree(new Difference("", string.Empty, valueComparer.ToString(element),
                         DifferenceTypes.MissedElementInFirstObject), comparisonContext);
 
                     yield return difference;

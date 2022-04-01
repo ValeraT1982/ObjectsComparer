@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using ObjectsComparer.ContextExtensions;
 using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
@@ -29,10 +30,11 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings));
+            return CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings))
+                .Select(differenceLoccation => differenceLoccation.Difference);
         }
 
-        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext)
+        public IEnumerable<DifferenceLocation> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext)
         {
             if (comparisonContext is null)
             {
@@ -60,7 +62,7 @@ namespace ObjectsComparer
             var genericMethodParameters = comparerIsIContextableComparerT ? new[] { obj1, obj2, comparisonContext } : new[] { obj1, obj2 };
 
             // ReSharper disable once PossibleNullReferenceException
-            return (IEnumerable<Difference>)genericMethod.Invoke(comparer, genericMethodParameters);
+            return (IEnumerable<DifferenceLocation>)genericMethod.Invoke(comparer, genericMethodParameters);
         }
     }
 }

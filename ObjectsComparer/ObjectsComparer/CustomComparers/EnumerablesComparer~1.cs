@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using ObjectsComparer.ContextExtensions;
 using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
@@ -18,10 +19,11 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings));
+            return CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings))
+                .Select(differeneLocation => differeneLocation.Difference);
         }
 
-        public IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext listComparisonContext)
+        public IEnumerable<DifferenceLocation> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext listComparisonContext)
         {
             Debug.WriteLine($"{GetType().Name}.{nameof(CalculateDifferences)}: {type.Name}");
 
@@ -64,7 +66,7 @@ namespace ObjectsComparer
             {
                 if (!type.GetTypeInfo().IsArray)
                 {
-                    yield return AddDifferenceToComparisonContext(new Difference("", list1.Count().ToString(), list2.Count().ToString(), DifferenceTypes.NumberOfElementsMismatch), listComparisonContext);
+                    yield return AddDifferenceToTree(new Difference("", list1.Count().ToString(), list2.Count().ToString(), DifferenceTypes.NumberOfElementsMismatch), listComparisonContext);
                 }
 
                 if (listComparisonOptions.UnequalListsComparisonEnabled == false)
@@ -73,7 +75,7 @@ namespace ObjectsComparer
                 }
             }
 
-            IEnumerable<Difference> failrues = CalculateDifferences(list1, list2, listComparisonContext, listComparisonOptions);
+            var failrues = CalculateDifferences(list1, list2, listComparisonContext, listComparisonOptions);
 
             foreach (var failrue in failrues)
             {
@@ -81,7 +83,7 @@ namespace ObjectsComparer
             }
         }
 
-        public IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, IComparisonContext listComparisonContext)
+        public IEnumerable<DifferenceLocation> CalculateDifferences(T obj1, T obj2, IComparisonContext listComparisonContext)
         {
             return CalculateDifferences(((object)obj1 ?? obj2).GetType(), obj1, obj2, listComparisonContext);
         }
