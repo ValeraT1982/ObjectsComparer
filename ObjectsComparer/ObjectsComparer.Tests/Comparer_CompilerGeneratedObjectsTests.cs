@@ -79,16 +79,13 @@ namespace ObjectsComparer.Tests
 
             var comparer = new Comparer();
 
-            var comparisonContext = new ComparisonContext();
-            IEnumerable<Difference> calculateDifferences = comparer.CalculateDifferences(typeof(object), (object)a1, (object)a2, comparisonContext).ToArray();
-            var comparisonContextDifferences = comparisonContext.GetDifferences(true).ToArray();
+            var rootDiffenenceNode = comparer.CalculateDifferencesTree(typeof(object), (object)a1, (object)a2);
+            var calculateDifferences = rootDiffenenceNode.GetDifferences(true).ToArray();
 
             Assert.AreEqual(3, calculateDifferences.Count());
             Assert.IsTrue(calculateDifferences.Any(d => d.MemberPath == "Field1" && d.Value1 == "A" && d.Value2 == "B"));
             Assert.IsTrue(calculateDifferences.Any(d => d.MemberPath == "Field2" && d.Value1 == "5" && d.Value2 == "8"));
             Assert.IsTrue(calculateDifferences.Any(d => d.DifferenceType == DifferenceTypes.MissedMemberInFirstObject && d.MemberPath == "Field3" && d.Value2 == "False"));
-
-            CollectionAssert.AreEquivalent(calculateDifferences, comparisonContextDifferences);
         }
 
         [Test]
@@ -220,9 +217,8 @@ namespace ObjectsComparer.Tests
             var comparer = new Comparer();
             
 
-            var comparisonContext = new ComparisonContext();
-            var calculateDifferences = comparer.CalculateDifferences(typeof(object), (object)a1, (object)a2, comparisonContext).ToArray();
-            var comparisonContextDifferences = comparisonContext.GetDifferences(true).ToArray();
+            var rootDifferenceNode = comparer.CalculateDifferencesTree(typeof(object), (object)a1, (object)a2);
+            var calculateDifferences = rootDifferenceNode.GetDifferences(true);
 
             Assert.IsTrue(calculateDifferences.Any());
             Assert.AreEqual(2, calculateDifferences.Count());
@@ -230,8 +226,6 @@ namespace ObjectsComparer.Tests
                 d => d.MemberPath == "Field1" && d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject));
             Assert.IsTrue(calculateDifferences.Any(
                 d => d.MemberPath == "Field2" && d.DifferenceType == DifferenceTypes.MissedMemberInFirstObject));
-
-            CollectionAssert.AreEquivalent(calculateDifferences, comparisonContextDifferences);
         }
 
         [Test]

@@ -289,13 +289,10 @@ namespace ObjectsComparer.Examples.Example4
                     .FormatElementKey(formatKeyArgs => $"Id={formatKeyArgs.ElementKey}")));
 
             var comparer = new Comparer<Formula>(settings);
-            var rootContext = new ComparisonContext();
-            var differences = comparer.CalculateDifferences(formula1, formula2, rootContext).ToArray();
-            rootContext.Shrink();
+            var rootDifferenceNode = comparer.CalculateContextableDifferences(formula1, formula2); 
+            var differences = rootDifferenceNode.GetDifferences(recursive: true).ToArray();
             bool isEqual = differences.Any() == false;
             ResultToOutput(isEqual, differences);
-
-            CollectionAssert.AreEquivalent(differences, rootContext.GetDifferences(true));
 
             Assert.IsFalse(isEqual);
             Assert.AreEqual(5, differences.Count());

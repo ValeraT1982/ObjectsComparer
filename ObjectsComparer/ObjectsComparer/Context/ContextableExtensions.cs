@@ -37,6 +37,8 @@ namespace ObjectsComparer.ContextExtensions
                 {
                     yield return differenceTreeNodeInfo;
                 }
+
+                yield break;
             }
 
             ThrowContextableComparerNotImplemented(comparisonContext, comparer.Settings, comparer, nameof(IContextableComparer));
@@ -74,6 +76,8 @@ namespace ObjectsComparer.ContextExtensions
                 {
                     yield return differenceTreeNodeInfo;
                 }
+
+                yield break;
             }
 
             ThrowContextableComparerNotImplemented(comparisonContext, comparer.Settings, comparer, $"{nameof(IContextableComparer)}<{typeof(T).FullName}>");

@@ -57,7 +57,7 @@ namespace ObjectsComparer
             return CalculateDifferences(obj1, obj2, memberInfo: null);
         }
 
-        public IEnumerable<DifferenceLocation> CalculateDifferences(T obj1, T obj2, IComparisonContext comparisonContext)
+        IEnumerable<DifferenceLocation> IContextableComparer<T>.CalculateDifferences(T obj1, T obj2, IComparisonContext comparisonContext)
         {
             return CalculateDifferences(obj1, obj2, memberInfo: null, comparisonContext);
         }

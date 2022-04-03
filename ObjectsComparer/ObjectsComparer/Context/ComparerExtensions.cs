@@ -10,7 +10,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Calculates list of differences between objects. Accepts comparison context.
         /// </summary>
-        public static IComparisonContext CalculateDifferences(this IComparer comparer, Type type, object obj1, object obj2, Func<DifferenceLocation, bool> findNextDifference = null, Action contextCompleted = null)
+        public static IComparisonContext CalculateDifferencesTree(this IComparer comparer, Type type, object obj1, object obj2, Func<DifferenceLocation, bool> findNextDifference = null, Action contextCompleted = null)
         {
             if (comparer is null)
             {
