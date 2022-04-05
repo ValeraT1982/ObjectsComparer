@@ -183,22 +183,18 @@ namespace ObjectsComparer.Tests
             var a2 = new A { NonGenericEnumerable = new ArrayList { new B { Property1 = "Str3", Id = 2 }, new B { Property1 = "Str1", Id = 1 } } };
 
             var settings = new ComparisonSettings();
-            settings.ConfigureListComparison(listOptions => listOptions.CompareElementsByKey());
+            settings.ConfigureListComparison(compareElementsByKey: true);
 
             var comparer = new Comparer<A>(settings);
 
-            var rootCtx = new ComparisonContext();
-            var differences = comparer.CalculateDifferences(a1, a2, rootCtx).ToList();
+            var rootNode = comparer.CalculateDifferencesTree(a1, a2);
+            var differences = rootNode.GetDifferences(true);
 
             CollectionAssert.IsNotEmpty(differences);
             var diff = differences.First();
             Assert.AreEqual("NonGenericEnumerable[2].Property1", diff.MemberPath);
             Assert.AreEqual("Str2", diff.Value1);
             Assert.AreEqual("Str3", diff.Value2);
-
-            var diffFromCtx = rootCtx.GetDifferences(recursive: true).FirstOrDefault();
-            Assert.NotNull(diffFromCtx);
-            Assert.AreEqual(diff, diffFromCtx);
         }
 
         [Test]

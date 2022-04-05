@@ -22,6 +22,9 @@ namespace ObjectsComparer
                 throw new ArgumentNullException(nameof(type));
             }
 
+            findNextDifference = findNextDifference ?? ((_) => true);
+
+            //Anything but ImplicitComparisonContext (ImplicitDifferenceTreeNode).
             var rootCtx = ComparisonContextProvider.CreateContext(comparer.Settings, ancestor: null);
 
             var differenceLocationList = comparer.CalculateDifferences(type, obj1, obj2, rootCtx);
@@ -39,7 +42,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Calculates list of differences between objects. Accepts comparison context.
         /// </summary>
-        public static IComparisonContext CalculateContextableDifferences<T>(this IComparer<T> comparer, T obj1, T obj2, Func<DifferenceLocation, bool> findNextDifference = null, Action contextCompleted = null)
+        public static IComparisonContext CalculateDifferencesTree<T>(this IComparer<T> comparer, T obj1, T obj2, Func<DifferenceLocation, bool> findNextDifference = null, Action contextCompleted = null)
         {
             if (comparer is null)
             {

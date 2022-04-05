@@ -412,20 +412,14 @@ namespace ObjectsComparer.Tests
             var a2 = new MultidimensionalArrays { IntInt = null };
             var comparer = new Comparer<MultidimensionalArrays>();
 
-            var rootComparisonContext = new ComparisonContext();
-            var differences = comparer.CalculateDifferences(a1, a2, rootComparisonContext).ToList();
+            var rootNode = comparer.CalculateDifferencesTree(a1, a2);
+            var differences = rootNode.GetDifferences(true).ToList();
             
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual(1, differences.Count());
             Assert.AreEqual("IntInt", differences[0].MemberPath);
             Assert.AreEqual(typeof(int[,]).FullName, differences[0].Value1);
             Assert.AreEqual(string.Empty, differences[0].Value2);
-
-            var comparisonContextDifferences = rootComparisonContext.GetDifferences(recursive: true).ToList();
-
-            comparisonContextDifferences.ForEach(ctxDiff => CollectionAssert.Contains(differences, ctxDiff));
-
-            differences.ForEach(diff => CollectionAssert.Contains(comparisonContextDifferences, diff));
         }
 
         [Test]

@@ -120,12 +120,9 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual(1, differences.Count);
             Assert.IsTrue(differences.Any(d => d.MemberPath == "FieldSub1.Field1" && d.Value1 == "10" && d.Value2 == "8"));
 
-            var ctx = new ComparisonContext();
-            var calcDifferences = comparer.CalculateDifferences(typeof(object), (object)a1, (object)a2, ctx).ToArray();
-            var ctxDifferences = ctx.GetDifferences(true).ToArray();
-
-            Assert.IsTrue(differences.AreEquivalent(calcDifferences));
-            Assert.IsTrue(differences.AreEquivalent(ctxDifferences));
+            var rootNode = comparer.CalculateDifferencesTree(typeof(object), (object)a1, (object)a2);
+            var treeDifferences = rootNode.GetDifferences(true).ToList();
+            Assert.IsTrue(treeDifferences.Any(d => d.MemberPath == "FieldSub1.Field1" && d.Value1 == "10" && d.Value2 == "8"));
         }
         
         [Test]
@@ -296,13 +293,14 @@ namespace ObjectsComparer.Tests
             dynamic a2 = new ExpandoObject();
             var comparer = new Comparer(new ComparisonSettings { UseDefaultIfMemberNotExist = true });
 
-            var rootComparisonContext = new ComparisonContext();
-            IEnumerable<Difference> diffs = comparer.CalculateDifferences(((object)a1).GetType(), a1, a2, rootComparisonContext);
+            var obja1 = (object)a1;
+            var obja2 = (object)a2;
+
+            var rootNode = comparer.CalculateDifferencesTree(((object)a1).GetType(), obja1, obja2);
+            IEnumerable<Difference> diffs = rootNode.GetDifferences(true);
             var differences = diffs.ToArray();
-            var comparisonContextDifferences = rootComparisonContext.GetDifferences(recursive: true).ToList();
 
             CollectionAssert.IsEmpty(differences);
-            CollectionAssert.IsEmpty(comparisonContextDifferences);
         }
 
         [Test]
@@ -344,12 +342,15 @@ namespace ObjectsComparer.Tests
             Assert.IsTrue(compareDifferences.Any(
                 d => d.MemberPath == "Field1" && d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject));
 
-            var rootComparisonContext = new ComparisonContext();
-            IEnumerable<Difference> calculateDiffs = comparer.CalculateDifferences(((object)a1).GetType(), a1, a2, rootComparisonContext);
-            var calculateDifferences = calculateDiffs.ToList();
-            var comparisonContextDifferences = rootComparisonContext.GetDifferences(recursive: true).ToList();
+            var obja1 = (object)a1;
+            var obja2 = (object)a2;
 
-            CollectionAssert.AreEquivalent(calculateDifferences, comparisonContextDifferences);
+            var rootNode = comparer.CalculateDifferencesTree(((object)a1).GetType(), obja1, obja2);
+            var calculateDifferences = rootNode.GetDifferences(true).ToList();
+
+            Assert.AreEqual(1, calculateDifferences.Count);
+            Assert.IsTrue(calculateDifferences.Any(
+                d => d.MemberPath == "Field1" && d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject));
         }
 
         [Test]

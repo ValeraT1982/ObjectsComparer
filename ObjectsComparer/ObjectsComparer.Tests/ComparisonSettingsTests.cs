@@ -113,8 +113,8 @@ namespace ObjectsComparer.Tests
             settings.ConfigureListComparison(compareUnequalLists: true);
 
             var comparer = new Comparer(settings);
-            var ctx = new ComparisonContext();
-            var differences = comparer.CalculateDifferences(a1.GetType(), a1, a2, ctx).ToList();
+            var rootNode = comparer.CalculateDifferencesTree(a1.GetType(), a1, a2);
+            var differences = rootNode.GetDifferences(true).ToList();
 
             Assert.AreEqual(4, differences.Count);
 
@@ -137,8 +137,6 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual("Length", differences[3].MemberPath);
             Assert.AreEqual("3", differences[3].Value1);
             Assert.AreEqual("4", differences[3].Value2);
-            
-            Assert.IsTrue(differences.AreEquivalent(ctx.GetDifferences(true)));
         }
 
         [Test]
@@ -151,8 +149,9 @@ namespace ObjectsComparer.Tests
             settings.ConfigureListComparison(compareUnequalLists: true, compareElementsByKey: true);
 
             var comparer = new Comparer(settings);
-            var ctx = new ComparisonContext();
-            var differences = comparer.CalculateDifferences(a1.GetType(), a1, a2, ctx).ToList();
+
+            var rootNode = comparer.CalculateDifferencesTree(a1.GetType(), a1, a2);
+            var differences = rootNode.GetDifferences(true).ToList();
 
             Assert.AreEqual(2, differences.Count);
 
@@ -165,8 +164,6 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual("Length", differences[1].MemberPath);
             Assert.AreEqual("3", differences[1].Value1);
             Assert.AreEqual("4", differences[1].Value2);
-
-            Assert.IsTrue(differences.AreEquivalent(ctx.GetDifferences(true)));
         }
 
         [Test]

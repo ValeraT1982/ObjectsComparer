@@ -49,7 +49,6 @@ namespace ObjectsComparer.ContextExtensions
             {
                 yield return new DifferenceLocation(difference);
             }
-
         }
 
         /// <summary>
@@ -111,7 +110,7 @@ namespace ObjectsComparer.ContextExtensions
             return false;
         }
 
-        static void ThrowContextableComparerNotImplemented(IComparisonContext comparisonContext, ComparisonSettings comparisonSettings, object comparer, string unImplementedInterface)
+        internal static void ThrowContextableComparerNotImplemented(IComparisonContext comparisonContext, ComparisonSettings comparisonSettings, object comparer, string unImplementedInterface)
         {
             if (comparisonContext is null)
             {

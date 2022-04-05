@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
@@ -59,6 +60,8 @@ namespace ObjectsComparer.Tests
         [Test]
         public void ReadOnlyPropertyInequality()
         {
+            CultureInfo.CurrentCulture = new CultureInfo("en");
+
             var a1 = new A(1.99);
             var a2 = new A(0.89);
             var comparer = new Comparer<A>();

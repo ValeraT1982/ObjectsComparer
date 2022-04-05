@@ -65,11 +65,12 @@ namespace ObjectsComparer.Tests
             var a2 = new A { IntArray = new[] { 1, 2, 3 } };
 
             var settings = new ComparisonSettings();
-            settings.ConfigureListComparison(listOptions => listOptions.CompareUnequalLists(true));
+            settings.ConfigureListComparison(compareUnequalLists: true);
 
             var comparer = new Comparer<A>(settings);
-            var rootCtx = new ComparisonContext();
-            var differences = comparer.CalculateDifferences(a1, a2, rootCtx).ToList();
+
+            var rootNode = comparer.CalculateDifferencesTree(a1, a2);
+            var differences = rootNode.GetDifferences(true).ToList();
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual(2, differences.Count);
@@ -82,11 +83,6 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual("IntArray.Length", differences[1].MemberPath);
             Assert.AreEqual("2", differences[1].Value1);
             Assert.AreEqual("3", differences[1].Value2);
-
-            var diffsFromCtx = rootCtx.GetDifferences(recursive: true).ToList();
-            Assert.AreEqual(2, diffsFromCtx.Count);
-            Assert.AreEqual(differences[0], diffsFromCtx[0]);
-            Assert.AreEqual(differences[1], diffsFromCtx[1]);
         }
 
         [Test]

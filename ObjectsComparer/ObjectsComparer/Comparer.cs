@@ -54,9 +54,18 @@ namespace ObjectsComparer
             {
                 if (comparer is IContextableComparer contextableComparer)
                 {
-                    return contextableComparer.CalculateDifferences(type, obj1, obj2, comparisonContext);
+                    var diffLocationList = contextableComparer.CalculateDifferences(type, obj1, obj2, comparisonContext);
+
+                    foreach (var diffLocation in diffLocationList)
+                    {
+                        yield return diffLocation;
+                    }
+
+                    yield break;
                 }
             }
+
+            ContextableExtensions.ThrowContextableComparerNotImplemented(comparisonContext, Settings, comparer, $"{nameof(IContextableComparer)}<{type.FullName}>");
 
             var genericType = comparerIsIContextableComparerT ? typeof(IContextableComparer<>).MakeGenericType(type) : typeof(IComparer<>).MakeGenericType(type);
             var genericMethodParameterTypes = comparerIsIContextableComparerT ? new[] { type, type, typeof(IComparisonContext) } : new[] { type, type };
@@ -64,7 +73,32 @@ namespace ObjectsComparer
             var genericMethodParameters = comparerIsIContextableComparerT ? new[] { obj1, obj2, comparisonContext } : new[] { obj1, obj2 };
 
             // ReSharper disable once PossibleNullReferenceException
-            return (IEnumerable<DifferenceLocation>)genericMethod.Invoke(comparer, genericMethodParameters);
+            //return (IEnumerable<DifferenceLocation>)genericMethod.Invoke(comparer, genericMethodParameters);
+
+            var returnValue = genericMethod.Invoke(comparer, genericMethodParameters);
+
+            if (returnValue is IEnumerable<DifferenceLocation> differenceLocationList)
+            {
+                foreach (var differenceLocation in differenceLocationList)
+                {
+                    yield return differenceLocation;
+                }
+
+                yield break;
+            }
+
+            if (returnValue is IEnumerable<Difference> differenceList)
+            {
+                foreach (var difference in differenceList)
+                {
+                    yield return new DifferenceLocation(difference);
+                }
+
+                yield break;
+            }
+
+            //TODO: 
+            throw new NotImplementedException("");
         }
     }
 }
