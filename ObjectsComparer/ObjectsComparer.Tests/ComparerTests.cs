@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using NSubstitute;
 using NUnit.Framework;
 using ObjectsComparer.Tests.TestClasses;
@@ -60,8 +61,6 @@ namespace ObjectsComparer.Tests
         [Test]
         public void ReadOnlyPropertyInequality()
         {
-            CultureInfo.CurrentCulture = new CultureInfo("en");
-
             var a1 = new A(1.99);
             var a2 = new A(0.89);
             var comparer = new Comparer<A>();
@@ -70,8 +69,11 @@ namespace ObjectsComparer.Tests
 
             CollectionAssert.IsNotEmpty(differences);
             Assert.AreEqual("ReadOnlyProperty", differences.First().MemberPath);
-            Assert.AreEqual("1.99", differences.First().Value1);
-            Assert.AreEqual("0.89", differences.First().Value2);
+            //Assert.AreEqual("1.99", differences.First().Value1);
+            //Assert.AreEqual("0.89", differences.First().Value2);
+            NumberFormatInfo nfi = CultureInfo.CurrentCulture.NumberFormat;
+            Assert.AreEqual($"1{nfi.NumberDecimalSeparator}99", differences.First().Value1);
+            Assert.AreEqual($"0{nfi.NumberDecimalSeparator}89", differences.First().Value2);
         }
 
         [Test]
