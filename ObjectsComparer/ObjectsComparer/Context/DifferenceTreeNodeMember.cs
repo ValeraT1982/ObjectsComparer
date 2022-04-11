@@ -3,9 +3,9 @@ using System.Reflection;
 
 namespace ObjectsComparer
 {
-    public class ComparisonContextMember : IComparisonContextMember
+    public class DifferenceTreeNodeMember : IDifferenceTreeNodeMember
     {
-        public ComparisonContextMember(MemberInfo info = null, string name = null) 
+        public DifferenceTreeNodeMember(MemberInfo info = null, string name = null) 
         {
             Info = info;
             Name = name;

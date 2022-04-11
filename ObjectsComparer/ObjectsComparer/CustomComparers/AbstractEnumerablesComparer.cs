@@ -8,7 +8,7 @@ using ObjectsComparer.ContextExtensions;
 
 namespace ObjectsComparer
 {
-    internal abstract class AbstractEnumerablesComparer: AbstractComparer, IComparerWithCondition, IContextableComparer
+    internal abstract class AbstractEnumerablesComparer: AbstractComparer, IComparerWithCondition, IDifferenceTreeBuilder
     {
         ///// <summary>
         ///// <see cref="Array"/> member names that will be skipped from comaprison.
@@ -60,6 +60,6 @@ namespace ObjectsComparer
 
         public abstract bool IsMatch(Type type, object obj1, object obj2);
 
-        public abstract IEnumerable<DifferenceLocation> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext);
+        public abstract IEnumerable<DifferenceLocation> CalculateDifferences(Type type, object obj1, object obj2, IDifferenceTreeNode comparisonContext);
     }
 }

@@ -9,20 +9,20 @@ namespace ObjectsComparer
     //TODO: Edit "Once the comparison process is completed, it is possible to traverse "
 
     /// <summary>
-    /// Context of comparison process. Each <see cref="IComparisonContext"/> instance wraps compared <see cref="Member"/>, which is typically property. Each context has its ancestor and descendants the same way as its compared <see cref="Member"/> has its ancestor and descendant members.
+    /// Context of comparison process. Each <see cref="IDifferenceTreeNode"/> instance wraps compared <see cref="Member"/>, which is typically property. Each context has its ancestor and descendants the same way as its compared <see cref="Member"/> has its ancestor and descendant members.
     /// Once the comparison process is completed, it is possible to traverse the comparison context graph and see differences at particular members.
     /// </summary>
-    public interface IComparisonContext
+    public interface IDifferenceTreeNode
     {
         /// <summary>
         /// Ancestor context.
         /// </summary>
-        IComparisonContext Ancestor { get; set; }
+        IDifferenceTreeNode Ancestor { get; set; }
 
         /// <summary>
         /// Children contexts.
         /// </summary>
-        IEnumerable<IComparisonContext> Descendants { get; }
+        IEnumerable<IDifferenceTreeNode> Descendants { get; }
 
         /// <summary>
         /// A list of differences directly related to the context.
@@ -30,16 +30,16 @@ namespace ObjectsComparer
         IEnumerable<Difference> Differences { get; }
 
         /// <summary>
-        /// Compared member, for more info see <see cref="IComparisonContextMember"/>.
+        /// Compared member, for more info see <see cref="IDifferenceTreeNodeMember"/>.
         /// It should be null for the root context (the starting point of the comparison) and for the list element context. A list element context never has a member, but it has an ancestor context which is the list and that list has its member.
         /// </summary>
-        IComparisonContextMember Member { get; }
+        IDifferenceTreeNodeMember Member { get; }
 
         /// <summary>
         /// Adds descendant to the context.
         /// </summary>
         /// <param name="descendant"></param>
-        void AddDescendant(IComparisonContext descendant);
+        void AddDescendant(IDifferenceTreeNode descendant);
 
         /// <summary>
         /// Adds the difference to the context.
@@ -62,6 +62,6 @@ namespace ObjectsComparer
         /// <summary>
         /// Removes all <see cref="Descendants"/> which have no <see cref="Differences"/> directly or indirectly in their <see cref="Descendants"/>.
         /// </summary>
-        IComparisonContext Shrink();
+        IDifferenceTreeNode Shrink();
     }
 }

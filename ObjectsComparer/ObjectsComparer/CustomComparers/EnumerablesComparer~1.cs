@@ -8,7 +8,7 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    internal class EnumerablesComparer<T> : EnumerablesComparerBase, IContextableComparer, IContextableComparer<T>
+    internal class EnumerablesComparer<T> : EnumerablesComparerBase, IDifferenceTreeBuilder, IDifferenceTreeBuilder<T>
     {
         private readonly IComparer<T> _comparer;
 
@@ -23,9 +23,9 @@ namespace ObjectsComparer
                 .Select(differeneLocation => differeneLocation.Difference);
         }
 
-        public IEnumerable<DifferenceLocation> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext listComparisonContext)
+        public IEnumerable<DifferenceLocation> CalculateDifferences(Type type, object obj1, object obj2, IDifferenceTreeNode listComparisonContext)
         {
-            Debug.WriteLine($"{GetType().Name}.{nameof(CalculateDifferences)}: {type.Name}");
+            Debug.WriteLine($"{GetType().Name}.{nameof(BuildDifferencesTree)}: {type.Name}");
 
             if (listComparisonContext is null)
             {
@@ -83,7 +83,7 @@ namespace ObjectsComparer
             }
         }
 
-        public IEnumerable<DifferenceLocation> CalculateDifferences(T obj1, T obj2, IComparisonContext listComparisonContext)
+        public IEnumerable<DifferenceLocation> BuildDifferencesTree(T obj1, T obj2, IDifferenceTreeNode listComparisonContext)
         {
             return CalculateDifferences(((object)obj1 ?? obj2).GetType(), obj1, obj2, listComparisonContext);
         }

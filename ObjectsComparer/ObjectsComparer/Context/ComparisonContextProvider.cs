@@ -5,39 +5,39 @@ namespace ObjectsComparer
 {
     public static class ComparisonContextProvider
     {
-        public static IComparisonContext CreateRootContext()
+        public static IDifferenceTreeNode CreateRootContext()
         {
-            return new ComparisonContext(new ComparisonContextMember());
+            return new DifferenceTreeNode(new DifferenceTreeNodeMember());
         }
 
-        internal static IComparisonContext CreateImplicitRootContext(ComparisonSettings comparisonSettings)
+        internal static IDifferenceTreeNode CreateImplicitRootContext(ComparisonSettings comparisonSettings)
         {            
             _ = comparisonSettings ?? throw new ArgumentNullException(nameof(comparisonSettings));
 
-            return new ImplicitComparisonContext(new ComparisonContextMember());
+            return new ImplicitDifferenceTreeNode(new DifferenceTreeNodeMember());
         }
 
-        public static IComparisonContext CreateContext(ComparisonSettings comparisonSettings, IComparisonContext ancestor)
+        public static IDifferenceTreeNode CreateContext(ComparisonSettings comparisonSettings, IDifferenceTreeNode ancestor)
         {
-            return CreateContext(comparisonSettings, new ComparisonContextMember(), ancestor);
+            return CreateContext(comparisonSettings, new DifferenceTreeNodeMember(), ancestor);
         }
 
-        public static IComparisonContext CreateContext(ComparisonSettings comparisonSettings, IComparisonContext ancestor, MemberInfo memberInfo)
+        public static IDifferenceTreeNode CreateContext(ComparisonSettings comparisonSettings, IDifferenceTreeNode ancestor, MemberInfo memberInfo)
         {
-            return CreateContext(comparisonSettings, new ComparisonContextMember(memberInfo, memberInfo?.Name), ancestor);
+            return CreateContext(comparisonSettings, new DifferenceTreeNodeMember(memberInfo, memberInfo?.Name), ancestor);
         }
 
-        public static IComparisonContext CreateContext(ComparisonSettings comparisonSettings, IComparisonContext ancestor, string memberName)
+        public static IDifferenceTreeNode CreateContext(ComparisonSettings comparisonSettings, IDifferenceTreeNode ancestor, string memberName)
         {
-            return CreateContext(comparisonSettings, new ComparisonContextMember(name: memberName), ancestor);
+            return CreateContext(comparisonSettings, new DifferenceTreeNodeMember(name: memberName), ancestor);
         }
 
-        public static IComparisonContext CreateContext(ComparisonSettings comparisonSettings, IComparisonContext ancestor, MemberInfo memberInfo, string memberName)
+        public static IDifferenceTreeNode CreateContext(ComparisonSettings comparisonSettings, IDifferenceTreeNode ancestor, MemberInfo memberInfo, string memberName)
         {
-            return CreateContext(comparisonSettings, new ComparisonContextMember(memberInfo, memberName), ancestor);
+            return CreateContext(comparisonSettings, new DifferenceTreeNodeMember(memberInfo, memberName), ancestor);
         }
 
-        public static IComparisonContext CreateContext(ComparisonSettings comparisonSettings, IComparisonContextMember comparisonContextMember, IComparisonContext ancestor)
+        public static IDifferenceTreeNode CreateContext(ComparisonSettings comparisonSettings, IDifferenceTreeNodeMember comparisonContextMember, IDifferenceTreeNode ancestor)
         {
             _ = comparisonSettings ?? throw new ArgumentNullException(nameof(comparisonSettings));
             _ = comparisonContextMember ?? throw new ArgumentNullException(nameof(comparisonContextMember));
@@ -73,7 +73,7 @@ namespace ObjectsComparer
                 }
             }
 
-            return new ComparisonContext(comparisonContextMember, ancestor);
+            return new DifferenceTreeNode(comparisonContextMember, ancestor);
         }
     }
 }

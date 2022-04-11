@@ -6,14 +6,14 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    internal class HashSetsComparer<T> : AbstractComparer, IContextableComparer, IContextableComparer<T>
+    internal class HashSetsComparer<T> : AbstractComparer, IDifferenceTreeBuilder, IDifferenceTreeBuilder<T>
     {
         public HashSetsComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory)
             :base(settings, parentComparer, factory)
         {
         }
 
-        public IEnumerable<DifferenceLocation> CalculateDifferences(T obj1, T obj2, IComparisonContext comparisonContext)
+        public IEnumerable<DifferenceLocation> BuildDifferencesTree(T obj1, T obj2, IDifferenceTreeNode comparisonContext)
         {
             return CalculateDifferences(typeof(T), obj1, obj2, comparisonContext);
         }
@@ -24,7 +24,7 @@ namespace ObjectsComparer
                 .Select(differenceLocation => differenceLocation.Difference);
         }
 
-        public IEnumerable<DifferenceLocation> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext)
+        public IEnumerable<DifferenceLocation> CalculateDifferences(Type type, object obj1, object obj2, IDifferenceTreeNode comparisonContext)
         {
             if (comparisonContext is null)
             {

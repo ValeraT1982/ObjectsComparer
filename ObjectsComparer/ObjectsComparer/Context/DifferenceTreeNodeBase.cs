@@ -5,23 +5,23 @@ using System.Linq;
 namespace ObjectsComparer
 {
     /// <summary>
-    /// Base class for <see cref="IComparisonContext"/> implementors.
+    /// Base class for <see cref="IDifferenceTreeNode"/> implementors.
     /// </summary>
-    public abstract class ComparisonContextBase : IComparisonContext
+    public abstract class DifferenceTreeNodeBase : IDifferenceTreeNode
     {
-        readonly List<IComparisonContext> _descendants = new List<IComparisonContext>();
+        readonly List<IDifferenceTreeNode> _descendants = new List<IDifferenceTreeNode>();
 
         readonly List<Difference> _differences = new List<Difference>();
 
-        public ComparisonContextBase(IComparisonContextMember member = null, IComparisonContext ancestor = null)
+        public DifferenceTreeNodeBase(IDifferenceTreeNodeMember member = null, IDifferenceTreeNode ancestor = null)
         {
             ancestor?.AddDescendant(this);
             Member = member;
         }
 
-        IComparisonContext _ancestor;
+        IDifferenceTreeNode _ancestor;
 
-        public virtual IComparisonContext Ancestor
+        public virtual IDifferenceTreeNode Ancestor
         {
             get
             {
@@ -38,13 +38,13 @@ namespace ObjectsComparer
             } 
         }
 
-        public IEnumerable<IComparisonContext> Descendants => _descendants.AsReadOnly();
+        public IEnumerable<IDifferenceTreeNode> Descendants => _descendants.AsReadOnly();
 
         public IEnumerable<Difference> Differences => _differences.AsReadOnly();
         
-        public IComparisonContextMember Member { get; }
+        public IDifferenceTreeNodeMember Member { get; }
 
-        public void AddDescendant(IComparisonContext descendant)
+        public void AddDescendant(IDifferenceTreeNode descendant)
         {
             if (descendant is null)
             {
@@ -90,9 +90,9 @@ namespace ObjectsComparer
             return GetDifferences(recursive).Any();
         }
                 
-        public IComparisonContext Shrink()
+        public IDifferenceTreeNode Shrink()
         {
-            List<IComparisonContext> removeDescendants = new List<IComparisonContext>();
+            List<IDifferenceTreeNode> removeDescendants = new List<IDifferenceTreeNode>();
 
             _descendants.ForEach(descendantContext =>
             {

@@ -16,7 +16,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Selects calculation operation based on the current value of the <see cref="ListComparisonOptions.ElementSearchMode"/> property.
         /// </summary>
-        protected virtual IEnumerable<DifferenceLocation> CalculateDifferences<T>(IList<T> list1, IList<T> list2, IComparisonContext listComparisonContext, ListComparisonOptions listComparisonOptions)
+        protected virtual IEnumerable<DifferenceLocation> CalculateDifferences<T>(IList<T> list1, IList<T> list2, IDifferenceTreeNode listComparisonContext, ListComparisonOptions listComparisonOptions)
         {
             if (listComparisonOptions.ElementSearchMode == ListElementSearchMode.Key)
             {
@@ -35,7 +35,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Calculates differences using <see cref="ListElementSearchMode.Key"/> comparison mode.
         /// </summary>
-        protected virtual IEnumerable<DifferenceLocation> CalculateDifferencesByKey<T>(IList<T> array1, IList<T> array2, IComparisonContext listComparisonContext, ListComparisonOptions listComparisonOptions)
+        protected virtual IEnumerable<DifferenceLocation> CalculateDifferencesByKey<T>(IList<T> array1, IList<T> array2, IDifferenceTreeNode listComparisonContext, ListComparisonOptions listComparisonOptions)
         {
             Debug.WriteLine($"{GetType().Name}.{nameof(CalculateDifferencesByKey)}: {array1?.GetType().Name}");
 
@@ -136,7 +136,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Calculates differences using <see cref="ListElementSearchMode.Index"/> comparison mode.
         /// </summary>
-        protected virtual IEnumerable<DifferenceLocation> CalculateDifferencesByIndex<T>(IList<T> array1, IList<T> array2, IComparisonContext listComparisonContext, ListComparisonOptions listComparisonOptions)
+        protected virtual IEnumerable<DifferenceLocation> CalculateDifferencesByIndex<T>(IList<T> array1, IList<T> array2, IDifferenceTreeNode listComparisonContext, ListComparisonOptions listComparisonOptions)
         {
             Debug.WriteLine($"{GetType().Name}.{nameof(CalculateDifferencesByIndex)}: {array1?.GetType().Name}");
 

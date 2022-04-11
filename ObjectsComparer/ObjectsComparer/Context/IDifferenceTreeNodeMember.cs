@@ -5,7 +5,7 @@ namespace ObjectsComparer
     /// <summary>
     /// The member in the comparison process, usually a property.
     /// </summary>
-    public interface IComparisonContextMember
+    public interface IDifferenceTreeNodeMember
     {
         /// <summary>
         /// Member. It should never be empty.

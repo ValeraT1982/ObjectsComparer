@@ -11,7 +11,7 @@ namespace ObjectsComparer
     /// <summary>
     /// Compares objects of type <see cref="T"/>.
     /// </summary>
-    public class Comparer<T> : AbstractComparer<T>, IContextableComparer<T>
+    public class Comparer<T> : AbstractComparer<T>, IDifferenceTreeBuilder<T>
     {
         private readonly List<MemberInfo> _members;
         private readonly List<IComparerWithCondition> _conditionalComparers;
@@ -57,7 +57,7 @@ namespace ObjectsComparer
             return CalculateDifferences(obj1, obj2, memberInfo: null);
         }
 
-        IEnumerable<DifferenceLocation> IContextableComparer<T>.CalculateDifferences(T obj1, T obj2, IComparisonContext comparisonContext)
+        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder<T>.BuildDifferencesTree(T obj1, T obj2, IDifferenceTreeNode comparisonContext)
         {
             return CalculateDifferences(obj1, obj2, memberInfo: null, comparisonContext);
         }
@@ -68,7 +68,7 @@ namespace ObjectsComparer
                 .Select(differenceLocation => differenceLocation.Difference);
         }
 
-        IEnumerable<DifferenceLocation> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo, IComparisonContext comparisonContext)
+        IEnumerable<DifferenceLocation> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo, IDifferenceTreeNode comparisonContext)
         {
             var comparer = memberInfo != null
                 ? OverridesCollection.GetComparer(memberInfo)

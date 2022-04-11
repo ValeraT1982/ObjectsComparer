@@ -12,7 +12,7 @@ namespace ObjectsComparer.ContextExtensions
         /// </summary>
         /// <remarks>The method is intended for IContextableComparer implementers.</remarks>
         /// <returns>Current difference and its location in the difference tree.</returns>
-        public static IEnumerable<DifferenceLocation> CalculateDifferences(this IComparer comparer, Type type, object obj1, object obj2, IComparisonContext comparisonContext)
+        public static IEnumerable<DifferenceLocation> CalculateDifferences(this IComparer comparer, Type type, object obj1, object obj2, IDifferenceTreeNode comparisonContext)
         {
             if (comparer is null)
             {
@@ -29,7 +29,7 @@ namespace ObjectsComparer.ContextExtensions
                 throw new ArgumentNullException(nameof(comparisonContext));
             }
 
-            if (comparer is IContextableComparer contextableComparer)
+            if (comparer is IDifferenceTreeBuilder contextableComparer)
             {
                 var differenceTreeNodeInfoList = contextableComparer.CalculateDifferences(type, obj1, obj2, comparisonContext);
 
@@ -41,7 +41,7 @@ namespace ObjectsComparer.ContextExtensions
                 yield break;
             }
 
-            ThrowContextableComparerNotImplemented(comparisonContext, comparer.Settings, comparer, nameof(IContextableComparer));
+            ThrowContextableComparerNotImplemented(comparisonContext, comparer.Settings, comparer, nameof(IDifferenceTreeBuilder));
 
             var differences = comparer.CalculateDifferences(type, obj1, obj2);
 
@@ -55,7 +55,7 @@ namespace ObjectsComparer.ContextExtensions
         /// Calculates list of differences between objects. Accepts comparison context.
         /// </summary>
         /// <remarks>The method is intended for IContextableComparer implementers.</remarks>
-        public static IEnumerable<DifferenceLocation> CalculateDifferences<T>(this IComparer<T> comparer, T obj1, T obj2, IComparisonContext comparisonContext)
+        public static IEnumerable<DifferenceLocation> CalculateDifferences<T>(this IComparer<T> comparer, T obj1, T obj2, IDifferenceTreeNode comparisonContext)
         {
             if (comparer is null)
             {
@@ -67,9 +67,9 @@ namespace ObjectsComparer.ContextExtensions
                 throw new ArgumentNullException(nameof(comparisonContext));
             }
 
-            if (comparer is IContextableComparer<T> contextableComparer)
+            if (comparer is IDifferenceTreeBuilder<T> contextableComparer)
             {
-                var differenceTreeNodeInfoList = contextableComparer.CalculateDifferences(obj1, obj2, comparisonContext);
+                var differenceTreeNodeInfoList = contextableComparer.BuildDifferencesTree(obj1, obj2, comparisonContext);
 
                 foreach (var differenceTreeNodeInfo in differenceTreeNodeInfoList)
                 {
@@ -79,7 +79,7 @@ namespace ObjectsComparer.ContextExtensions
                 yield break;
             }
 
-            ThrowContextableComparerNotImplemented(comparisonContext, comparer.Settings, comparer, $"{nameof(IContextableComparer)}<{typeof(T).FullName}>");
+            ThrowContextableComparerNotImplemented(comparisonContext, comparer.Settings, comparer, $"{nameof(IDifferenceTreeBuilder)}<{typeof(T).FullName}>");
 
             var differences = comparer.CalculateDifferences(obj1, obj2);
 
@@ -89,7 +89,7 @@ namespace ObjectsComparer.ContextExtensions
             }
         }
 
-        static bool HasComparisonContextImplicitRoot(IComparisonContext comparisonContext)
+        static bool HasComparisonContextImplicitRoot(IDifferenceTreeNode comparisonContext)
         {
             if (comparisonContext is null)
             {
@@ -98,7 +98,7 @@ namespace ObjectsComparer.ContextExtensions
 
             do
             {
-                if (comparisonContext.Ancestor == null && comparisonContext is ImplicitComparisonContext)
+                if (comparisonContext.Ancestor == null && comparisonContext is ImplicitDifferenceTreeNode)
                 {
                     return true;
                 }
@@ -110,7 +110,7 @@ namespace ObjectsComparer.ContextExtensions
             return false;
         }
 
-        internal static void ThrowContextableComparerNotImplemented(IComparisonContext comparisonContext, ComparisonSettings comparisonSettings, object comparer, string unImplementedInterface)
+        internal static void ThrowContextableComparerNotImplemented(IDifferenceTreeNode comparisonContext, ComparisonSettings comparisonSettings, object comparer, string unImplementedInterface)
         {
             if (comparisonContext is null)
             {

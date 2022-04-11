@@ -14,18 +14,18 @@ namespace ObjectsComparer.Tests.Utils
     internal static class ComparisonContextSerializationExtensions
     {
         /// <summary>
-        /// Serializes <see cref="ComparisonContext"/> object to json string.
+        /// Serializes <see cref="DifferenceTreeNode"/> object to json string.
         /// </summary>
         /// <param name="comparisonContext"></param>
         /// <param name="skipEmptyList"></param>
         /// <param name="skipNullReference"></param>
         /// <returns></returns>
-        public static string ToJson(this ComparisonContext comparisonContext, bool skipEmptyList = true, bool skipNullReference = true)
+        public static string ToJson(this DifferenceTreeNode comparisonContext, bool skipEmptyList = true, bool skipNullReference = true)
         {
             return SerializeComparisonContext(comparisonContext, skipEmptyList, skipNullReference);
         }
 
-        static string SerializeComparisonContext(ComparisonContext context, bool skipEmptyList, bool skipNullReference)
+        static string SerializeComparisonContext(DifferenceTreeNode context, bool skipEmptyList, bool skipNullReference)
         {
             var settings = new JsonSerializerSettings()
             {
@@ -76,29 +76,29 @@ namespace ObjectsComparer.Tests.Utils
             {
                 JsonProperty property = base.CreateProperty(member, memberSerialization);
 
-                if (property.DeclaringType == typeof(ComparisonContext))
+                if (property.DeclaringType == typeof(DifferenceTreeNode))
                 {
                     property.ShouldSerialize =
                         instance =>
                         {
-                            ComparisonContext ctx = (ComparisonContext)instance;
+                            DifferenceTreeNode ctx = (DifferenceTreeNode)instance;
 
-                            if (property.PropertyName == nameof(ComparisonContext.Descendants))
+                            if (property.PropertyName == nameof(DifferenceTreeNode.Descendants))
                             {
                                 return _skipEmptyList == false || ctx.Descendants.Any();
                             }
 
-                            if (property.PropertyName == nameof(ComparisonContext.Differences))
+                            if (property.PropertyName == nameof(DifferenceTreeNode.Differences))
                             {
                                 return _skipEmptyList == false || ctx.Differences.Any();
                             }
 
-                            if (property.PropertyName == nameof(ComparisonContext.Member))
+                            if (property.PropertyName == nameof(DifferenceTreeNode.Member))
                             {
                                 return _skipNullReference == false || ctx.Member != null;
                             }
 
-                            if (property.PropertyName == nameof(ComparisonContext.Ancestor))
+                            if (property.PropertyName == nameof(DifferenceTreeNode.Ancestor))
                             {
                                 return _skipNullReference == false || ctx.Ancestor != null;
                             }
@@ -106,7 +106,7 @@ namespace ObjectsComparer.Tests.Utils
                             return true;
                         };
 
-                    //if (property.PropertyName == nameof(ComparisonContext.Ancestor))
+                    //if (property.PropertyName == nameof(DifferenceTreeNode.Ancestor))
                     //{
                     //    property.ValueProvider = new AncestorValueProvider();
                     //}
@@ -120,8 +120,8 @@ namespace ObjectsComparer.Tests.Utils
         //{
         //    public object GetValue(object target)
         //    {
-        //        var ancestor = (target as ComparisonContext).Ancestor;
-        //        var newAncestor = new ComparisonContext(member: ancestor?.Member);
+        //        var ancestor = (target as DifferenceTreeNode).Ancestor;
+        //        var newAncestor = new DifferenceTreeNode(member: ancestor?.Member);
         //        return newAncestor;
         //    }
 

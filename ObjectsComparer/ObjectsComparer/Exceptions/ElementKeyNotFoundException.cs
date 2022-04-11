@@ -16,7 +16,7 @@ namespace ObjectsComparer.Exceptions
         /// </summary>
         /// <param name="keylessElement">An element that is missing a key.</param>
         /// <param name="message"></param>
-        internal ElementKeyNotFoundException(object keylessElement, IComparisonContext keylessElementComparisonContext, string message = ElementKeyNotFoundExceptionMsg) : base(message)
+        internal ElementKeyNotFoundException(object keylessElement, IDifferenceTreeNode keylessElementComparisonContext, string message = ElementKeyNotFoundExceptionMsg) : base(message)
         {
             KeylessElement = keylessElement ?? throw new ArgumentNullException(nameof(keylessElement));
             KeylessElementComparisonContext = keylessElementComparisonContext ?? throw new ArgumentNullException(nameof(keylessElementComparisonContext));
@@ -28,8 +28,8 @@ namespace ObjectsComparer.Exceptions
         public object KeylessElement { get; }
 
         /// <summary>
-        /// The current <see cref="IComparisonContext"/> in which the exception occurred.
+        /// The current <see cref="IDifferenceTreeNode"/> in which the exception occurred.
         /// </summary>
-        public IComparisonContext KeylessElementComparisonContext { get; }
+        public IDifferenceTreeNode KeylessElementComparisonContext { get; }
     }
 }

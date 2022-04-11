@@ -7,7 +7,7 @@ namespace ObjectsComparer.ContextExtensions
     /// </summary>
     public class DifferenceLocation
     {
-        public DifferenceLocation(Difference difference, IComparisonContext treeNode = null)
+        public DifferenceLocation(Difference difference, IDifferenceTreeNode treeNode = null)
         {
             Difference = difference ?? throw new ArgumentNullException(nameof(difference));
             TreeNode = treeNode;
@@ -15,6 +15,6 @@ namespace ObjectsComparer.ContextExtensions
 
         public Difference Difference { get; }
         
-        public IComparisonContext TreeNode { get; }
+        public IDifferenceTreeNode TreeNode { get; }
     }
 }

@@ -10,7 +10,7 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    internal class EnumerablesComparer : EnumerablesComparerBase, IComparerWithCondition, IContextableComparer
+    internal class EnumerablesComparer : EnumerablesComparerBase, IComparerWithCondition, IDifferenceTreeBuilder
     {
         public EnumerablesComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory) : base(settings, parentComparer, factory)
         {
@@ -22,9 +22,9 @@ namespace ObjectsComparer
                 .Select(differenceLocation => differenceLocation.Difference);
         }
 
-        IContextableComparer AsContextable() => this;
+        IDifferenceTreeBuilder AsContextable() => this;
 
-        IEnumerable<DifferenceLocation> IContextableComparer.CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext listComparisonContext)
+        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder.CalculateDifferences(Type type, object obj1, object obj2, IDifferenceTreeNode listComparisonContext)
         {
             Debug.WriteLine($"{GetType().Name}.{nameof(CalculateDifferences)}: {type.Name}");
 

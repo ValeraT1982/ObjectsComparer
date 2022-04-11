@@ -7,7 +7,7 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    internal class TypesComparer : AbstractComparer, IComparerWithCondition, IContextableComparer
+    internal class TypesComparer : AbstractComparer, IComparerWithCondition, IDifferenceTreeBuilder
     {
         public TypesComparer(ComparisonSettings settings, BaseComparer parentComparer,
             IComparersFactory factory)
@@ -21,7 +21,7 @@ namespace ObjectsComparer
                 .Select(differenceLocation => differenceLocation.Difference);
         }
 
-        public IEnumerable<DifferenceLocation> CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext)
+        public IEnumerable<DifferenceLocation> CalculateDifferences(Type type, object obj1, object obj2, IDifferenceTreeNode comparisonContext)
         {
             if (comparisonContext is null)
             {

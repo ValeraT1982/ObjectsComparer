@@ -10,7 +10,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Calculates list of differences between objects. Accepts comparison context.
         /// </summary>
-        public static IComparisonContext CalculateDifferencesTree(this IComparer comparer, Type type, object obj1, object obj2, Func<DifferenceLocation, bool> findNextDifference = null, Action contextCompleted = null)
+        public static IDifferenceTreeNode CalculateDifferencesTree(this IComparer comparer, Type type, object obj1, object obj2, Func<DifferenceLocation, bool> findNextDifference = null, Action contextCompleted = null)
         {
             if (comparer is null)
             {
@@ -42,7 +42,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Calculates list of differences between objects. Accepts comparison context.
         /// </summary>
-        public static IComparisonContext CalculateDifferencesTree<T>(this IComparer<T> comparer, T obj1, T obj2, Func<DifferenceLocation, bool> findNextDifference = null, Action contextCompleted = null)
+        public static IDifferenceTreeNode CalculateDifferencesTree<T>(this IComparer<T> comparer, T obj1, T obj2, Func<DifferenceLocation, bool> findNextDifference = null, Action contextCompleted = null)
         {
             if (comparer is null)
             {

@@ -7,7 +7,7 @@ using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    internal abstract class AbstractDynamicObjectsComprer<T>: AbstractComparer, IComparerWithCondition, IContextableComparer, IContextableComparer<T>
+    internal abstract class AbstractDynamicObjectsComprer<T>: AbstractComparer, IComparerWithCondition, IDifferenceTreeBuilder, IDifferenceTreeBuilder<T>
     {
         protected AbstractDynamicObjectsComprer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory) : base(settings, parentComparer, factory)
         {
@@ -19,17 +19,17 @@ namespace ObjectsComparer
                 .Select(differenceLocation => differenceLocation.Difference);
         }
 
-        IEnumerable<DifferenceLocation> IContextableComparer<T>.CalculateDifferences(T obj1, T obj2, IComparisonContext comparisonContext)
+        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder<T>.BuildDifferencesTree(T obj1, T obj2, IDifferenceTreeNode comparisonContext)
         {
             return AsContextableComparer().CalculateDifferences(typeof(T), obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings));
         }
 
-        IContextableComparer AsContextableComparer()
+        IDifferenceTreeBuilder AsContextableComparer()
         {
             return this;
         }
 
-        IEnumerable<DifferenceLocation> IContextableComparer.CalculateDifferences(Type type, object obj1, object obj2, IComparisonContext comparisonContext)
+        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder.CalculateDifferences(Type type, object obj1, object obj2, IDifferenceTreeNode comparisonContext)
         {
             var castedObject1 = (T)obj1;
             var castedObject2 = (T)obj2;

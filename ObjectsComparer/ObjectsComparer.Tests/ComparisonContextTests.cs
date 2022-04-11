@@ -16,7 +16,7 @@ namespace ObjectsComparer.Tests
         [Test]
         public void ComparisonContextMember_Member_Correct_MemberName()
         {
-            var ctxMember = new ComparisonContextMember(name: "Property1");
+            var ctxMember = new DifferenceTreeNodeMember(name: "Property1");
             Assert.AreEqual("Property1", ctxMember.Name);
             Assert.AreEqual(null, ctxMember.Info);
         }
@@ -25,7 +25,7 @@ namespace ObjectsComparer.Tests
         public void ComparisonContextMember_Member_Correct_Member()
         {
             var memberInfo = typeof(Address).GetMember(nameof(Address.Country)).Single();
-            var ctxMember = new ComparisonContextMember(memberInfo, memberInfo.Name);
+            var ctxMember = new DifferenceTreeNodeMember(memberInfo, memberInfo.Name);
             Assert.AreEqual(nameof(Address.Country), ctxMember.Info.Name);
             Assert.AreEqual(nameof(Address.Country), ctxMember.Name);
         }
@@ -175,15 +175,15 @@ namespace ObjectsComparer.Tests
         }
     }
 
-    class CustomComparisonContext : ComparisonContextBase
+    class CustomComparisonContext : DifferenceTreeNodeBase
     {
-        public CustomComparisonContext(IComparisonContextMember member = null, IComparisonContext ancestor = null) : base(member, ancestor)
+        public CustomComparisonContext(IDifferenceTreeNodeMember member = null, IDifferenceTreeNode ancestor = null) : base(member, ancestor)
         {
 
         }
     }
 
-    class CustomComparisonContextMember : IComparisonContextMember
+    class CustomComparisonContextMember : IDifferenceTreeNodeMember
     {
         public CustomComparisonContextMember(string memberName)
         {
