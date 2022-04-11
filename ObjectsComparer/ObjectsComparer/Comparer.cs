@@ -63,9 +63,9 @@ namespace ObjectsComparer
 
                     yield break;
                 }
-            }
 
-            ContextableExtensions.ThrowContextableComparerNotImplemented(comparisonContext, Settings, comparer, $"{nameof(IContextableComparer)}<{type.FullName}>");
+                ContextableExtensions.ThrowContextableComparerNotImplemented(comparisonContext, Settings, comparer, $"{nameof(IContextableComparer)}<{type.FullName}>");
+            }
 
             var genericType = comparerIsIContextableComparerT ? typeof(IContextableComparer<>).MakeGenericType(type) : typeof(IComparer<>).MakeGenericType(type);
             var genericMethodParameterTypes = comparerIsIContextableComparerT ? new[] { type, type, typeof(IComparisonContext) } : new[] { type, type };
