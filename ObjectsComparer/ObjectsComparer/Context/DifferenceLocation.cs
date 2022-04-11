@@ -3,7 +3,7 @@
 namespace ObjectsComparer.ContextExtensions
 {
     /// <summary>
-    /// The location of the <see cref="Difference"/> in the difference tree.
+    /// The location of the difference in the difference tree.
     /// </summary>
     public class DifferenceLocation
     {
