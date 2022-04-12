@@ -2,18 +2,23 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using ObjectsComparer.Exceptions;
 
 namespace ObjectsComparer.DifferenceTreeExtensions
 {
     public static class ContextableExtensions
     {
         /// <summary>
-        /// If <paramref name="comparer"/> is <see cref="IDifferenceTreeBuilder"/>, it looks for the difference, adds it to the difference tree and returns it, including its location.
-        /// If not, it only looks for the difference and returns it with empty location.
+        /// Builds the difference tree.
         /// </summary>
-        /// <remarks>Intended for <see cref="IDifferenceTreeBuilder{T}"/> implementers. To avoid side effects, consumers should call <see cref="ComparerExtensions.CalculateDifferenceTree(IComparer, Type, object, object, Func{DifferenceLocation, bool}, Action)"/> extension method instead.</remarks>
-        /// <returns>The location of the difference in the difference tree.</returns>
-        public static IEnumerable<DifferenceLocation> TryBuildDifferenceTree(this IComparer comparer, Type type, object obj1, object obj2, IDifferenceTreeNode comparisonContext)
+        /// <remarks>
+        /// If <paramref name="comparer"/> is <see cref="IDifferenceTreeBuilder"/>, it looks for the difference, adds it to the difference tree and returns it, including its location.
+        /// If not, it only looks for the difference and returns it with empty location. <br/> 
+        /// It throws exception <see cref="DifferenceTreeBuilderNotImplementedException"/> if necessary. <br/>
+        /// Intended for <see cref="IDifferenceTreeBuilder{T}"/> implementers. To avoid side effects, consumers should call <see cref="ComparerExtensions.CalculateDifferenceTree(IComparer, Type, object, object, Func{DifferenceLocation, bool}, Action)"/> extension method instead.
+        /// </remarks>
+        /// <returns>The difference with its eventual location in the difference tree.</returns>
+        public static IEnumerable<DifferenceLocation> TryBuildDifferenceTree(this IComparer comparer, Type type, object obj1, object obj2, IDifferenceTreeNode currentNode)
         {
             if (comparer is null)
             {
@@ -25,24 +30,24 @@ namespace ObjectsComparer.DifferenceTreeExtensions
                 throw new ArgumentNullException(nameof(type));
             }
 
-            if (comparisonContext is null)
+            if (currentNode is null)
             {
-                throw new ArgumentNullException(nameof(comparisonContext));
+                throw new ArgumentNullException(nameof(currentNode));
             }
 
-            if (comparer is IDifferenceTreeBuilder contextableComparer)
+            if (comparer is IDifferenceTreeBuilder differenceTreeBuilder)
             {
-                var differenceTreeNodeInfoList = contextableComparer.BuildDifferenceTree(type, obj1, obj2, comparisonContext);
+                var differenceNodeLocationList = differenceTreeBuilder.BuildDifferenceTree(type, obj1, obj2, currentNode);
 
-                foreach (var differenceTreeNodeInfo in differenceTreeNodeInfoList)
+                foreach (var differenceNodeLocation in differenceNodeLocationList)
                 {
-                    yield return differenceTreeNodeInfo;
+                    yield return differenceNodeLocation;
                 }
 
                 yield break;
             }
 
-            ThrowContextableComparerNotImplemented(comparisonContext, comparer.Settings, comparer, nameof(IDifferenceTreeBuilder));
+            ThrowDifferenceTreeBuilderNotImplemented(currentNode, comparer.Settings, comparer, nameof(IDifferenceTreeBuilder));
 
             var differences = comparer.CalculateDifferences(type, obj1, obj2);
 
@@ -53,11 +58,15 @@ namespace ObjectsComparer.DifferenceTreeExtensions
         }
 
         /// <summary>
-        /// If <paramref name="comparer"/> is <see cref="IDifferenceTreeBuilder"/>, it looks for the difference, adds it to the difference tree and returns it, including its location.
-        /// If not, it only looks for the difference and returns it.
+        /// Builds the difference tree. <br/>
         /// </summary>
-        /// <remarks>Intended for <see cref="IDifferenceTreeBuilder{T}"/> implementers. To avoid side effects, consumers should call <see cref="ComparerExtensions.CalculateDifferenceTree{T}(IComparer{T}, T, T, Func{DifferenceLocation, bool}, Action)"/> extension method instead.</remarks>
-        /// <returns>The location of the difference in the difference tree.</returns>
+        /// <remarks>
+        /// If <paramref name="comparer"/> is <see cref="IDifferenceTreeBuilder"/>, it looks for the difference, adds it to the difference tree and returns it, including its location.
+        /// If not, it only looks for the difference and returns it with empty location. <br/>
+        /// It throws exception <see cref="DifferenceTreeBuilderNotImplementedException"/> if necessary.<br/>
+        /// Intended for <see cref="IDifferenceTreeBuilder{T}"/> implementers. To avoid side effects, consumers should call <see cref="ComparerExtensions.CalculateDifferenceTree{T}(IComparer{T}, T, T, Func{DifferenceLocation, bool}, Action)"/> extension method instead.
+        /// </remarks>
+        /// <returns>The difference with its eventual location in the difference tree.</returns>
         public static IEnumerable<DifferenceLocation> TryBuildDifferenceTree<T>(this IComparer<T> comparer, T obj1, T obj2, IDifferenceTreeNode comparisonContext)
         {
             if (comparer is null)
@@ -82,7 +91,7 @@ namespace ObjectsComparer.DifferenceTreeExtensions
                 yield break;
             }
 
-            ThrowContextableComparerNotImplemented(comparisonContext, comparer.Settings, comparer, $"{nameof(IDifferenceTreeBuilder)}<{typeof(T).FullName}>");
+            ThrowDifferenceTreeBuilderNotImplemented(comparisonContext, comparer.Settings, comparer, $"{nameof(IDifferenceTreeBuilder)}<{typeof(T).FullName}>");
 
             var differences = comparer.CalculateDifferences(obj1, obj2);
 
@@ -113,7 +122,7 @@ namespace ObjectsComparer.DifferenceTreeExtensions
             return false;
         }
 
-        internal static void ThrowContextableComparerNotImplemented(IDifferenceTreeNode comparisonContext, ComparisonSettings comparisonSettings, object comparer, string unImplementedInterface)
+        internal static void ThrowDifferenceTreeBuilderNotImplemented(IDifferenceTreeNode comparisonContext, ComparisonSettings comparisonSettings, object comparer, string unImplementedInterface)
         {
             if (comparisonContext is null)
             {
@@ -136,15 +145,15 @@ namespace ObjectsComparer.DifferenceTreeExtensions
             if (comparisonSettings.ComparisonContextOptionsAction != null)
             {
                 var message = $"Because the comparison context was explicitly configured, the {comparer.GetType().FullName} must implement {unImplementedInterface} interface " +
-                    "or throwing the ContextableComparerNotImplementedException must be disabled.";
-                throw new ContextableComparerNotImplementedException(message);
+                    "or throwing the DifferenceTreeBuilderNotImplementedException must be disabled.";
+                throw new DifferenceTreeBuilderNotImplementedException(message);
             }
 
             if (comparisonSettings.ListComparisonOptionsAction != null)
             {
                 var message = $"Because the list comparison was explicitly configured, the {comparer.GetType().FullName} must implement {unImplementedInterface} interface " +
-                    "or throwing the ContextableComparerNotImplementedException must be disabled.";
-                throw new ContextableComparerNotImplementedException(message);
+                    "or throwing the DifferenceTreeBuilderNotImplementedException must be disabled.";
+                throw new DifferenceTreeBuilderNotImplementedException(message);
             }
 
             //TODO: Check DifferenceOptionsAction
@@ -152,8 +161,8 @@ namespace ObjectsComparer.DifferenceTreeExtensions
             if (HasComparisonContextImplicitRoot(comparisonContext) == false)
             {
                 var message = $"Because the comparison context was explicitly passed, the {comparer.GetType().FullName} must implement {unImplementedInterface} interface " +
-                    "or throwing the ContextableComparerNotImplementedException must be disabled.";
-                throw new ContextableComparerNotImplementedException(message);
+                    "or throwing the DifferenceTreeBuilderNotImplementedException must be disabled.";
+                throw new DifferenceTreeBuilderNotImplementedException(message);
             }
         }
     }

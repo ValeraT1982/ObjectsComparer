@@ -39,7 +39,7 @@ namespace ObjectsComparer
         public bool ThrowContextableComparerNotImplementedEnabled { get; private set; } = true;
 
         /// <summary>
-        /// Whether to throw the <see cref="ContextableComparerNotImplementedException"/> when the user requires comparison context but has a comparer that does not implement <see cref="IContextableComparer"/> or <see cref="IContextableComparer{T}"/>.
+        /// Whether to throw the <see cref="DifferenceTreeBuilderNotImplementedException"/> when the user requires comparison context but has a comparer that does not implement <see cref="IContextableComparer"/> or <see cref="IContextableComparer{T}"/>.
         /// Default = true.
         /// </summary>
         public ComparisonContextOptions ThrowContextableComparerNotImplemented(bool value)

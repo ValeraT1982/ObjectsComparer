@@ -101,7 +101,7 @@ namespace ObjectsComparer.Examples.Example4
                 }
             };
 
-            Assert.Throws<ContextableComparerNotImplementedException>(() => 
+            Assert.Throws<DifferenceTreeBuilderNotImplementedException>(() => 
             {
                 var rootNode = _comparer.CalculateDifferenceTree(formula1, formula2);
                 var differences = rootNode.GetDifferences(true).ToArray();
