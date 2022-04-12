@@ -69,7 +69,7 @@ namespace ObjectsComparer
                     yield break;
                 }
 
-                ContextableExtensions.ThrowDifferenceTreeBuilderNotImplemented(comparisonContext, Settings, comparer, $"{nameof(IDifferenceTreeBuilder)}<{type.FullName}>");
+                DifferenceTreeBuilderExtensions.ThrowDifferenceTreeBuilderNotImplemented(comparisonContext, Settings, comparer, $"{nameof(IDifferenceTreeBuilder)}<{type.FullName}>");
             }
 
             var genericType = comparerIsIContextableComparerT ? typeof(IDifferenceTreeBuilder<>).MakeGenericType(type) : typeof(IComparer<>).MakeGenericType(type);

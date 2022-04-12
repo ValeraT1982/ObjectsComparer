@@ -2,11 +2,10 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using ObjectsComparer.Exceptions;
 
 namespace ObjectsComparer.DifferenceTreeExtensions
 {
-    public static class ContextableExtensions
+    public static class DifferenceTreeBuilderExtensions
     {
         /// <summary>
         /// Builds the difference tree.
