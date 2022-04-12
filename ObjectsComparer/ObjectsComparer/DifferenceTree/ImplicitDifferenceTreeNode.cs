@@ -4,7 +4,7 @@ using System.Linq;
 namespace ObjectsComparer
 {
     /// <summary>
-    /// Root comparison context for cases where the consumer does not create and pass his own root context at the beginning of the comparison.
+    /// The root difference tree node for cases where consumers does not explicitly, directly or indirectly request a difference tree, this means that the difference tree will only be created as an auxiliary.
     /// </summary>
     internal class ImplicitDifferenceTreeNode : DifferenceTreeNodeBase
     {

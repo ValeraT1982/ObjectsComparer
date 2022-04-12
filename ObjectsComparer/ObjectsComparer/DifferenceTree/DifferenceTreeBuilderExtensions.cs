@@ -100,7 +100,10 @@ namespace ObjectsComparer.DifferenceTreeExtensions
             }
         }
 
-        static bool HasComparisonContextImplicitRoot(IDifferenceTreeNode comparisonContext)
+        /// <summary>
+        /// See <see cref="ImplicitDifferenceTreeNode"/>.
+        /// </summary>
+        static bool HasDifferenceTreeImplicitRoot(IDifferenceTreeNode comparisonContext)
         {
             if (comparisonContext is null)
             {
@@ -157,7 +160,7 @@ namespace ObjectsComparer.DifferenceTreeExtensions
 
             //TODO: Check DifferenceOptionsAction
 
-            if (HasComparisonContextImplicitRoot(comparisonContext) == false)
+            if (HasDifferenceTreeImplicitRoot(comparisonContext) == false)
             {
                 var message = $"Because the comparison context was explicitly passed, the {comparer.GetType().FullName} must implement {unImplementedInterface} interface " +
                     "or throwing the DifferenceTreeBuilderNotImplementedException must be disabled.";
