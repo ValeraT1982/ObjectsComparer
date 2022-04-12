@@ -89,7 +89,7 @@ namespace ObjectsComparer
             {
                 var indecies = IndexToCoordinates(array1, i);
 
-                foreach (var failure in _comparer.CalculateDifferences((T)array1.GetValue(indecies), (T)array2.GetValue(indecies), comparisonContext))
+                foreach (var failure in _comparer.TryBuildDifferenceTree((T)array1.GetValue(indecies), (T)array2.GetValue(indecies), comparisonContext))
                 {
                     failure.Difference.InsertPath($"[{string.Join(",", indecies)}]");
                     yield return failure;

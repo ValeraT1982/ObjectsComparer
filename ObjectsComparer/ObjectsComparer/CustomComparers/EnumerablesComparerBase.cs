@@ -80,7 +80,7 @@ namespace ObjectsComparer
                     var element2 = array2.First(elm2 => elm2 != null && object.Equals(element1Key, keyOptions.ElementKeyProviderAction(new ListElementKeyProviderArgs(elm2))));
                     var comparer = Factory.GetObjectsComparer(element1.GetType(), Settings, this);
 
-                    foreach (var failure in comparer.CalculateDifferences(element1.GetType(), element1, element2, elementComparisonContext))
+                    foreach (var failure in comparer.TryBuildDifferenceTree(element1.GetType(), element1, element2, elementComparisonContext))
                     {
                         failure.Difference.InsertPath($"[{formattedElement1Key}]");
                         yield return failure;
@@ -178,7 +178,7 @@ namespace ObjectsComparer
 
                 var comparer = Factory.GetObjectsComparer(array1[i].GetType(), Settings, this);
 
-                foreach (var failure in comparer.CalculateDifferences(array1[i].GetType(), array1[i], array2[i], elementComparisonContext))
+                foreach (var failure in comparer.TryBuildDifferenceTree(array1[i].GetType(), array1[i], array2[i], elementComparisonContext))
                 {
                     failure.Difference.InsertPath($"[{i}]");
                     yield return failure;

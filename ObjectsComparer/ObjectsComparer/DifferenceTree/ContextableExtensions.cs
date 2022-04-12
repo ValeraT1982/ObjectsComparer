@@ -8,11 +8,12 @@ namespace ObjectsComparer.DifferenceTreeExtensions
     public static class ContextableExtensions
     {
         /// <summary>
-        /// Calculates list of differences between objects. Accepts comparison context.
+        /// If <paramref name="comparer"/> is <see cref="IDifferenceTreeBuilder"/>, it looks for the difference, adds it to the difference tree and returns it, including its location.
+        /// If not, it only looks for the difference and returns it with empty location.
         /// </summary>
-        /// <remarks>The method is intended for IContextableComparer implementers.</remarks>
-        /// <returns>Current difference and its location in the difference tree.</returns>
-        public static IEnumerable<DifferenceLocation> CalculateDifferences(this IComparer comparer, Type type, object obj1, object obj2, IDifferenceTreeNode comparisonContext)
+        /// <remarks>Intended for <see cref="IDifferenceTreeBuilder{T}"/> implementers. To avoid side effects, consumers should call <see cref="ComparerExtensions.CalculateDifferenceTree(IComparer, Type, object, object, Func{DifferenceLocation, bool}, Action)"/> extension method instead.</remarks>
+        /// <returns>The location of the difference in the difference tree.</returns>
+        public static IEnumerable<DifferenceLocation> TryBuildDifferenceTree(this IComparer comparer, Type type, object obj1, object obj2, IDifferenceTreeNode comparisonContext)
         {
             if (comparer is null)
             {
@@ -52,10 +53,12 @@ namespace ObjectsComparer.DifferenceTreeExtensions
         }
 
         /// <summary>
-        /// Calculates list of differences between objects. Accepts comparison context.
+        /// If <paramref name="comparer"/> is <see cref="IDifferenceTreeBuilder"/>, it looks for the difference, adds it to the difference tree and returns it, including its location.
+        /// If not, it only looks for the difference and returns it.
         /// </summary>
-        /// <remarks>The method is intended for IContextableComparer implementers.</remarks>
-        public static IEnumerable<DifferenceLocation> CalculateDifferences<T>(this IComparer<T> comparer, T obj1, T obj2, IDifferenceTreeNode comparisonContext)
+        /// <remarks>Intended for <see cref="IDifferenceTreeBuilder{T}"/> implementers. To avoid side effects, consumers should call <see cref="ComparerExtensions.CalculateDifferenceTree{T}(IComparer{T}, T, T, Func{DifferenceLocation, bool}, Action)"/> extension method instead.</remarks>
+        /// <returns>The location of the difference in the difference tree.</returns>
+        public static IEnumerable<DifferenceLocation> TryBuildDifferenceTree<T>(this IComparer<T> comparer, T obj1, T obj2, IDifferenceTreeNode comparisonContext)
         {
             if (comparer is null)
             {

@@ -74,7 +74,7 @@ namespace ObjectsComparer.Tests
         //    var comparer = factory.GetObjectsComparer<string>();
         //    var rootCtx = ComparisonContextProvider.CreateRootContext();
 
-        //    var diffs =  comparer.CalculateDifferences("hello", "hi", rootCtx).ToArray();
+        //    var diffs =  comparer.TryBuildDifferenceTree("hello", "hi", rootCtx).ToArray();
         //}
 
         [Test]

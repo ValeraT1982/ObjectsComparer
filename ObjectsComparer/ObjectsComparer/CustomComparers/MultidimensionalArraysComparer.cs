@@ -32,7 +32,7 @@ namespace ObjectsComparer
             var enumerablesComparerType = typeof(MultidimensionalArrayComparer<>).MakeGenericType(typeInfo.GetElementType());
             var comparer = (IComparer)Activator.CreateInstance(enumerablesComparerType, Settings, this, Factory);
 
-            foreach (var difference in comparer.CalculateDifferences(type, obj1, obj2, comparisonContext))
+            foreach (var difference in comparer.TryBuildDifferenceTree(type, obj1, obj2, comparisonContext))
             {
                 yield return difference;
             }

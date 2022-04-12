@@ -8,7 +8,7 @@ namespace ObjectsComparer
     public static class ComparerExtensions
     {
         /// <summary>
-        /// Calculates list of differences between objects. Accepts comparison context.
+        /// XXX
         /// </summary>
         public static IDifferenceTreeNode CalculateDifferenceTree(this IComparer comparer, Type type, object obj1, object obj2, Func<DifferenceLocation, bool> findNextDifference = null, Action contextCompleted = null)
         {
@@ -25,9 +25,9 @@ namespace ObjectsComparer
             findNextDifference = findNextDifference ?? ((_) => true);
 
             //Anything but ImplicitComparisonContext (ImplicitDifferenceTreeNode).
-            var rootCtx = ComparisonContextProvider.CreateContext(comparer.Settings, ancestor: null);
+            var rootNode = ComparisonContextProvider.CreateContext(comparer.Settings, ancestor: null);
 
-            var differenceLocationList = comparer.CalculateDifferences(type, obj1, obj2, rootCtx);
+            var differenceLocationList = comparer.TryBuildDifferenceTree(type, obj1, obj2, rootNode);
 
             differenceLocationList.EnumerateConditional(
                 currentLocation => 
@@ -36,11 +36,11 @@ namespace ObjectsComparer
                 }, 
                 contextCompleted);
 
-            return rootCtx;
+            return rootNode;
         }
 
         /// <summary>
-        /// Calculates list of differences between objects. Accepts comparison context.
+        /// XXX
         /// </summary>
         public static IDifferenceTreeNode CalculateDifferenceTree<T>(this IComparer<T> comparer, T obj1, T obj2, Func<DifferenceLocation, bool> findNextDifference = null, Action contextCompleted = null)
         {
@@ -53,7 +53,7 @@ namespace ObjectsComparer
 
             var rootCtx = ComparisonContextProvider.CreateContext(comparer.Settings, ancestor: null);
 
-            var differenceLocationList = comparer.CalculateDifferences(obj1, obj2, rootCtx);
+            var differenceLocationList = comparer.TryBuildDifferenceTree(obj1, obj2, rootCtx);
 
             differenceLocationList.EnumerateConditional(
                 currentLocation =>

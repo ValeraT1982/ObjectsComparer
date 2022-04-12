@@ -59,16 +59,16 @@ namespace ObjectsComparer
 
         IEnumerable<DifferenceLocation> IDifferenceTreeBuilder<T>.BuildDifferenceTree(T obj1, T obj2, IDifferenceTreeNode comparisonContext)
         {
-            return CalculateDifferences(obj1, obj2, memberInfo: null, comparisonContext);
+            return BuildDifferenceTree(obj1, obj2, memberInfo: null, comparisonContext);
         }
 
         internal IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo)
         {
-            return CalculateDifferences(obj1, obj2, memberInfo, ComparisonContextProvider.CreateImplicitRootContext(Settings))
+            return BuildDifferenceTree(obj1, obj2, memberInfo, ComparisonContextProvider.CreateImplicitRootContext(Settings))
                 .Select(differenceLocation => differenceLocation.Difference);
         }
 
-        IEnumerable<DifferenceLocation> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo, IDifferenceTreeNode comparisonContext)
+        IEnumerable<DifferenceLocation> BuildDifferenceTree(T obj1, T obj2, MemberInfo memberInfo, IDifferenceTreeNode comparisonContext)
         {
             var comparer = memberInfo != null
                 ? OverridesCollection.GetComparer(memberInfo)
@@ -89,7 +89,7 @@ namespace ObjectsComparer
             var conditionalComparer = _conditionalComparers.FirstOrDefault(c => c.IsMatch(typeof(T), obj1, obj2));
             if (conditionalComparer != null)
             {
-                foreach (var difference in conditionalComparer.CalculateDifferences(typeof(T), obj1, obj2, comparisonContext))
+                foreach (var difference in conditionalComparer.TryBuildDifferenceTree(typeof(T), obj1, obj2, comparisonContext))
                 {
                     yield return difference;
                 }
@@ -143,7 +143,7 @@ namespace ObjectsComparer
                 {
                     var objectDataComparer = Factory.GetObjectsComparer(type, Settings, this);
 
-                    foreach (var failure in objectDataComparer.CalculateDifferences(type, value1, value2, memberContext))
+                    foreach (var failure in objectDataComparer.TryBuildDifferenceTree(type, value1, value2, memberContext))
                     {
                         failure.Difference.InsertPath(member.Name);
                         yield return failure;

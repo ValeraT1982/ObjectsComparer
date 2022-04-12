@@ -51,7 +51,7 @@ namespace ObjectsComparer
             var enumerablesComparerType = typeof(EnumerablesComparer<>).MakeGenericType(elementType);
             var comparer = (IComparer)Activator.CreateInstance(enumerablesComparerType, Settings, this, Factory);
 
-            foreach (var difference in comparer.CalculateDifferences(type, obj1, obj2, comparisonContext))
+            foreach (var difference in comparer.TryBuildDifferenceTree(type, obj1, obj2, comparisonContext))
             {
                 yield return difference;
             }
