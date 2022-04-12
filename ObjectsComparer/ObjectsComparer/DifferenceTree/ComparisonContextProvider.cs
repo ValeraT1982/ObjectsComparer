@@ -10,7 +10,10 @@ namespace ObjectsComparer
             return new DifferenceTreeNode(new DifferenceTreeNodeMember());
         }
 
-        internal static IDifferenceTreeNode CreateImplicitRootContext(ComparisonSettings comparisonSettings)
+        /// <summary>
+        /// Returns the root of the difference tree for cases where consumers do not explicitly, directly or indirectly request the difference tree, this means that the difference tree is created only as an auxiliary.
+        /// </summary>
+        public static IDifferenceTreeNode CreateImplicitRootContext(ComparisonSettings comparisonSettings)
         {            
             _ = comparisonSettings ?? throw new ArgumentNullException(nameof(comparisonSettings));
 
