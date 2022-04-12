@@ -19,13 +19,13 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings))
+            return BuildDifferenceTree(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings))
                 .Select(differeneLocation => differeneLocation.Difference);
         }
 
-        public IEnumerable<DifferenceLocation> CalculateDifferences(Type type, object obj1, object obj2, IDifferenceTreeNode listComparisonContext)
+        public IEnumerable<DifferenceLocation> BuildDifferenceTree(Type type, object obj1, object obj2, IDifferenceTreeNode listComparisonContext)
         {
-            Debug.WriteLine($"{GetType().Name}.{nameof(BuildDifferencesTree)}: {type.Name}");
+            Debug.WriteLine($"{GetType().Name}.{nameof(BuildDifferenceTree)}: {type.Name}");
 
             if (listComparisonContext is null)
             {
@@ -83,9 +83,9 @@ namespace ObjectsComparer
             }
         }
 
-        public IEnumerable<DifferenceLocation> BuildDifferencesTree(T obj1, T obj2, IDifferenceTreeNode listComparisonContext)
+        public IEnumerable<DifferenceLocation> BuildDifferenceTree(T obj1, T obj2, IDifferenceTreeNode listComparisonContext)
         {
-            return CalculateDifferences(((object)obj1 ?? obj2).GetType(), obj1, obj2, listComparisonContext);
+            return BuildDifferenceTree(((object)obj1 ?? obj2).GetType(), obj1, obj2, listComparisonContext);
         }
     }
 }

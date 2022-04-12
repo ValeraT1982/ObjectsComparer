@@ -31,7 +31,7 @@ namespace ObjectsComparer.ContextExtensions
 
             if (comparer is IDifferenceTreeBuilder contextableComparer)
             {
-                var differenceTreeNodeInfoList = contextableComparer.CalculateDifferences(type, obj1, obj2, comparisonContext);
+                var differenceTreeNodeInfoList = contextableComparer.BuildDifferenceTree(type, obj1, obj2, comparisonContext);
 
                 foreach (var differenceTreeNodeInfo in differenceTreeNodeInfoList)
                 {
@@ -69,7 +69,7 @@ namespace ObjectsComparer.ContextExtensions
 
             if (comparer is IDifferenceTreeBuilder<T> contextableComparer)
             {
-                var differenceTreeNodeInfoList = contextableComparer.BuildDifferencesTree(obj1, obj2, comparisonContext);
+                var differenceTreeNodeInfoList = contextableComparer.BuildDifferenceTree(obj1, obj2, comparisonContext);
 
                 foreach (var differenceTreeNodeInfo in differenceTreeNodeInfoList)
                 {

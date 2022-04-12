@@ -412,7 +412,7 @@ namespace ObjectsComparer.Tests
             var a2 = new MultidimensionalArrays { IntInt = null };
             var comparer = new Comparer<MultidimensionalArrays>();
 
-            var rootNode = comparer.CalculateDifferencesTree(a1, a2);
+            var rootNode = comparer.CalculateDifferenceTree(a1, a2);
             var differences = rootNode.GetDifferences(true).ToList();
             
             CollectionAssert.IsNotEmpty(differences);

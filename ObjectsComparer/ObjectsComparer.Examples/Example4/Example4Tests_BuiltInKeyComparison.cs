@@ -289,7 +289,7 @@ namespace ObjectsComparer.Examples.Example4
                     .FormatElementKey(formatKeyArgs => $"Id={formatKeyArgs.ElementKey}")));
 
             var comparer = new Comparer<Formula>(settings);
-            var rootDifferenceNode = comparer.CalculateDifferencesTree(formula1, formula2); 
+            var rootDifferenceNode = comparer.CalculateDifferenceTree(formula1, formula2); 
             var differences = rootDifferenceNode.GetDifferences(recursive: true).ToArray();
             bool isEqual = differences.Any() == false;
             ResultToOutput(isEqual, differences);

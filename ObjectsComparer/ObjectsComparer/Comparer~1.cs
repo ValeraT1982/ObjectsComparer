@@ -57,7 +57,7 @@ namespace ObjectsComparer
             return CalculateDifferences(obj1, obj2, memberInfo: null);
         }
 
-        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder<T>.BuildDifferencesTree(T obj1, T obj2, IDifferenceTreeNode comparisonContext)
+        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder<T>.BuildDifferenceTree(T obj1, T obj2, IDifferenceTreeNode comparisonContext)
         {
             return CalculateDifferences(obj1, obj2, memberInfo: null, comparisonContext);
         }

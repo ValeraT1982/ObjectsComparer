@@ -113,7 +113,7 @@ namespace ObjectsComparer.Tests
             settings.ConfigureListComparison(compareUnequalLists: true);
 
             var comparer = new Comparer(settings);
-            var rootNode = comparer.CalculateDifferencesTree(a1.GetType(), a1, a2);
+            var rootNode = comparer.CalculateDifferenceTree(a1.GetType(), a1, a2);
             var differences = rootNode.GetDifferences(true).ToList();
 
             Assert.AreEqual(4, differences.Count);
@@ -150,7 +150,7 @@ namespace ObjectsComparer.Tests
 
             var comparer = new Comparer(settings);
 
-            var rootNode = comparer.CalculateDifferencesTree(a1.GetType(), a1, a2);
+            var rootNode = comparer.CalculateDifferenceTree(a1.GetType(), a1, a2);
             var differences = rootNode.GetDifferences(true).ToList();
 
             Assert.AreEqual(2, differences.Count);

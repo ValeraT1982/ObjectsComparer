@@ -79,7 +79,7 @@ namespace ObjectsComparer.Tests
 
             var comparer = new Comparer();
 
-            var rootDiffenenceNode = comparer.CalculateDifferencesTree(typeof(object), (object)a1, (object)a2);
+            var rootDiffenenceNode = comparer.CalculateDifferenceTree(typeof(object), (object)a1, (object)a2);
             var calculateDifferences = rootDiffenenceNode.GetDifferences(true).ToArray();
 
             Assert.AreEqual(3, calculateDifferences.Count());
@@ -217,7 +217,7 @@ namespace ObjectsComparer.Tests
             var comparer = new Comparer();
             
 
-            var rootDifferenceNode = comparer.CalculateDifferencesTree(typeof(object), (object)a1, (object)a2);
+            var rootDifferenceNode = comparer.CalculateDifferenceTree(typeof(object), (object)a1, (object)a2);
             var calculateDifferences = rootDifferenceNode.GetDifferences(true);
 
             Assert.IsTrue(calculateDifferences.Any());

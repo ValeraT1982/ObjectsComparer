@@ -18,9 +18,9 @@ namespace ObjectsComparer
             get { return MemberInfoExtensions.GetMethodName<Comparer<object>>(x => x.CalculateDifferences(null, null)); }
         }
 
-        private static string BuildDifferencesTreeMethodName
+        private static string BuildDifferenceTreeMethodName
         {
-            get { return MemberInfoExtensions.GetMethodName<IDifferenceTreeBuilder<object>>(x => x.BuildDifferencesTree(null, null, null)); }
+            get { return MemberInfoExtensions.GetMethodName<IDifferenceTreeBuilder<object>>(x => x.BuildDifferenceTree(null, null, null)); }
         }
 
         /// <summary>
@@ -35,13 +35,13 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return AsContextableComparer().CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings))
+            return AsContextableComparer().BuildDifferenceTree(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings))
                 .Select(differenceLoccation => differenceLoccation.Difference);
         }
 
         IDifferenceTreeBuilder AsContextableComparer() => this;
 
-        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder.CalculateDifferences(Type type, object obj1, object obj2, IDifferenceTreeNode comparisonContext)
+        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder.BuildDifferenceTree(Type type, object obj1, object obj2, IDifferenceTreeNode comparisonContext)
         {
             if (comparisonContext is null)
             {
@@ -59,7 +59,7 @@ namespace ObjectsComparer
             {
                 if (comparer is IDifferenceTreeBuilder contextableComparer)
                 {
-                    var diffLocationList = contextableComparer.CalculateDifferences(type, obj1, obj2, comparisonContext);
+                    var diffLocationList = contextableComparer.BuildDifferenceTree(type, obj1, obj2, comparisonContext);
 
                     foreach (var diffLocation in diffLocationList)
                     {
@@ -73,7 +73,7 @@ namespace ObjectsComparer
             }
 
             var genericType = comparerIsIContextableComparerT ? typeof(IDifferenceTreeBuilder<>).MakeGenericType(type) : typeof(IComparer<>).MakeGenericType(type);
-            var genericMethodName = comparerIsIContextableComparerT ? BuildDifferencesTreeMethodName : CalculateDifferencesMethodName;
+            var genericMethodName = comparerIsIContextableComparerT ? BuildDifferenceTreeMethodName : CalculateDifferencesMethodName;
             var genericMethodParameterTypes = comparerIsIContextableComparerT ? new[] { type, type, typeof(IDifferenceTreeNode) } : new[] { type, type };            
             var genericMethod = genericType.GetTypeInfo().GetMethod(genericMethodName, genericMethodParameterTypes);
             var genericMethodParameters = comparerIsIContextableComparerT ? new[] { obj1, obj2, comparisonContext } : new[] { obj1, obj2 };

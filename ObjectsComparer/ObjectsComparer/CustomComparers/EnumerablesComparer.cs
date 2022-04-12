@@ -18,13 +18,13 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return AsContextable().CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings))
+            return AsContextable().BuildDifferenceTree(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings))
                 .Select(differenceLocation => differenceLocation.Difference);
         }
 
         IDifferenceTreeBuilder AsContextable() => this;
 
-        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder.CalculateDifferences(Type type, object obj1, object obj2, IDifferenceTreeNode listComparisonContext)
+        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder.BuildDifferenceTree(Type type, object obj1, object obj2, IDifferenceTreeNode listComparisonContext)
         {
             Debug.WriteLine($"{GetType().Name}.{nameof(CalculateDifferences)}: {type.Name}");
 

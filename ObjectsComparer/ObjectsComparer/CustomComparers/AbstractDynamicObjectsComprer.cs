@@ -15,13 +15,13 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return AsContextableComparer().CalculateDifferences(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings))
+            return AsContextableComparer().BuildDifferenceTree(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings))
                 .Select(differenceLocation => differenceLocation.Difference);
         }
 
-        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder<T>.BuildDifferencesTree(T obj1, T obj2, IDifferenceTreeNode comparisonContext)
+        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder<T>.BuildDifferenceTree(T obj1, T obj2, IDifferenceTreeNode comparisonContext)
         {
-            return AsContextableComparer().CalculateDifferences(typeof(T), obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings));
+            return AsContextableComparer().BuildDifferenceTree(typeof(T), obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings));
         }
 
         IDifferenceTreeBuilder AsContextableComparer()
@@ -29,7 +29,7 @@ namespace ObjectsComparer
             return this;
         }
 
-        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder.CalculateDifferences(Type type, object obj1, object obj2, IDifferenceTreeNode comparisonContext)
+        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder.BuildDifferenceTree(Type type, object obj1, object obj2, IDifferenceTreeNode comparisonContext)
         {
             var castedObject1 = (T)obj1;
             var castedObject2 = (T)obj2;

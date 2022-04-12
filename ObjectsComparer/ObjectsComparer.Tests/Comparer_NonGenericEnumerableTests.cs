@@ -187,7 +187,7 @@ namespace ObjectsComparer.Tests
 
             var comparer = new Comparer<A>(settings);
 
-            var rootNode = comparer.CalculateDifferencesTree(a1, a2);
+            var rootNode = comparer.CalculateDifferenceTree(a1, a2);
             var differences = rootNode.GetDifferences(true);
 
             CollectionAssert.IsNotEmpty(differences);

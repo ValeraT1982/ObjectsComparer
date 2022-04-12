@@ -120,7 +120,7 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual(1, differences.Count);
             Assert.IsTrue(differences.Any(d => d.MemberPath == "FieldSub1.Field1" && d.Value1 == "10" && d.Value2 == "8"));
 
-            var rootNode = comparer.CalculateDifferencesTree(typeof(object), (object)a1, (object)a2);
+            var rootNode = comparer.CalculateDifferenceTree(typeof(object), (object)a1, (object)a2);
             var treeDifferences = rootNode.GetDifferences(true).ToList();
             Assert.IsTrue(treeDifferences.Any(d => d.MemberPath == "FieldSub1.Field1" && d.Value1 == "10" && d.Value2 == "8"));
         }
@@ -296,7 +296,7 @@ namespace ObjectsComparer.Tests
             var obja1 = (object)a1;
             var obja2 = (object)a2;
 
-            var rootNode = comparer.CalculateDifferencesTree(((object)a1).GetType(), obja1, obja2);
+            var rootNode = comparer.CalculateDifferenceTree(((object)a1).GetType(), obja1, obja2);
             IEnumerable<Difference> diffs = rootNode.GetDifferences(true);
             var differences = diffs.ToArray();
 
@@ -345,7 +345,7 @@ namespace ObjectsComparer.Tests
             var obja1 = (object)a1;
             var obja2 = (object)a2;
 
-            var rootNode = comparer.CalculateDifferencesTree(((object)a1).GetType(), obja1, obja2);
+            var rootNode = comparer.CalculateDifferenceTree(((object)a1).GetType(), obja1, obja2);
             var calculateDifferences = rootNode.GetDifferences(true).ToList();
 
             Assert.AreEqual(1, calculateDifferences.Count);

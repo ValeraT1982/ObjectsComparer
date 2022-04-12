@@ -67,7 +67,7 @@ namespace ObjectsComparer.Examples.Example4
         }
 
         [Test]
-        public void CalculateDifferencesTree_Throw_ContextableComparerNotImplemented()
+        public void CalculateDifferenceTree_Throw_ContextableComparerNotImplemented()
         {            
             var formula1 = new Formula
             {
@@ -103,7 +103,7 @@ namespace ObjectsComparer.Examples.Example4
 
             Assert.Throws<ContextableComparerNotImplementedException>(() => 
             {
-                var rootNode = _comparer.CalculateDifferencesTree(formula1, formula2);
+                var rootNode = _comparer.CalculateDifferenceTree(formula1, formula2);
                 var differences = rootNode.GetDifferences(true).ToArray();
             });
         }
