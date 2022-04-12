@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using ObjectsComparer.Utils;
 using System.Collections;
-using ObjectsComparer.ContextExtensions;
+using ObjectsComparer.DifferenceTreeExtensions;
 
 namespace ObjectsComparer
 {

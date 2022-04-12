@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ObjectsComparer.ContextExtensions
+namespace ObjectsComparer.DifferenceTreeExtensions
 {
     /// <summary>
     /// The location of the difference in the difference tree.

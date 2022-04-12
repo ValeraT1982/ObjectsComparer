@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 
-namespace ObjectsComparer.ContextExtensions
+namespace ObjectsComparer.DifferenceTreeExtensions
 {
     public static class ContextableExtensions
     {

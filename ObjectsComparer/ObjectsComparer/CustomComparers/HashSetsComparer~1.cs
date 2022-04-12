@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ObjectsComparer.ContextExtensions;
+using ObjectsComparer.DifferenceTreeExtensions;
 using ObjectsComparer.Utils;
 
 namespace ObjectsComparer

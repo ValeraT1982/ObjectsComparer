@@ -2,7 +2,7 @@ using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using ObjectsComparer.Utils;
-using ObjectsComparer.ContextExtensions;
+using ObjectsComparer.DifferenceTreeExtensions;
 
 namespace ObjectsComparer
 {

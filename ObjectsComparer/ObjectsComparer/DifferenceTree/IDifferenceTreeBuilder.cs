@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ObjectsComparer.ContextExtensions
+namespace ObjectsComparer.DifferenceTreeExtensions
 {
     /// <summary>
     /// Builds the difference tree.

@@ -1,4 +1,4 @@
-﻿using ObjectsComparer.ContextExtensions;
+﻿using ObjectsComparer.DifferenceTreeExtensions;
 using ObjectsComparer.Exceptions;
 using System;
 using System.Collections.Generic;
