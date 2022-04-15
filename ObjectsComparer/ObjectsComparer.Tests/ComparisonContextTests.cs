@@ -7,6 +7,7 @@ using ObjectsComparer.Tests.TestClasses;
 using ObjectsComparer.Tests.Utils;
 using System.Reflection;
 using System.Diagnostics;
+using ObjectsComparer.Utils;
 
 namespace ObjectsComparer.Tests
 {
