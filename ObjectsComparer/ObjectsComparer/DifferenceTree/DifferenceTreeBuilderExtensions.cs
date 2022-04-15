@@ -8,15 +8,15 @@ namespace ObjectsComparer.DifferenceTreeExtensions
     public static class DifferenceTreeBuilderExtensions
     {
         /// <summary>
-        /// Builds the difference tree.
+        /// If possible, creates a difference tree.
         /// </summary>
         /// <remarks>
         /// If <paramref name="comparer"/> is <see cref="IDifferenceTreeBuilder"/>, it looks for the difference, adds it to the difference tree and returns it, including its location.
         /// If not, it only looks for the difference and returns it with empty location. <br/> 
-        /// It throws exception <see cref="DifferenceTreeBuilderNotImplementedException"/> if necessary. <br/>
+        /// It throws <see cref="DifferenceTreeBuilderNotImplementedException"/> exception if necessary. <br/>
         /// Intended for <see cref="IDifferenceTreeBuilder{T}"/> implementers. To avoid side effects, consumers should call <see cref="ComparerExtensions.CalculateDifferenceTree(IComparer, Type, object, object, Func{DifferenceLocation, bool}, Action)"/> extension method instead.
         /// </remarks>
-        /// <returns>The difference with its eventual location in the difference tree.</returns>
+        /// <returns>The differences with its eventual location in the difference tree.</returns>
         public static IEnumerable<DifferenceLocation> TryBuildDifferenceTree(this IComparer comparer, Type type, object obj1, object obj2, IDifferenceTreeNode currentNode)
         {
             if (comparer is null)
@@ -57,15 +57,15 @@ namespace ObjectsComparer.DifferenceTreeExtensions
         }
 
         /// <summary>
-        /// Builds the difference tree. <br/>
+        /// If possible, creates a difference tree.
         /// </summary>
         /// <remarks>
         /// If <paramref name="comparer"/> is <see cref="IDifferenceTreeBuilder"/>, it looks for the difference, adds it to the difference tree and returns it, including its location.
         /// If not, it only looks for the difference and returns it with empty location. <br/>
-        /// It throws exception <see cref="DifferenceTreeBuilderNotImplementedException"/> if necessary.<br/>
+        /// It throws <see cref="DifferenceTreeBuilderNotImplementedException"/> exception if necessary. <br/>
         /// Intended for <see cref="IDifferenceTreeBuilder{T}"/> implementers. To avoid side effects, consumers should call <see cref="ComparerExtensions.CalculateDifferenceTree{T}(IComparer{T}, T, T, Func{DifferenceLocation, bool}, Action)"/> extension method instead.
         /// </remarks>
-        /// <returns>The difference with its eventual location in the difference tree.</returns>
+        /// <returns>The differences with its eventual location in the difference tree.</returns>
         public static IEnumerable<DifferenceLocation> TryBuildDifferenceTree<T>(this IComparer<T> comparer, T obj1, T obj2, IDifferenceTreeNode comparisonContext)
         {
             if (comparer is null)
