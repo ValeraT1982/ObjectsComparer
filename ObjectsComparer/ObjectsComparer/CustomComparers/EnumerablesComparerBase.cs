@@ -16,15 +16,15 @@ namespace ObjectsComparer
         /// <summary>
         /// Selects calculation operation based on the current value of the <see cref="ListComparisonOptions.ElementSearchMode"/> property.
         /// </summary>
-        protected virtual IEnumerable<DifferenceLocation> CalculateDifferences<T>(IList<T> list1, IList<T> list2, IDifferenceTreeNode listComparisonContext, ListComparisonOptions listComparisonOptions)
+        protected virtual IEnumerable<DifferenceLocation> CalculateDifferences<T>(IList<T> list1, IList<T> list2, IDifferenceTreeNode listDifferenceTreeNode, ListComparisonOptions listComparisonOptions)
         {
             if (listComparisonOptions.ElementSearchMode == ListElementSearchMode.Key)
             {
-                return CalculateDifferencesByKey(list1, list2, listComparisonContext, listComparisonOptions);
+                return CalculateDifferencesByKey(list1, list2, listDifferenceTreeNode, listComparisonOptions);
             }
             else if (listComparisonOptions.ElementSearchMode == ListElementSearchMode.Index)
             {
-                return CalculateDifferencesByIndex(list1, list2, listComparisonContext, listComparisonOptions);
+                return CalculateDifferencesByIndex(list1, list2, listDifferenceTreeNode, listComparisonOptions);
             }
             else
             {
@@ -35,7 +35,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Calculates differences using <see cref="ListElementSearchMode.Key"/> comparison mode.
         /// </summary>
-        protected virtual IEnumerable<DifferenceLocation> CalculateDifferencesByKey<T>(IList<T> array1, IList<T> array2, IDifferenceTreeNode listComparisonContext, ListComparisonOptions listComparisonOptions)
+        protected virtual IEnumerable<DifferenceLocation> CalculateDifferencesByKey<T>(IList<T> array1, IList<T> array2, IDifferenceTreeNode listDifferenceTreeNode, ListComparisonOptions listComparisonOptions)
         {
             Debug.WriteLine($"{GetType().Name}.{nameof(CalculateDifferencesByKey)}: {array1?.GetType().Name}");
 
@@ -45,8 +45,7 @@ namespace ObjectsComparer
             for (int element1Index = 0; element1Index < array1.Count(); element1Index++)
             {
                 var element1 = array1[element1Index];
-                //var elementComparisonContext = new ComparisonContext(new ComparisonContextMember(), listComparisonContext);
-                var elementComparisonContext = ComparisonContextProvider.CreateContext(Settings, listComparisonContext);
+                var elementDifferenceTreeNode = DifferenceTreeNodeProvider.CreateNode(Settings, listDifferenceTreeNode);
 
                 if (element1 == null)
                 {
@@ -57,7 +56,7 @@ namespace ObjectsComparer
 
                     var nullElementIdentifier = keyOptions.GetNullElementIdentifier(new FormatNullElementIdentifierArgs(element1Index));
 
-                    yield return AddDifferenceToTree(new Difference($"[{nullElementIdentifier}]", string.Empty, string.Empty, DifferenceTypes.MissedElementInSecondObject), elementComparisonContext);
+                    yield return AddDifferenceToTree(new Difference($"[{nullElementIdentifier}]", string.Empty, string.Empty, DifferenceTypes.MissedElementInSecondObject), elementDifferenceTreeNode);
                     continue;
                 }
 
@@ -67,7 +66,7 @@ namespace ObjectsComparer
                 {
                     if (keyOptions.ThrowKeyNotFoundEnabled)
                     {
-                        throw new ElementKeyNotFoundException(element1, elementComparisonContext);
+                        throw new ElementKeyNotFoundException(element1, elementDifferenceTreeNode);
                     }
 
                     continue;
@@ -80,7 +79,7 @@ namespace ObjectsComparer
                     var element2 = array2.First(elm2 => elm2 != null && object.Equals(element1Key, keyOptions.ElementKeyProviderAction(new ListElementKeyProviderArgs(elm2))));
                     var comparer = Factory.GetObjectsComparer(element1.GetType(), Settings, this);
 
-                    foreach (var failure in comparer.TryBuildDifferenceTree(element1.GetType(), element1, element2, elementComparisonContext))
+                    foreach (var failure in comparer.TryBuildDifferenceTree(element1.GetType(), element1, element2, elementDifferenceTreeNode))
                     {
                         failure.Difference.InsertPath($"[{formattedElement1Key}]");
                         yield return failure;
@@ -89,15 +88,14 @@ namespace ObjectsComparer
                 else
                 {
                     var valueComparer1 = OverridesCollection.GetComparer(element1.GetType()) ?? DefaultValueComparer;
-                    yield return AddDifferenceToTree(new Difference($"[{formattedElement1Key}]", valueComparer1.ToString(element1), string.Empty, DifferenceTypes.MissedElementInSecondObject), elementComparisonContext);
+                    yield return AddDifferenceToTree(new Difference($"[{formattedElement1Key}]", valueComparer1.ToString(element1), string.Empty, DifferenceTypes.MissedElementInSecondObject), elementDifferenceTreeNode);
                 }
             }
 
             for (int element2Index = 0; element2Index < array2.Count(); element2Index++)
             {
                 var element2 = array2[element2Index];
-                //var elementComparisonContext = new ComparisonContext(new ComparisonContextMember(), listComparisonContext);
-                var elementComparisonContext = ComparisonContextProvider.CreateContext(Settings, listComparisonContext);
+                var elementDifferenceTreeNode = DifferenceTreeNodeProvider.CreateNode(Settings, listDifferenceTreeNode);
 
                 if (element2 == null)
                 {
@@ -108,7 +106,7 @@ namespace ObjectsComparer
 
                     var nullElementIdentifier = keyOptions.GetNullElementIdentifier(new FormatNullElementIdentifierArgs(element2Index));
 
-                    yield return AddDifferenceToTree(new Difference($"[{nullElementIdentifier}]", string.Empty, string.Empty, DifferenceTypes.MissedElementInFirstObject), elementComparisonContext);
+                    yield return AddDifferenceToTree(new Difference($"[{nullElementIdentifier}]", string.Empty, string.Empty, DifferenceTypes.MissedElementInFirstObject), elementDifferenceTreeNode);
                     continue;
                 }
 
@@ -118,7 +116,7 @@ namespace ObjectsComparer
                 {
                     if (keyOptions.ThrowKeyNotFoundEnabled)
                     {
-                        throw new ElementKeyNotFoundException(element2, elementComparisonContext);
+                        throw new ElementKeyNotFoundException(element2, elementDifferenceTreeNode);
                     }
 
                     continue;
@@ -128,7 +126,7 @@ namespace ObjectsComparer
                 {
                     var formattedElement2Key = keyOptions.GetFormattedElementKey(new FormatListElementKeyArgs(element2Index, element2Key, element2));
                     var valueComparer2 = OverridesCollection.GetComparer(element2.GetType()) ?? DefaultValueComparer;
-                    yield return AddDifferenceToTree(new Difference($"[{formattedElement2Key}]", string.Empty, valueComparer2.ToString(element2), DifferenceTypes.MissedElementInFirstObject), elementComparisonContext);
+                    yield return AddDifferenceToTree(new Difference($"[{formattedElement2Key}]", string.Empty, valueComparer2.ToString(element2), DifferenceTypes.MissedElementInFirstObject), elementDifferenceTreeNode);
                 }
             }
         }
@@ -136,7 +134,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Calculates differences using <see cref="ListElementSearchMode.Index"/> comparison mode.
         /// </summary>
-        protected virtual IEnumerable<DifferenceLocation> CalculateDifferencesByIndex<T>(IList<T> array1, IList<T> array2, IDifferenceTreeNode listComparisonContext, ListComparisonOptions listComparisonOptions)
+        protected virtual IEnumerable<DifferenceLocation> CalculateDifferencesByIndex<T>(IList<T> array1, IList<T> array2, IDifferenceTreeNode listDifferenceTreeNode, ListComparisonOptions listComparisonOptions)
         {
             Debug.WriteLine($"{GetType().Name}.{nameof(CalculateDifferencesByIndex)}: {array1?.GetType().Name}");
 
@@ -147,8 +145,7 @@ namespace ObjectsComparer
             //ToDo Extract type
             for (var i = 0; i < smallerCount; i++)
             {
-                //var elementComparisonContext = new ComparisonContext(new ComparisonContextMember(), listComparisonContext);
-                var elementComparisonContext = ComparisonContextProvider.CreateContext(Settings, listComparisonContext);
+                var elementDifferenceTreeNode = DifferenceTreeNodeProvider.CreateNode(Settings, listDifferenceTreeNode);
 
                 if (array1[i] == null && array2[i] == null)
                 {
@@ -160,25 +157,25 @@ namespace ObjectsComparer
 
                 if (array1[i] == null)
                 {
-                    yield return AddDifferenceToTree(new Difference($"[{i}]", string.Empty, valueComparer2.ToString(array2[i])), elementComparisonContext);
+                    yield return AddDifferenceToTree(new Difference($"[{i}]", string.Empty, valueComparer2.ToString(array2[i])), elementDifferenceTreeNode);
                     continue;
                 }
 
                 if (array2[i] == null)
                 {
-                    yield return AddDifferenceToTree(new Difference($"[{i}]", valueComparer1.ToString(array1[i]), string.Empty), elementComparisonContext);
+                    yield return AddDifferenceToTree(new Difference($"[{i}]", valueComparer1.ToString(array1[i]), string.Empty), elementDifferenceTreeNode);
                     continue;
                 }
 
                 if (array1[i].GetType() != array2[i].GetType())
                 {
-                    yield return AddDifferenceToTree(new Difference($"[{i}]", valueComparer1.ToString(array1[i]), valueComparer2.ToString(array2[i]), DifferenceTypes.TypeMismatch), elementComparisonContext);
+                    yield return AddDifferenceToTree(new Difference($"[{i}]", valueComparer1.ToString(array1[i]), valueComparer2.ToString(array2[i]), DifferenceTypes.TypeMismatch), elementDifferenceTreeNode);
                     continue;
                 }
 
                 var comparer = Factory.GetObjectsComparer(array1[i].GetType(), Settings, this);
 
-                foreach (var failure in comparer.TryBuildDifferenceTree(array1[i].GetType(), array1[i], array2[i], elementComparisonContext))
+                foreach (var failure in comparer.TryBuildDifferenceTree(array1[i].GetType(), array1[i], array2[i], elementDifferenceTreeNode))
                 {
                     failure.Difference.InsertPath($"[{i}]");
                     yield return failure;
@@ -200,8 +197,7 @@ namespace ObjectsComparer
                         value2: array2Count > array1Count ? valueComparer.ToString(largerArray[i]) : string.Empty,
                         differenceType: array1Count > array2Count ? DifferenceTypes.MissedElementInSecondObject : DifferenceTypes.MissedElementInFirstObject);
 
-                    //yield return AddDifferenceToComparisonContext(difference, new ComparisonContext(new ComparisonContextMember(), listComparisonContext));
-                    yield return AddDifferenceToTree(difference, ComparisonContextProvider.CreateContext(Settings, listComparisonContext));
+                    yield return AddDifferenceToTree(difference, DifferenceTreeNodeProvider.CreateNode(Settings, listDifferenceTreeNode));
                 }
             }
         }

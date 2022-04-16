@@ -8,14 +8,16 @@ using ObjectsComparer.Tests.Utils;
 using System.Reflection;
 using System.Diagnostics;
 using ObjectsComparer.Utils;
+using ObjectsComparer.DifferenceTreeExtensions;
+using ObjectsComparer.Exceptions;
 
 namespace ObjectsComparer.Tests
 {
     [TestFixture]
-    internal class ComparisonContextTests
+    internal class DifferenceTreeNodeTests
     {
         [Test]
-        public void ComparisonContextMember_Member_Correct_MemberName()
+        public void DifferenceTreeNodeMember_Member_Correct_MemberName()
         {
             var ctxMember = new DifferenceTreeNodeMember(name: "Property1");
             Assert.AreEqual("Property1", ctxMember.Name);
@@ -23,7 +25,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void ComparisonContextMember_Member_Correct_Member()
+        public void DifferenceTreeNodeMember_Member_Correct_Member()
         {
             var memberInfo = typeof(Address).GetMember(nameof(Address.Country)).Single();
             var ctxMember = new DifferenceTreeNodeMember(memberInfo, memberInfo.Name);
@@ -32,51 +34,50 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void CustomComparisonContext()
+        public void CustomDifferenceTreeNode()
         {            
             var settings = new ComparisonSettings();
-            var rootCtx = ComparisonContextProvider.CreateRootContext();
+            var rootNode = DifferenceTreeNodeProvider.CreateRootNode();
 
-            settings.ConfigureComparisonContext((currentContex, options) =>
+            settings.ConfigureDifferenceTree((currentNode, options) =>
             {
-                options.UseComparisonContextFactory(ctxMember => new CustomComparisonContext(ctxMember, rootCtx));
+                options.UseDifferenceTreeNodeFactory(ctxMember => new CustomDifferenceTreeNode(ctxMember, rootNode));
             });
             
-            var ctx = ComparisonContextProvider.CreateContext(settings, rootCtx, "Property1");
+            var ctx = DifferenceTreeNodeProvider.CreateNode(settings, rootNode, "Property1");
 
             Assert.AreEqual("Property1", ctx.Member.Name);
-            Assert.IsTrue(ctx.GetType() == typeof(CustomComparisonContext));
+            Assert.IsTrue(ctx.GetType() == typeof(CustomDifferenceTreeNode));
+            Assert.IsTrue(ctx.Ancestor == rootNode);
+        }
+
+        [Test]
+        public void CustomDifferenceTreeNodeMember()
+        {
+            var settings = new ComparisonSettings();
+            var rootCtx = DifferenceTreeNodeProvider.CreateRootNode();
+
+            settings.ConfigureDifferenceTree((currentContex, options) =>
+            {
+                options.UseDifferenceTreeNodeMemberFactory(defaultMember => new CustomDifferenceTreeNodeMember(defaultMember.Name));
+            });
+            
+            var ctx = DifferenceTreeNodeProvider.CreateNode(settings, rootCtx, "Property1");
+
+            Assert.AreEqual("Property1", ctx.Member.Name);
+            Assert.AreEqual(null, ctx.Member.Info);
+            Assert.IsTrue(ctx.Member.GetType() == typeof(CustomDifferenceTreeNodeMember));
             Assert.IsTrue(ctx.Ancestor == rootCtx);
         }
 
         [Test]
-        public void CustomComparisonContextMember()
+        public void TestThrowDifferenceTreeBuilderNotImplementedException()
         {
-            var settings = new ComparisonSettings();
-            var rootCtx = ComparisonContextProvider.CreateRootContext();
-
-            settings.ConfigureComparisonContext((currentContex, options) =>
-            {
-                options.UseComparisonContextMemberFactory(defaultMember => new CustomComparisonContextMember(defaultMember.Name));
-            });
-            
-            var ctx = ComparisonContextProvider.CreateContext(settings, rootCtx, "Property1");
-
-            Assert.AreEqual("Property1", ctx.Member.Name);
-            Assert.AreEqual(null, ctx.Member.Info);
-            Assert.IsTrue(ctx.Member.GetType() == typeof(CustomComparisonContextMember));
-            Assert.IsTrue(ctx.Ancestor == rootCtx);
+            var factory = new CustomComparersFactory();
+            var comparer = factory.GetObjectsComparer<string>();
+            var rootCtx = DifferenceTreeNodeProvider.CreateRootNode();
+            Assert.Throws<DifferenceTreeBuilderNotImplementedException>(() => comparer.TryBuildDifferenceTree("hello", "hi", rootCtx).ToArray());
         }
-
-        //[Test]
-        //public void ComparisonContextException()
-        //{
-        //    var factory = new CustomComparersFactory();
-        //    var comparer = factory.GetObjectsComparer<string>();
-        //    var rootCtx = ComparisonContextProvider.CreateRootContext();
-
-        //    var diffs =  comparer.TryBuildDifferenceTree("hello", "hi", rootCtx).ToArray();
-        //}
 
         [Test]
         public void EnumerateConditional()
@@ -176,17 +177,17 @@ namespace ObjectsComparer.Tests
         }
     }
 
-    class CustomComparisonContext : DifferenceTreeNodeBase
+    class CustomDifferenceTreeNode : DifferenceTreeNodeBase
     {
-        public CustomComparisonContext(IDifferenceTreeNodeMember member = null, IDifferenceTreeNode ancestor = null) : base(member, ancestor)
+        public CustomDifferenceTreeNode(IDifferenceTreeNodeMember member = null, IDifferenceTreeNode ancestor = null) : base(member, ancestor)
         {
 
         }
     }
 
-    class CustomComparisonContextMember : IDifferenceTreeNodeMember
+    class CustomDifferenceTreeNodeMember : IDifferenceTreeNodeMember
     {
-        public CustomComparisonContextMember(string memberName)
+        public CustomDifferenceTreeNodeMember(string memberName)
         {
             Name = memberName;
         }

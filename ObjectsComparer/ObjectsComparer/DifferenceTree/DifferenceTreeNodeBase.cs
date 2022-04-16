@@ -94,13 +94,13 @@ namespace ObjectsComparer
         {
             List<IDifferenceTreeNode> removeDescendants = new List<IDifferenceTreeNode>();
 
-            _descendants.ForEach(descendantContext =>
+            _descendants.ForEach(descendantNode =>
             {
-                descendantContext.Shrink();
+                descendantNode.Shrink();
 
-                if (descendantContext.HasDifferences(true) == false)
+                if (descendantNode.HasDifferences(true) == false)
                 {
-                    removeDescendants.Add(descendantContext);
+                    removeDescendants.Add(descendantNode);
                 }
             });
 

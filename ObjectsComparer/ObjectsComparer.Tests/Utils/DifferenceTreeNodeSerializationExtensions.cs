@@ -11,31 +11,31 @@ namespace ObjectsComparer.Tests.Utils
 {
     //TODO: Move ToJson to Core.
 
-    internal static class ComparisonContextSerializationExtensions
+    internal static class DifferenceTreeNodeSerializationExtensions
     {
         /// <summary>
         /// Serializes <see cref="DifferenceTreeNode"/> object to json string.
         /// </summary>
-        /// <param name="comparisonContext"></param>
+        /// <param name="differenceTreeNode"></param>
         /// <param name="skipEmptyList"></param>
         /// <param name="skipNullReference"></param>
         /// <returns></returns>
-        public static string ToJson(this DifferenceTreeNode comparisonContext, bool skipEmptyList = true, bool skipNullReference = true)
+        public static string ToJson(this DifferenceTreeNode differenceTreeNode, bool skipEmptyList = true, bool skipNullReference = true)
         {
-            return SerializeComparisonContext(comparisonContext, skipEmptyList, skipNullReference);
+            return SerializeDifferenceTreeNode(differenceTreeNode, skipEmptyList, skipNullReference);
         }
 
-        static string SerializeComparisonContext(DifferenceTreeNode context, bool skipEmptyList, bool skipNullReference)
+        static string SerializeDifferenceTreeNode(DifferenceTreeNode node, bool skipEmptyList, bool skipNullReference)
         {
             var settings = new JsonSerializerSettings()
             {
-                ContractResolver = new ComparisonContextContractResolver(skipEmptyList, skipNullReference),
+                ContractResolver = new DifferenceTreeNodeContractResolver(skipEmptyList, skipNullReference),
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
             };
             settings.Converters.Add(new StringEnumConverter { CamelCaseText = false });
             settings.Converters.Add(new MemberInfoConverter());
 
-            return JsonConvert.SerializeObject(context, Formatting.Indented, settings);
+            return JsonConvert.SerializeObject(node, Formatting.Indented, settings);
         }
 
         /// <summary>
@@ -61,12 +61,12 @@ namespace ObjectsComparer.Tests.Utils
             public override bool CanRead => false;
         }
 
-        class ComparisonContextContractResolver : DefaultContractResolver
+        class DifferenceTreeNodeContractResolver : DefaultContractResolver
         {
             readonly bool _skipEmptyList;
             readonly bool _skipNullReference;
 
-            public ComparisonContextContractResolver(bool skipEmptyList = true, bool skipNullReference = true)
+            public DifferenceTreeNodeContractResolver(bool skipEmptyList = true, bool skipNullReference = true)
             {
                 _skipEmptyList = skipEmptyList;
                 _skipNullReference = skipNullReference;

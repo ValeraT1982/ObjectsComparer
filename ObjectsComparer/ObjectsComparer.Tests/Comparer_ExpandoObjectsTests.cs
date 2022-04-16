@@ -101,7 +101,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void Hierarchy_CheckComparisonContext()
+        public void Hierarchy_CheckDifferenceTreeNode()
         {
             dynamic a1Sub1 = new ExpandoObject();
             a1Sub1.Field1 = 10;
@@ -283,7 +283,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void UseDefaultValuesWhenSubclassNotSpecified_CheckComparisonContext()
+        public void UseDefaultValuesWhenSubclassNotSpecified_CheckDifferenceTreeNode()
         {
             dynamic a1 = new ExpandoObject();
             a1.Field1 = new ExpandoObject();
@@ -324,7 +324,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void DifferenceWhenSubclassNotSpecified_CheckComparisonContext()
+        public void DifferenceWhenSubclassNotSpecified_CheckDifferenceTreeNode()
         {
             dynamic a1 = new ExpandoObject();
             a1.Field1 = new ExpandoObject();

@@ -13,9 +13,9 @@ namespace ObjectsComparer
         /// Calculates the difference tree.
         /// </summary>
         /// <param name="findNextDifference">Current comparison context. The return value tells whether to look for another difference. If the argument is null the process is looking for all the differences.</param>
-        /// <param name="contextCompleted">If the comparison process has been completed, this action will be invoked.</param>
+        /// <param name="differenceTreeCompleted">If the comparison process has been completed, this action will be invoked.</param>
         /// <returns>The root node of the difference tree.</returns>
-        public static IDifferenceTreeNode CalculateDifferenceTree(this IComparer comparer, Type type, object obj1, object obj2, Func<ComparisonContext, bool> findNextDifference = null, Action contextCompleted = null)
+        public static IDifferenceTreeNode CalculateDifferenceTree(this IComparer comparer, Type type, object obj1, object obj2, Func<ComparisonContext, bool> findNextDifference = null, Action differenceTreeCompleted = null)
         {
             if (comparer is null)
             {
@@ -30,7 +30,7 @@ namespace ObjectsComparer
             findNextDifference = findNextDifference ?? ((_) => true);
 
             //Anything but ImplicitComparisonContext (ImplicitDifferenceTreeNode).
-            var rootNode = ComparisonContextProvider.CreateContext(comparer.Settings, ancestor: null);
+            var rootNode = DifferenceTreeNodeProvider.CreateNode(comparer.Settings, ancestor: null);
 
             var differenceLocationList = comparer.TryBuildDifferenceTree(type, obj1, obj2, rootNode);
 
@@ -39,7 +39,7 @@ namespace ObjectsComparer
                 {
                     return findNextDifference(new ComparisonContext(rootNode, currentLocation.Difference, currentLocation.TreeNode));
                 },
-                contextCompleted);
+                differenceTreeCompleted);
 
             return rootNode;
         }
@@ -48,9 +48,9 @@ namespace ObjectsComparer
         /// Calculates the difference tree.
         /// </summary>
         /// <param name="findNextDifference">Current comparison context. The return value tells whether to look for another difference.</param>
-        /// <param name="contextCompleted">If the comparison process has been completed, this action will be invoked.</param>
+        /// <param name="differenceTreeCompleted">If the comparison process has been completed, this action will be invoked.</param>
         /// <returns>The root node of the difference tree.</returns>
-        public static IDifferenceTreeNode CalculateDifferenceTree<T>(this IComparer<T> comparer, T obj1, T obj2, Func<ComparisonContext, bool> findNextDifference = null, Action contextCompleted = null)
+        public static IDifferenceTreeNode CalculateDifferenceTree<T>(this IComparer<T> comparer, T obj1, T obj2, Func<ComparisonContext, bool> findNextDifference = null, Action differenceTreeCompleted = null)
         {
             if (comparer is null)
             {
@@ -59,7 +59,7 @@ namespace ObjectsComparer
 
             findNextDifference = findNextDifference ?? ((_) => true);
 
-            var rootNode = ComparisonContextProvider.CreateContext(comparer.Settings, ancestor: null);
+            var rootNode = DifferenceTreeNodeProvider.CreateNode(comparer.Settings, ancestor: null);
 
             var differenceLocationList = comparer.TryBuildDifferenceTree(obj1, obj2, rootNode);
 
@@ -68,7 +68,7 @@ namespace ObjectsComparer
                 {
                     return findNextDifference(new ComparisonContext(rootNode, currentLocation.Difference, currentLocation.TreeNode));
                 },
-                contextCompleted);
+                differenceTreeCompleted);
 
             return rootNode;
         }

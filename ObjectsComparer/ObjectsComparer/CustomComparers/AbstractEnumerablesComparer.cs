@@ -60,6 +60,6 @@ namespace ObjectsComparer
 
         public abstract bool IsMatch(Type type, object obj1, object obj2);
 
-        public abstract IEnumerable<DifferenceLocation> BuildDifferenceTree(Type type, object obj1, object obj2, IDifferenceTreeNode comparisonContext);
+        public abstract IEnumerable<DifferenceLocation> BuildDifferenceTree(Type type, object obj1, object obj2, IDifferenceTreeNode differenceTreeNode);
     }
 }

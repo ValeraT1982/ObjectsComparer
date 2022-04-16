@@ -19,17 +19,17 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return BuildDifferenceTree(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings))
+            return BuildDifferenceTree(type, obj1, obj2, DifferenceTreeNodeProvider.CreateImplicitRootNode(Settings))
                 .Select(differeneLocation => differeneLocation.Difference);
         }
 
-        public IEnumerable<DifferenceLocation> BuildDifferenceTree(Type type, object obj1, object obj2, IDifferenceTreeNode listComparisonContext)
+        public IEnumerable<DifferenceLocation> BuildDifferenceTree(Type type, object obj1, object obj2, IDifferenceTreeNode listDifferenceTreeNode)
         {
             Debug.WriteLine($"{GetType().Name}.{nameof(BuildDifferenceTree)}: {type.Name}");
 
-            if (listComparisonContext is null)
+            if (listDifferenceTreeNode is null)
             {
-                throw new ArgumentNullException(nameof(listComparisonContext));
+                throw new ArgumentNullException(nameof(listDifferenceTreeNode));
             }
 
             if (!type.InheritsFrom(typeof(IEnumerable<>)))
@@ -60,13 +60,13 @@ namespace ObjectsComparer
             var list2 = ((IEnumerable<T>)obj2).ToList();
 
             var listComparisonOptions = ListComparisonOptions.Default();
-            Settings.ListComparisonOptionsAction?.Invoke(listComparisonContext, listComparisonOptions);
+            Settings.ListComparisonOptionsAction?.Invoke(listDifferenceTreeNode, listComparisonOptions);
 
             if (list1.Count != list2.Count)
             {
                 if (!type.GetTypeInfo().IsArray)
                 {
-                    yield return AddDifferenceToTree(new Difference("", list1.Count().ToString(), list2.Count().ToString(), DifferenceTypes.NumberOfElementsMismatch), listComparisonContext);
+                    yield return AddDifferenceToTree(new Difference("", list1.Count().ToString(), list2.Count().ToString(), DifferenceTypes.NumberOfElementsMismatch), listDifferenceTreeNode);
                 }
 
                 if (listComparisonOptions.UnequalListsComparisonEnabled == false)
@@ -75,7 +75,7 @@ namespace ObjectsComparer
                 }
             }
 
-            var failrues = CalculateDifferences(list1, list2, listComparisonContext, listComparisonOptions);
+            var failrues = CalculateDifferences(list1, list2, listDifferenceTreeNode, listComparisonOptions);
 
             foreach (var failrue in failrues)
             {
@@ -83,9 +83,9 @@ namespace ObjectsComparer
             }
         }
 
-        public IEnumerable<DifferenceLocation> BuildDifferenceTree(T obj1, T obj2, IDifferenceTreeNode listComparisonContext)
+        public IEnumerable<DifferenceLocation> BuildDifferenceTree(T obj1, T obj2, IDifferenceTreeNode listDifferenceTreeNode)
         {
-            return BuildDifferenceTree(((object)obj1 ?? obj2).GetType(), obj1, obj2, listComparisonContext);
+            return BuildDifferenceTree(((object)obj1 ?? obj2).GetType(), obj1, obj2, listDifferenceTreeNode);
         }
     }
 }

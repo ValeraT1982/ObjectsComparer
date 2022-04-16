@@ -240,7 +240,7 @@ namespace ObjectsComparer.Examples.Example4
         }
 
         [Test]
-        public void List_Of_Different_Sizes_But_Is_Inequality_FormatKey_CheckComparisonContext()
+        public void List_Of_Different_Sizes_But_Is_Inequality_FormatKey_CheckDifferenceTreeNode()
         {
             var formula1 = new Formula
             {

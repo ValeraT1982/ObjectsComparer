@@ -57,18 +57,18 @@ namespace ObjectsComparer
             return CalculateDifferences(obj1, obj2, memberInfo: null);
         }
 
-        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder<T>.BuildDifferenceTree(T obj1, T obj2, IDifferenceTreeNode comparisonContext)
+        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder<T>.BuildDifferenceTree(T obj1, T obj2, IDifferenceTreeNode differenceTreeNode)
         {
-            return BuildDifferenceTree(obj1, obj2, memberInfo: null, comparisonContext);
+            return BuildDifferenceTree(obj1, obj2, memberInfo: null, differenceTreeNode);
         }
 
         internal IEnumerable<Difference> CalculateDifferences(T obj1, T obj2, MemberInfo memberInfo)
         {
-            return BuildDifferenceTree(obj1, obj2, memberInfo, ComparisonContextProvider.CreateImplicitRootContext(Settings))
+            return BuildDifferenceTree(obj1, obj2, memberInfo, DifferenceTreeNodeProvider.CreateImplicitRootNode(Settings))
                 .Select(differenceLocation => differenceLocation.Difference);
         }
 
-        IEnumerable<DifferenceLocation> BuildDifferenceTree(T obj1, T obj2, MemberInfo memberInfo, IDifferenceTreeNode comparisonContext)
+        IEnumerable<DifferenceLocation> BuildDifferenceTree(T obj1, T obj2, MemberInfo memberInfo, IDifferenceTreeNode differenceTreeNode)
         {
             var comparer = memberInfo != null
                 ? OverridesCollection.GetComparer(memberInfo)
@@ -80,7 +80,7 @@ namespace ObjectsComparer
                 comparer = comparer ?? DefaultValueComparer;
                 if (!comparer.Compare(obj1, obj2, Settings))
                 {
-                    yield return AddDifferenceToTree(new Difference(string.Empty, comparer.ToString(obj1), comparer.ToString(obj2)), comparisonContext);
+                    yield return AddDifferenceToTree(new Difference(string.Empty, comparer.ToString(obj1), comparer.ToString(obj2)), differenceTreeNode);
                 }
 
                 yield break;
@@ -89,7 +89,7 @@ namespace ObjectsComparer
             var conditionalComparer = _conditionalComparers.FirstOrDefault(c => c.IsMatch(typeof(T), obj1, obj2));
             if (conditionalComparer != null)
             {
-                foreach (var difference in conditionalComparer.TryBuildDifferenceTree(typeof(T), obj1, obj2, comparisonContext))
+                foreach (var difference in conditionalComparer.TryBuildDifferenceTree(typeof(T), obj1, obj2, differenceTreeNode))
                 {
                     yield return difference;
                 }
@@ -104,7 +104,7 @@ namespace ObjectsComparer
             {
                 if (!DefaultValueComparer.Compare(obj1, obj2, Settings))
                 {
-                    yield return AddDifferenceToTree(new Difference(string.Empty, DefaultValueComparer.ToString(obj1), DefaultValueComparer.ToString(obj2)), comparisonContext);
+                    yield return AddDifferenceToTree(new Difference(string.Empty, DefaultValueComparer.ToString(obj1), DefaultValueComparer.ToString(obj2)), differenceTreeNode);
                 }
 
                 yield break;
@@ -126,7 +126,7 @@ namespace ObjectsComparer
                     continue;
                 }
 
-                var memberContext = ComparisonContextProvider.CreateContext(Settings, comparisonContext, member);
+                var memberNode = DifferenceTreeNodeProvider.CreateNode(Settings, differenceTreeNode, member);
 
                 var valueComparer = DefaultValueComparer;
                 var hasCustomComparer = false;
@@ -143,7 +143,7 @@ namespace ObjectsComparer
                 {
                     var objectDataComparer = Factory.GetObjectsComparer(type, Settings, this);
 
-                    foreach (var failure in objectDataComparer.TryBuildDifferenceTree(type, value1, value2, memberContext))
+                    foreach (var failure in objectDataComparer.TryBuildDifferenceTree(type, value1, value2, memberNode))
                     {
                         failure.Difference.InsertPath(member.Name);
                         yield return failure;
@@ -154,7 +154,7 @@ namespace ObjectsComparer
 
                 if (!valueComparer.Compare(value1, value2, Settings))
                 {
-                    yield return AddDifferenceToTree(new Difference(member.Name, valueComparer.ToString(value1), valueComparer.ToString(value2)), memberContext);
+                    yield return AddDifferenceToTree(new Difference(member.Name, valueComparer.ToString(value1), valueComparer.ToString(value2)), memberNode);
                 }
             }
         }

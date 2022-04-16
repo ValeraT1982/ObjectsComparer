@@ -72,7 +72,7 @@ namespace ObjectsComparer
         /// <summary>
         /// Configures list comparison behavior, especially the type of the comparison. For more info, see <see cref="ListComparisonOptions"/>.
         /// </summary>
-        /// <param name="comparisonOptions">First parameter: Current list comparison context.</param>
+        /// <param name="comparisonOptions">First parameter: Current list node.</param>
         public ComparisonSettings ConfigureListComparison(Action<IDifferenceTreeNode, ListComparisonOptions> comparisonOptions)
         {
             if (comparisonOptions is null)
@@ -117,11 +117,16 @@ namespace ObjectsComparer
             });
         }
 
-        internal Action<IDifferenceTreeNode, ComparisonContextOptions> ComparisonContextOptionsAction { get; private set; }
+        internal Action<IDifferenceTreeNode, DifferenceTreeOptions> DifferenceTreeOptionsAction { get; private set; }
 
-        public void ConfigureComparisonContext(Action<IDifferenceTreeNode, ComparisonContextOptions> options)
+        /// <summary>
+        /// Configures the difference tree behavior, see <see cref="DifferenceTreeOptions"/>.
+        /// </summary>
+        /// <param name="options"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public void ConfigureDifferenceTree(Action<IDifferenceTreeNode, DifferenceTreeOptions> options)
         {
-            ComparisonContextOptionsAction = options ?? throw new ArgumentNullException(nameof(options));
+            DifferenceTreeOptionsAction = options ?? throw new ArgumentNullException(nameof(options));
         }
     }
 }

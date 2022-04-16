@@ -35,31 +35,31 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return AsContextableComparer().BuildDifferenceTree(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings))
+            return AsDifferenceTreeBuilder().BuildDifferenceTree(type, obj1, obj2, DifferenceTreeNodeProvider.CreateImplicitRootNode(Settings))
                 .Select(differenceLoccation => differenceLoccation.Difference);
         }
 
-        IDifferenceTreeBuilder AsContextableComparer() => this;
+        IDifferenceTreeBuilder AsDifferenceTreeBuilder() => this;
 
-        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder.BuildDifferenceTree(Type type, object obj1, object obj2, IDifferenceTreeNode comparisonContext)
+        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder.BuildDifferenceTree(Type type, object obj1, object obj2, IDifferenceTreeNode differenceTreeNode)
         {
-            if (comparisonContext is null)
+            if (differenceTreeNode is null)
             {
-                throw new ArgumentNullException(nameof(comparisonContext));
+                throw new ArgumentNullException(nameof(differenceTreeNode));
             }
 
             var getObjectsComparerMethod = typeof(IComparersFactory).GetTypeInfo().GetMethods().First(m => m.IsGenericMethod);
             var getObjectsComparerGenericMethod = getObjectsComparerMethod.MakeGenericMethod(type);
             var comparer = getObjectsComparerGenericMethod.Invoke(Factory, new object[] { Settings, this });
 
-            bool comparerIsIContextableComparerT = comparer.GetType().GetTypeInfo().GetInterfaces()
+            bool comparerIsDifferenceTreeBuilderT = comparer.GetType().GetTypeInfo().GetInterfaces()
                 .Any(intft => intft.GetTypeInfo().IsGenericType && intft.GetGenericTypeDefinition() == typeof(IDifferenceTreeBuilder<>));
 
-            if (comparerIsIContextableComparerT == false)
+            if (comparerIsDifferenceTreeBuilderT == false)
             {
-                if (comparer is IDifferenceTreeBuilder contextableComparer)
+                if (comparer is IDifferenceTreeBuilder differenceTreeBuilder)
                 {
-                    var diffLocationList = contextableComparer.BuildDifferenceTree(type, obj1, obj2, comparisonContext);
+                    var diffLocationList = differenceTreeBuilder.BuildDifferenceTree(type, obj1, obj2, differenceTreeNode);
 
                     foreach (var diffLocation in diffLocationList)
                     {
@@ -69,14 +69,14 @@ namespace ObjectsComparer
                     yield break;
                 }
 
-                DifferenceTreeBuilderExtensions.ThrowDifferenceTreeBuilderNotImplemented(comparisonContext, Settings, comparer, $"{nameof(IDifferenceTreeBuilder)}<{type.FullName}>");
+                DifferenceTreeBuilderExtensions.ThrowDifferenceTreeBuilderNotImplemented(differenceTreeNode, Settings, comparer, $"{nameof(IDifferenceTreeBuilder)}<{type.FullName}>");
             }
 
-            var genericType = comparerIsIContextableComparerT ? typeof(IDifferenceTreeBuilder<>).MakeGenericType(type) : typeof(IComparer<>).MakeGenericType(type);
-            var genericMethodName = comparerIsIContextableComparerT ? BuildDifferenceTreeMethodName : CalculateDifferencesMethodName;
-            var genericMethodParameterTypes = comparerIsIContextableComparerT ? new[] { type, type, typeof(IDifferenceTreeNode) } : new[] { type, type };            
+            var genericType = comparerIsDifferenceTreeBuilderT ? typeof(IDifferenceTreeBuilder<>).MakeGenericType(type) : typeof(IComparer<>).MakeGenericType(type);
+            var genericMethodName = comparerIsDifferenceTreeBuilderT ? BuildDifferenceTreeMethodName : CalculateDifferencesMethodName;
+            var genericMethodParameterTypes = comparerIsDifferenceTreeBuilderT ? new[] { type, type, typeof(IDifferenceTreeNode) } : new[] { type, type };            
             var genericMethod = genericType.GetTypeInfo().GetMethod(genericMethodName, genericMethodParameterTypes);
-            var genericMethodParameters = comparerIsIContextableComparerT ? new[] { obj1, obj2, comparisonContext } : new[] { obj1, obj2 };
+            var genericMethodParameters = comparerIsDifferenceTreeBuilderT ? new[] { obj1, obj2, differenceTreeNode } : new[] { obj1, obj2 };
 
             // ReSharper disable once PossibleNullReferenceException
             //return (IEnumerable<DifferenceLocation>)genericMethod.Invoke(comparer, genericMethodParameters);

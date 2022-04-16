@@ -406,7 +406,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void IntIntInequality7_CheckComparisonContext()
+        public void IntIntInequality7_CheckDifferenceTreeNode()
         {
             var a1 = new MultidimensionalArrays { IntInt = new int[0, 0] };
             var a2 = new MultidimensionalArrays { IntInt = null };

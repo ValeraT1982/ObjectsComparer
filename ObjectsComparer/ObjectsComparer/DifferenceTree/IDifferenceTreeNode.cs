@@ -9,52 +9,52 @@ namespace ObjectsComparer
     //TODO: Edit "Once the comparison process is completed, it is possible to traverse "
 
     /// <summary>
-    /// Context of comparison process. Each <see cref="IDifferenceTreeNode"/> instance wraps compared <see cref="Member"/>, which is typically property. Each context has its ancestor and descendants the same way as its compared <see cref="Member"/> has its ancestor and descendant members.
-    /// Once the comparison process is completed, it is possible to traverse the comparison context graph and see differences at particular members.
+    /// Node in the difference tree. Each instance of the node wraps compared <see cref="Member"/>, which is typically property. Each node has its ancestor and descendants the same way as its compared <see cref="Member"/> has its ancestor and descendant members.
+    /// Once the comparison process is finished (completed or uncompleted), it is possible to traverse the difference tree and see differences at particular members.
     /// </summary>
     public interface IDifferenceTreeNode
     {
         /// <summary>
-        /// Ancestor context.
+        /// Ancestor node.
         /// </summary>
         IDifferenceTreeNode Ancestor { get; set; }
 
         /// <summary>
-        /// Children contexts.
+        /// Children nodes.
         /// </summary>
         IEnumerable<IDifferenceTreeNode> Descendants { get; }
 
         /// <summary>
-        /// A list of differences directly related to the context.
+        /// A list of differences directly related to the node.
         /// </summary>
         IEnumerable<Difference> Differences { get; }
 
         /// <summary>
         /// Compared member, for more info see <see cref="IDifferenceTreeNodeMember"/>.
-        /// It should be null for the root context (the starting point of the comparison) and for the list element context. A list element context never has a member, but it has an ancestor context which is the list and that list has its member.
+        /// It should be null for the root node (the starting point of the comparison) and for the list element node. A list element node never has a member, but it has an ancestor node which is the list and that list has its member.
         /// </summary>
         IDifferenceTreeNodeMember Member { get; }
 
         /// <summary>
-        /// Adds descendant to the context.
+        /// Adds descendant to the node.
         /// </summary>
         /// <param name="descendant"></param>
         void AddDescendant(IDifferenceTreeNode descendant);
 
         /// <summary>
-        /// Adds the difference to the context.
+        /// Adds the difference to the node.
         /// </summary>
         /// <param name="difference"></param>
         void AddDifference(Difference difference);
 
         /// <summary>
-        /// Returns differences directly or indirectly related to the context.
+        /// Returns differences directly or indirectly related to the node.
         /// </summary>
         /// <param name="recursive">If value is true, it also looks for <see cref="Differences"/> in <see cref="Descendants"/>.</param>
         IEnumerable<Difference> GetDifferences(bool recursive = true);
 
         /// <summary>
-        /// Whether there are differences directly or indirectly related to the context.
+        /// Whether there are differences directly or indirectly related to the node.
         /// </summary>
         /// <param name="recursive">If value is true, it also looks for <see cref="Differences"/> in <see cref="Descendants"/>.</param>
         bool HasDifferences(bool recursive);

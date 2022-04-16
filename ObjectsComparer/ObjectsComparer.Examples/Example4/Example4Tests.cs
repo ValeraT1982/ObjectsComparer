@@ -67,7 +67,7 @@ namespace ObjectsComparer.Examples.Example4
         }
 
         [Test]
-        public void CalculateDifferenceTree_Throw_ContextableComparerNotImplemented()
+        public void CalculateDifferenceTree_Throw_DifferenceBuilderNotImplemented()
         {            
             var formula1 = new Formula
             {

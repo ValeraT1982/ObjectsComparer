@@ -13,22 +13,22 @@ namespace ObjectsComparer
         {
         }
 
-        public IEnumerable<DifferenceLocation> BuildDifferenceTree(T obj1, T obj2, IDifferenceTreeNode comparisonContext)
+        public IEnumerable<DifferenceLocation> BuildDifferenceTree(T obj1, T obj2, IDifferenceTreeNode differenceTreeNode)
         {
-            return BuildDifferenceTree(typeof(T), obj1, obj2, comparisonContext);
+            return BuildDifferenceTree(typeof(T), obj1, obj2, differenceTreeNode);
         }
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return BuildDifferenceTree(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings))
+            return BuildDifferenceTree(type, obj1, obj2, DifferenceTreeNodeProvider.CreateImplicitRootNode(Settings))
                 .Select(differenceLocation => differenceLocation.Difference);
         }
 
-        public IEnumerable<DifferenceLocation> BuildDifferenceTree(Type type, object obj1, object obj2, IDifferenceTreeNode comparisonContext)
+        public IEnumerable<DifferenceLocation> BuildDifferenceTree(Type type, object obj1, object obj2, IDifferenceTreeNode differenceTreeNode)
         {
-            if (comparisonContext is null)
+            if (differenceTreeNode is null)
             {
-                throw new ArgumentNullException(nameof(comparisonContext));
+                throw new ArgumentNullException(nameof(differenceTreeNode));
             }
 
             if (!type.InheritsFrom(typeof(HashSet<>)))
@@ -65,7 +65,7 @@ namespace ObjectsComparer
                 {
                     var difference = AddDifferenceToTree(
                         new Difference("", valueComparer.ToString(element), string.Empty, DifferenceTypes.MissedElementInSecondObject), 
-                        comparisonContext);
+                        differenceTreeNode);
 
                     yield return difference;
                 }
@@ -76,7 +76,7 @@ namespace ObjectsComparer
                 if (!hashSet1.Contains(element))
                 {
                     var difference = AddDifferenceToTree(new Difference("", string.Empty, valueComparer.ToString(element),
-                        DifferenceTypes.MissedElementInFirstObject), comparisonContext);
+                        DifferenceTypes.MissedElementInFirstObject), differenceTreeNode);
 
                     yield return difference;
                 }

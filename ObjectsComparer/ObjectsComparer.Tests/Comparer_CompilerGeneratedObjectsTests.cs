@@ -62,7 +62,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void MissedFields_CheckComparisonContext()
+        public void MissedFields_CheckDifferenceTreeNode()
         {
             dynamic a1 = new
             {
@@ -200,7 +200,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void NullAndMissedMemberAreNotEqual_CheckComparisonContext()
+        public void NullAndMissedMemberAreNotEqual_CheckDifferenceTreeNode()
         {
             dynamic a1 = new
             {

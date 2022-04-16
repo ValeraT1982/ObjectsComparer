@@ -15,21 +15,21 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return AsContextableComparer().BuildDifferenceTree(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings))
+            return AsDifferenceTreeBuilder().BuildDifferenceTree(type, obj1, obj2, DifferenceTreeNodeProvider.CreateImplicitRootNode(Settings))
                 .Select(differenceLocation => differenceLocation.Difference);
         }
 
-        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder<T>.BuildDifferenceTree(T obj1, T obj2, IDifferenceTreeNode comparisonContext)
+        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder<T>.BuildDifferenceTree(T obj1, T obj2, IDifferenceTreeNode differenceTreeNode)
         {
-            return AsContextableComparer().BuildDifferenceTree(typeof(T), obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings));
+            return AsDifferenceTreeBuilder().BuildDifferenceTree(typeof(T), obj1, obj2, DifferenceTreeNodeProvider.CreateImplicitRootNode(Settings));
         }
 
-        IDifferenceTreeBuilder AsContextableComparer()
+        IDifferenceTreeBuilder AsDifferenceTreeBuilder()
         {
             return this;
         }
 
-        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder.BuildDifferenceTree(Type type, object obj1, object obj2, IDifferenceTreeNode comparisonContext)
+        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder.BuildDifferenceTree(Type type, object obj1, object obj2, IDifferenceTreeNode differenceTreeNode)
         {
             var castedObject1 = (T)obj1;
             var castedObject2 = (T)obj2;
@@ -58,7 +58,7 @@ namespace ObjectsComparer
                     TryGetMember(castedObject1, propertyKey, out member2);
                 }
 
-                var keyComparisonContext = ComparisonContextProvider.CreateContext(Settings, comparisonContext, member1 ?? member2, propertyKey);
+                var keyDifferenceTreeNode = DifferenceTreeNodeProvider.CreateNode(Settings, differenceTreeNode, member1 ?? member2, propertyKey);
 
                 var propertyType = (value1 ?? value2)?.GetType() ?? typeof(object);
                 var customComparer = OverridesCollection.GetComparer(propertyType) ??
@@ -84,7 +84,7 @@ namespace ObjectsComparer
                     {
                         var difference = AddDifferenceToTree(
                             new Difference(propertyKey, string.Empty, valueComparer.ToString(value2), DifferenceTypes.MissedMemberInFirstObject),
-                            keyComparisonContext);
+                            keyDifferenceTreeNode);
 
                         yield return difference;
                         continue;
@@ -94,7 +94,7 @@ namespace ObjectsComparer
                     {
                         var difference = AddDifferenceToTree(
                             new Difference(propertyKey, valueComparer.ToString(value1), string.Empty, DifferenceTypes.MissedMemberInSecondObject),
-                            keyComparisonContext);
+                            keyDifferenceTreeNode);
 
                         yield return difference;
                         continue;
@@ -109,7 +109,7 @@ namespace ObjectsComparer
 
                     var difference = AddDifferenceToTree(
                         new Difference(propertyKey, valueComparer.ToString(value1), valueComparer2.ToString(value2), DifferenceTypes.TypeMismatch),
-                        keyComparisonContext);
+                        keyDifferenceTreeNode);
 
                     yield return difference;
                     continue;
@@ -125,7 +125,7 @@ namespace ObjectsComparer
 
                     var difference = AddDifferenceToTree(
                         new Difference(propertyKey, valueComparer.ToString(value1), valueComparer2.ToString(value2), DifferenceTypes.TypeMismatch),
-                        keyComparisonContext);
+                        keyDifferenceTreeNode);
 
                     yield return difference;
                     continue;
@@ -137,7 +137,7 @@ namespace ObjectsComparer
                     {
                         var differenceLocation = AddDifferenceToTree(
                             new Difference(propertyKey, customComparer.ToString(value1), customComparer.ToString(value2)),
-                            keyComparisonContext);
+                            keyDifferenceTreeNode);
 
                         yield return differenceLocation;
                     }
@@ -146,7 +146,7 @@ namespace ObjectsComparer
                 }
 
                 var comparer = Factory.GetObjectsComparer(propertyType, Settings, this);
-                foreach (var failure in comparer.TryBuildDifferenceTree(propertyType, value1, value2, comparisonContext))
+                foreach (var failure in comparer.TryBuildDifferenceTree(propertyType, value1, value2, differenceTreeNode))
                 {
                     failure.Difference.InsertPath(propertyKey);
                     yield return failure;

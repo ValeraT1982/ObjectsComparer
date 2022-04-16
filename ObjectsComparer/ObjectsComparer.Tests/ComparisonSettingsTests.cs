@@ -9,8 +9,6 @@ using System.Reflection;
 
 namespace ObjectsComparer.Tests
 {
-    //NullAndMissedMemberAreNotEqual_CheckComparisonContext
-
     [TestFixture]
     public class ComparisonSettingsTests
     {
@@ -66,7 +64,7 @@ namespace ObjectsComparer.Tests
             //Client side.
             var settings = new ComparisonSettings();
 
-            settings.ConfigureListComparison((curentContext, listOptions) =>
+            settings.ConfigureListComparison((curentNode, listOptions) =>
             {
                 listOptions.CompareUnequalLists(true);
 
@@ -76,7 +74,7 @@ namespace ObjectsComparer.Tests
                     keyOptions.ThrowKeyNotFound(false);
                 });
 
-                var currentMember = curentContext.Member;
+                var currentMember = curentNode.Member;
             });
 
             //Component side.

@@ -16,11 +16,11 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
-            return BuildDifferenceTree(type, obj1, obj2, ComparisonContextProvider.CreateImplicitRootContext(Settings))
+            return BuildDifferenceTree(type, obj1, obj2, DifferenceTreeNodeProvider.CreateImplicitRootNode(Settings))
                 .Select(differenceLocation => differenceLocation.Difference); 
         }
 
-        public override IEnumerable<DifferenceLocation> BuildDifferenceTree(Type type, object obj1, object obj2, IDifferenceTreeNode comparisonContext)
+        public override IEnumerable<DifferenceLocation> BuildDifferenceTree(Type type, object obj1, object obj2, IDifferenceTreeNode differenceTreeNode)
         {
             if (obj1 == null && obj2 == null)
             {
@@ -40,7 +40,7 @@ namespace ObjectsComparer
             var enumerablesComparerType = typeof(HashSetsComparer<>).MakeGenericType(elementType);
             var comparer = (IComparer)Activator.CreateInstance(enumerablesComparerType, Settings, this, Factory);
 
-            foreach (var difference in comparer.TryBuildDifferenceTree(type, obj1, obj2, comparisonContext))
+            foreach (var difference in comparer.TryBuildDifferenceTree(type, obj1, obj2, differenceTreeNode))
             {
                 yield return difference;
             }
