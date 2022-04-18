@@ -81,26 +81,26 @@ namespace ObjectsComparer.Tests.Utils
                     property.ShouldSerialize =
                         instance =>
                         {
-                            DifferenceTreeNode ctx = (DifferenceTreeNode)instance;
+                            DifferenceTreeNode treeNode = (DifferenceTreeNode)instance;
 
                             if (property.PropertyName == nameof(DifferenceTreeNode.Descendants))
                             {
-                                return _skipEmptyList == false || ctx.Descendants.Any();
+                                return _skipEmptyList == false || treeNode.Descendants.Any();
                             }
 
                             if (property.PropertyName == nameof(DifferenceTreeNode.Differences))
                             {
-                                return _skipEmptyList == false || ctx.Differences.Any();
+                                return _skipEmptyList == false || treeNode.Differences.Any();
                             }
 
                             if (property.PropertyName == nameof(DifferenceTreeNode.Member))
                             {
-                                return _skipNullReference == false || ctx.Member != null;
+                                return _skipNullReference == false || treeNode.Member != null;
                             }
 
                             if (property.PropertyName == nameof(DifferenceTreeNode.Ancestor))
                             {
-                                return _skipNullReference == false || ctx.Ancestor != null;
+                                return _skipNullReference == false || treeNode.Ancestor != null;
                             }
 
                             return true;

@@ -79,8 +79,8 @@ namespace ObjectsComparer.Tests
 
             //Component side.
             var listComparisonOptions = ListComparisonOptions.Default();
-            var ctx = new DifferenceTreeNode();
-            settings.ListComparisonOptionsAction(ctx, listComparisonOptions);
+            var currentNode = new DifferenceTreeNode();
+            settings.ListComparisonOptionsAction(currentNode, listComparisonOptions);
             var listElementComparisonByKeyOptions = ListElementComparisonByKeyOptions.Default();
             listComparisonOptions.KeyOptionsAction(listElementComparisonByKeyOptions);
 

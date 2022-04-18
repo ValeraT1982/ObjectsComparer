@@ -15,7 +15,7 @@ namespace ObjectsComparer.DifferenceTreeExtensions
         /// It throws <see cref="DifferenceTreeBuilderNotImplementedException"/> exception if necessary. <br/>
         /// Intended for <see cref="IDifferenceTreeBuilder{T}"/> implementers. To avoid side effects, consumers should call <see cref="ComparerExtensions.CalculateDifferenceTree(IComparer, Type, object, object, Func{DifferenceLocation, bool}, Action)"/> extension method instead.
         /// </remarks>
-        /// <returns>The differences with its eventual location in the difference tree.</returns>
+        /// <returns>The differences with their eventual location in the difference tree.</returns>
         public static IEnumerable<DifferenceLocation> TryBuildDifferenceTree(this IComparer comparer, Type type, object obj1, object obj2, IDifferenceTreeNode currentNode)
         {
             if (comparer is null)
@@ -63,7 +63,7 @@ namespace ObjectsComparer.DifferenceTreeExtensions
         /// It throws <see cref="DifferenceTreeBuilderNotImplementedException"/> exception if necessary. <br/>
         /// Intended for <see cref="IDifferenceTreeBuilder{T}"/> implementers. To avoid side effects, consumers should call <see cref="ComparerExtensions.CalculateDifferenceTree{T}(IComparer{T}, T, T, Func{DifferenceLocation, bool}, Action)"/> extension method instead.
         /// </remarks>
-        /// <returns>The differences with its eventual location in the difference tree.</returns>
+        /// <returns>The differences with their eventual location in the difference tree.</returns>
         public static IEnumerable<DifferenceLocation> TryBuildDifferenceTree<T>(this IComparer<T> comparer, T obj1, T obj2, IDifferenceTreeNode differenceTreeNode)
         {
             if (comparer is null)

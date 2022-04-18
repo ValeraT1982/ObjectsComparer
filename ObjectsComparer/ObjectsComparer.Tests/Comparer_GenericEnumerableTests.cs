@@ -304,9 +304,9 @@ namespace ObjectsComparer.Tests
                 .CompareUnequalLists(true)
                 .CompareElementsByKey(keyOptions => keyOptions.ThrowKeyNotFound(false)));
 
-            settings.ConfigureListComparison((ctx, options) => 
+            settings.ConfigureListComparison((currentNode, options) => 
             {
-                if (ctx.Member.Name == "TrvaleAdresy") 
+                if (currentNode.Member.Name == "TrvaleAdresy") 
                 {
                     options.CompareElementsByKey();
                 }

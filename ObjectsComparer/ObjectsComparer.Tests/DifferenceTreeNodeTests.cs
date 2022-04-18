@@ -19,18 +19,18 @@ namespace ObjectsComparer.Tests
         [Test]
         public void DifferenceTreeNodeMember_Member_Correct_MemberName()
         {
-            var ctxMember = new DifferenceTreeNodeMember(name: "Property1");
-            Assert.AreEqual("Property1", ctxMember.Name);
-            Assert.AreEqual(null, ctxMember.Info);
+            var treeNodeMember = new DifferenceTreeNodeMember(name: "Property1");
+            Assert.AreEqual("Property1", treeNodeMember.Name);
+            Assert.AreEqual(null, treeNodeMember.Info);
         }
 
         [Test]
         public void DifferenceTreeNodeMember_Member_Correct_Member()
         {
             var memberInfo = typeof(Address).GetMember(nameof(Address.Country)).Single();
-            var ctxMember = new DifferenceTreeNodeMember(memberInfo, memberInfo.Name);
-            Assert.AreEqual(nameof(Address.Country), ctxMember.Info.Name);
-            Assert.AreEqual(nameof(Address.Country), ctxMember.Name);
+            var treeNodeMember = new DifferenceTreeNodeMember(memberInfo, memberInfo.Name);
+            Assert.AreEqual(nameof(Address.Country), treeNodeMember.Info.Name);
+            Assert.AreEqual(nameof(Address.Country), treeNodeMember.Name);
         }
 
         [Test]
@@ -41,33 +41,33 @@ namespace ObjectsComparer.Tests
 
             settings.ConfigureDifferenceTree((currentNode, options) =>
             {
-                options.UseDifferenceTreeNodeFactory(ctxMember => new CustomDifferenceTreeNode(ctxMember, rootNode));
+                options.UseDifferenceTreeNodeFactory(treeNodeMember => new CustomDifferenceTreeNode(treeNodeMember, rootNode));
             });
             
-            var ctx = DifferenceTreeNodeProvider.CreateNode(settings, rootNode, "Property1");
+            var treeNode = DifferenceTreeNodeProvider.CreateNode(settings, rootNode, "Property1");
 
-            Assert.AreEqual("Property1", ctx.Member.Name);
-            Assert.IsTrue(ctx.GetType() == typeof(CustomDifferenceTreeNode));
-            Assert.IsTrue(ctx.Ancestor == rootNode);
+            Assert.AreEqual("Property1", treeNode.Member.Name);
+            Assert.IsTrue(treeNode.GetType() == typeof(CustomDifferenceTreeNode));
+            Assert.IsTrue(treeNode.Ancestor == rootNode);
         }
 
         [Test]
         public void CustomDifferenceTreeNodeMember()
         {
             var settings = new ComparisonSettings();
-            var rootCtx = DifferenceTreeNodeProvider.CreateRootNode();
+            var rootNode = DifferenceTreeNodeProvider.CreateRootNode();
 
             settings.ConfigureDifferenceTree((currentContex, options) =>
             {
                 options.UseDifferenceTreeNodeMemberFactory(defaultMember => new CustomDifferenceTreeNodeMember(defaultMember.Name));
             });
             
-            var ctx = DifferenceTreeNodeProvider.CreateNode(settings, rootCtx, "Property1");
+            var treeNode = DifferenceTreeNodeProvider.CreateNode(settings, rootNode, "Property1");
 
-            Assert.AreEqual("Property1", ctx.Member.Name);
-            Assert.AreEqual(null, ctx.Member.Info);
-            Assert.IsTrue(ctx.Member.GetType() == typeof(CustomDifferenceTreeNodeMember));
-            Assert.IsTrue(ctx.Ancestor == rootCtx);
+            Assert.AreEqual("Property1", treeNode.Member.Name);
+            Assert.AreEqual(null, treeNode.Member.Info);
+            Assert.IsTrue(treeNode.Member.GetType() == typeof(CustomDifferenceTreeNodeMember));
+            Assert.IsTrue(treeNode.Ancestor == rootNode);
         }
 
         [Test]
@@ -75,8 +75,8 @@ namespace ObjectsComparer.Tests
         {
             var factory = new CustomComparersFactory();
             var comparer = factory.GetObjectsComparer<string>();
-            var rootCtx = DifferenceTreeNodeProvider.CreateRootNode();
-            Assert.Throws<DifferenceTreeBuilderNotImplementedException>(() => comparer.TryBuildDifferenceTree("hello", "hi", rootCtx).ToArray());
+            var rootNode = DifferenceTreeNodeProvider.CreateRootNode();
+            Assert.Throws<DifferenceTreeBuilderNotImplementedException>(() => comparer.TryBuildDifferenceTree("hello", "hi", rootNode).ToArray());
         }
 
         [Test]
@@ -115,7 +115,7 @@ namespace ObjectsComparer.Tests
         }
         
         [Test]
-        public void EnumerateConditional_FetchOne_NotCompleted()
+        public void EnumerateConditional_FetchFirst_NotCompleted()
         {
             var list = new List<int> { 6, 8, 79, 3, 45, 9 };
             bool completed = false;

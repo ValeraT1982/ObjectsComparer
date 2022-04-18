@@ -104,7 +104,7 @@ namespace ObjectsComparer
                 }
             });
 
-            _descendants.RemoveAll(ctx => removeDescendants.Contains(ctx));
+            _descendants.RemoveAll(descendantTreeNode  => removeDescendants.Contains(descendantTreeNode ));
 
             return this;
         }
