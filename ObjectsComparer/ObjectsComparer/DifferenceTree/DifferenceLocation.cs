@@ -14,7 +14,10 @@ namespace ObjectsComparer.DifferenceTreeExtensions
         }
 
         public Difference Difference { get; }
-        
+
+        /// <summary>
+        /// Optional. Returns null, if no location is specified (probably by a builder who does not implement <see cref="IDifferenceTreeBuilder"/>).
+        /// </summary>
         public IDifferenceTreeNode TreeNode { get; }
     }
 }
