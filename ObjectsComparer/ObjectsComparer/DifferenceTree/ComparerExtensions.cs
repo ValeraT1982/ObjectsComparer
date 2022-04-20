@@ -12,8 +12,8 @@ namespace ObjectsComparer
         /// <summary>
         /// Calculates the difference tree.
         /// </summary>
-        /// <param name="findNextDifference">Current comparison context. The return value tells whether to look for another difference. If the argument is null the process is looking for all the differences.</param>
-        /// <param name="differenceTreeCompleted">If the comparison process has been completed, this action will be invoked.</param>
+        /// <param name="findNextDifference">Current comparison context. The return value tells the comparison process whether to look for another difference. If the argument is null the process is looking for all the differences.</param>
+        /// <param name="differenceTreeCompleted">Occurs when the comparison process reaches the last member of the objects being compared.</param>
         /// <returns>The root node of the difference tree.</returns>
         public static IDifferenceTreeNode CalculateDifferenceTree(this IComparer comparer, Type type, object obj1, object obj2, Func<ComparisonContext, bool> findNextDifference = null, Action differenceTreeCompleted = null)
         {
@@ -47,8 +47,8 @@ namespace ObjectsComparer
         /// <summary>
         /// Calculates the difference tree.
         /// </summary>
-        /// <param name="findNextDifference">Current comparison context. The return value tells whether to look for another difference.</param>
-        /// <param name="differenceTreeCompleted">If the comparison process has been completed, this action will be invoked.</param>
+        /// <param name="findNextDifference">Current comparison context. The return value tells the comparison process whether to look for another difference. If the argument is null the process is looking for all the differences.</param>
+        /// <param name="differenceTreeCompleted">Occurs when the comparison process reaches the last member of the objects being compared.</param>
         /// <returns>The root node of the difference tree.</returns>
         public static IDifferenceTreeNode CalculateDifferenceTree<T>(this IComparer<T> comparer, T obj1, T obj2, Func<ComparisonContext, bool> findNextDifference = null, Action differenceTreeCompleted = null)
         {
