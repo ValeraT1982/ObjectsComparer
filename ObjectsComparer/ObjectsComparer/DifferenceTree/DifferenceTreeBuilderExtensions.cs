@@ -18,20 +18,9 @@ namespace ObjectsComparer.DifferenceTreeExtensions
         /// <returns>The differences with their eventual location in the difference tree.</returns>
         public static IEnumerable<DifferenceLocation> TryBuildDifferenceTree(this IComparer comparer, Type type, object obj1, object obj2, IDifferenceTreeNode differenceTreeNode)
         {
-            if (comparer is null)
-            {
-                throw new ArgumentNullException(nameof(comparer));
-            }
-
-            if (type is null)
-            {
-                throw new ArgumentNullException(nameof(type));
-            }
-
-            if (differenceTreeNode is null)
-            {
-                throw new ArgumentNullException(nameof(differenceTreeNode));
-            }
+            _ = comparer ?? throw new ArgumentNullException(nameof(comparer));
+            _ = type ?? throw new ArgumentNullException(nameof(type));
+            _ = differenceTreeNode ?? throw new ArgumentNullException(nameof(differenceTreeNode));
 
             if (comparer is IDifferenceTreeBuilder differenceTreeBuilder)
             {
@@ -66,15 +55,8 @@ namespace ObjectsComparer.DifferenceTreeExtensions
         /// <returns>The differences with their eventual location in the difference tree.</returns>
         public static IEnumerable<DifferenceLocation> TryBuildDifferenceTree<T>(this IComparer<T> comparer, T obj1, T obj2, IDifferenceTreeNode differenceTreeNode)
         {
-            if (comparer is null)
-            {
-                throw new ArgumentNullException(nameof(comparer));
-            }
-
-            if (differenceTreeNode is null)
-            {
-                throw new ArgumentNullException(nameof(differenceTreeNode));
-            }
+            _ = comparer ?? throw new ArgumentNullException(nameof(comparer));
+            _ = differenceTreeNode ?? throw new ArgumentNullException(nameof(differenceTreeNode));
 
             if (comparer is IDifferenceTreeBuilder<T> differenceTreeBuilder)
             {
@@ -124,15 +106,8 @@ namespace ObjectsComparer.DifferenceTreeExtensions
 
         internal static void ThrowDifferenceTreeBuilderNotImplemented(IDifferenceTreeNode differenceTreeNode, ComparisonSettings comparisonSettings, object comparer, string unImplementedInterface)
         {
-            if (differenceTreeNode is null)
-            {
-                throw new ArgumentNullException(nameof(differenceTreeNode));
-            }
-
-            if (comparisonSettings is null)
-            {
-                throw new ArgumentNullException(nameof(comparisonSettings));
-            }
+            _ = differenceTreeNode ?? throw new ArgumentNullException(nameof(differenceTreeNode));
+            _ = comparisonSettings ?? throw new ArgumentNullException(nameof(comparisonSettings));
 
             var options = DifferenceTreeOptions.Default();
             comparisonSettings.DifferenceTreeOptionsAction?.Invoke(null, options);
