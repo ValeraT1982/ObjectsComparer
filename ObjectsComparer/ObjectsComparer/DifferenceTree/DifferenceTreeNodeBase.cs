@@ -90,7 +90,7 @@ namespace ObjectsComparer
             return GetDifferences(recursive).Any();
         }
                 
-        public IDifferenceTreeNode Shrink()
+        public void Shrink()
         {
             List<IDifferenceTreeNode> removeDescendants = new List<IDifferenceTreeNode>();
 
@@ -105,8 +105,6 @@ namespace ObjectsComparer
             });
 
             _descendants.RemoveAll(descendantTreeNode  => removeDescendants.Contains(descendantTreeNode ));
-
-            return this;
         }
     }
 }

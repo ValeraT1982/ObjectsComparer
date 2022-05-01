@@ -64,6 +64,6 @@ namespace ObjectsComparer
         /// <summary>
         /// Removes all <see cref="Descendants"/> which have no <see cref="Differences"/> directly or indirectly in their <see cref="Descendants"/>.
         /// </summary>
-        IDifferenceTreeNode Shrink();
+        void Shrink();
     }
 }
