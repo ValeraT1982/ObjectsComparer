@@ -42,7 +42,7 @@ namespace ObjectsComparer
 
             // Additional value comparers
             AddComparerOverride<StringBuilder>(new ToStringComparer<StringBuilder>());
-            AddComparerOverride<Uri>(new UriComparer());
+            AddComparerOverride<Uri>(UriComparer.Instance);
         }
 
         /// <summary>
