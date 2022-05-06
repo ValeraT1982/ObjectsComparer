@@ -195,4 +195,6 @@ namespace ObjectsComparer.Tests
 
         public string Name { get; }
     }
+
+    //Test commit.
 }
