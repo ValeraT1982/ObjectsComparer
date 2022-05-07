@@ -146,7 +146,7 @@ namespace ObjectsComparer
                 }
 
                 var comparer = Factory.GetObjectsComparer(propertyType, Settings, this);
-                foreach (var failure in comparer.TryBuildDifferenceTree(propertyType, value1, value2, differenceTreeNode))
+                foreach (var failure in comparer.TryBuildDifferenceTree(propertyType, value1, value2, keyDifferenceTreeNode))
                 {
                     failure.Difference.InsertPath(propertyKey);
                     yield return failure;

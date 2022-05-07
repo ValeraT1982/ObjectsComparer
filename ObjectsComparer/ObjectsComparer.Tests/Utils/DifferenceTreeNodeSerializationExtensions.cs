@@ -9,8 +9,6 @@ using System.Text;
 
 namespace ObjectsComparer.Tests.Utils
 {
-    //TODO: Move ToJson to Core.
-
     internal static class DifferenceTreeNodeSerializationExtensions
     {
         /// <summary>

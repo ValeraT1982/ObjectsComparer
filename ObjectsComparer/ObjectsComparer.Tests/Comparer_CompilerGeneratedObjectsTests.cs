@@ -36,6 +36,32 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
+        public void DifferentValues_CalculateDifferenceTree()
+        {
+            dynamic a1 = new
+            {
+                Field1 = "A",
+                Field2 = 5,
+                Field3 = true
+            };
+            dynamic a2 = new
+            {
+                Field1 = "B",
+                Field2 = 8,
+                Field3 = false
+            };
+            var comparer = new Comparer();
+
+            var rootNode = comparer.CalculateDifferenceTree(typeof(object), (object)a1, (object)a2);
+            var differences = rootNode.GetDifferences().ToList();
+
+            Assert.AreEqual(3, differences.Count);
+            Assert.IsTrue(differences.Any(d => d.MemberPath == "Field1" && d.Value1 == "A" && d.Value2 == "B"));
+            Assert.IsTrue(differences.Any(d => d.MemberPath == "Field2" && d.Value1 == "5" && d.Value2 == "8"));
+            Assert.IsTrue(differences.Any(d => d.MemberPath == "Field3" && d.Value1 == "True" && d.Value2 == "False"));
+        }
+
+        [Test]
         public void MissedFields()
         {
             dynamic a1 = new
@@ -129,6 +155,28 @@ namespace ObjectsComparer.Tests
             Assert.IsFalse(isEqual);
             Assert.AreEqual(1, differences.Count);
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Field1.FieldSub1" && d.Value1 == "10" && d.Value2 == "8"));
+        }
+
+        [Test]
+        public void Hierarchy_CalculateDifferenceTree()
+        {
+            dynamic a1Sub1 = new { FieldSub1 = 10 };
+            dynamic a1 = new { Field1 = a1Sub1 };
+            dynamic a2Sub1 = new { FieldSub1 = 8 };
+            dynamic a2 = new { Field1 = a2Sub1 };
+            var comparer = new Comparer();
+
+            var rootNode = comparer.CalculateDifferenceTree(typeof(object), (object)a1, (object)a2);
+            var differences = rootNode.GetDifferences().ToList();
+
+            Assert.AreEqual(1, differences.Count);
+            Assert.IsTrue(differences.Any(d => d.MemberPath == "Field1.FieldSub1" && d.Value1 == "10" && d.Value2 == "8"));
+
+            var field1 = rootNode.Descendants.First();
+            var fieldSub1 = field1.Descendants.First();
+
+            Assert.IsTrue(differences.Any(d => d.MemberPath == $"{field1.Member.Name}.{fieldSub1.Member.Name}" && d.Value1 == "10" && d.Value2 == "8"));
+            Assert.IsTrue(differences.Any(d => d.MemberPath == $"{field1.Member.Info.Name}.{fieldSub1.Member.Info.Name}" && d.Value1 == "10" && d.Value2 == "8"));
         }
 
         [Test]
