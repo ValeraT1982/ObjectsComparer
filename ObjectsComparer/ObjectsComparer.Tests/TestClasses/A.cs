@@ -30,6 +30,8 @@ namespace ObjectsComparer.Tests.TestClasses
 
         public int[] IntArray { get; set; }
 
+        public int[] IntArray2 { get; set; }
+
         public B[] ArrayOfB { get; set; }
 
         public Collection<B> CollectionOfB { get; set; }

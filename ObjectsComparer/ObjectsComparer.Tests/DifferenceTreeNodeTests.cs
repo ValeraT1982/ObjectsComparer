@@ -17,6 +17,22 @@ namespace ObjectsComparer.Tests
     internal class DifferenceTreeNodeTests
     {
         [Test]
+        public void XXX()
+        {
+            var a1 = new A { ClassB = new B { Property1 = "hello" } };
+            var a2 = new A { ClassB = new B { Property1 = "hallo" } };
+
+            var comparer = new Comparer<A>();
+            var rootNode = comparer.CalculateDifferenceTree(a1, a2);
+            var differences = rootNode.GetDifferences().ToList();
+            var classB = rootNode.Descendants.Single(n => n.Member.Name == nameof(A.ClassB));
+            var property1 = classB.Descendants.Single(n => n.Member.Name == nameof(B.Property1));
+
+            Assert.AreEqual(1, differences.Count);
+            Assert.AreEqual(differences[0].MemberPath, $"{classB.Member.Name}.{property1.Member.Name}");
+        }
+
+        [Test]
         public void DifferenceTreeNodeMember_Member_Correct_MemberName()
         {
             var treeNodeMember = new DifferenceTreeNodeMember(name: "Property1");

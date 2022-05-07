@@ -1442,5 +1442,153 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual("Two!", differences.First().Value2);
             Assert.AreEqual("[Key=2].Value", differences.First().MemberPath);
         }
+
+        [Test]
+        public void CompareEnumerables_DefaultBehavior()
+        {
+            var a1 = new int[] { 3, 2, 1 };
+            var a2 = new int[] { 1, 2, 3, 4 };
+
+            var comparer = new Comparer();
+            var differences = comparer.CalculateDifferences(a1, a2).ToArray();
+
+            Assert.IsTrue(differences.Count() == 1);
+            Assert.AreEqual(DifferenceTypes.ValueMismatch, differences[0].DifferenceType);
+            Assert.AreEqual("Length", differences[0].MemberPath);
+            Assert.AreEqual("3", differences[0].Value1);
+            Assert.AreEqual("4", differences[0].Value2);
+        }
+
+        [Test]
+        public void CompareEnumerables_UnequalListEnabled()
+        {
+            var a1 = new int[] { 3, 2, 1 };
+            var a2 = new int[] { 1, 2, 3, 4 };
+
+            var settings = new ComparisonSettings();
+            settings.ConfigureListComparison(compareUnequalLists: true);
+            var comparer = new Comparer(settings);
+            var differences = comparer.CalculateDifferences(a1, a2).ToArray();
+
+            Assert.IsTrue(differences.Count() == 4);
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "[0]" && d.Value1 == "3" && d.Value2 == "1"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "[2]" && d.Value1 == "1" && d.Value2 == "3"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.MissedElementInFirstObject && d.MemberPath == "[3]" && d.Value1 == "" && d.Value2 == "4"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "Length" && d.Value1 == "3" && d.Value2 == "4"));
+        }
+
+        [Test]
+        public void CompareIntArrayByKey()
+        {
+            var a1 = new int[] { 3, 2, 1 };
+            var a2 = new int[] { 1, 2, 3, 4 };
+
+            var settings = new ComparisonSettings();
+            settings.ConfigureListComparison(compareElementsByKey: true, compareUnequalLists: true);
+            var comparer = new Comparer(settings);
+            var differences = comparer.CalculateDifferences(a1, a2).ToArray();
+
+            Assert.IsTrue(differences.Count() == 2);
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.MissedElementInFirstObject && d.MemberPath == "[4]" && d.Value1 == "" && d.Value2 == "4"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "Length" && d.Value1 == "3" && d.Value2 == "4"));
+        }
+
+        [Test]
+        public void CompareIntArrayByKeyDisplayIndex()
+        {
+            var a1 = new int[] { 3, 2, 1 };
+            var a2 = new int[] { 1, 2, 3, 4 };
+
+            var settings = new ComparisonSettings();
+
+            settings.ConfigureListComparison(listOptions =>
+            {
+                listOptions
+                    .CompareUnequalLists(true)
+                    .CompareElementsByKey(keyOptions => 
+                    {
+                        keyOptions.FormatElementKey(args => args.ElementIndex.ToString());
+                    });
+            });
+
+            var comparer = new Comparer(settings);
+            var differences = comparer.CalculateDifferences(a1, a2).ToArray();
+
+            Assert.IsTrue(differences.Count() == 2);
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.MissedElementInFirstObject && d.MemberPath == "[3]" && d.Value1 == "" && d.Value2 == "4"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "Length" && d.Value1 == "3" && d.Value2 == "4"));
+        }
+
+        [Test]
+        public void CompareObjectListByKey()
+        {
+            var a1 = new A { ListOfB = new List<B> { new B { Id = 1, Property1 = "Value 1" }, new B { Id = 2, Property1 = "Value 2" } } };
+            var a2 = new A { ListOfB = new List<B> { new B { Id = 2, Property1 = "Value two" }, new B { Id = 1, Property1 = "Value one" } } };
+
+            var settings = new ComparisonSettings();
+            settings.ConfigureListComparison(compareElementsByKey: true);
+            var comparer = new Comparer(settings);
+            var differences = comparer.CalculateDifferences(a1, a2).ToArray();
+
+            Assert.IsTrue(differences.Count() == 2);
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfB[1].Property1" && d.Value1 == "Value 1" && d.Value2 == "Value one"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfB[2].Property1" && d.Value1 == "Value 2" && d.Value2 == "Value two"));
+        }
+
+        [Test]
+        public void CompareObjectListByCustomKey()
+        {
+            var a1 = new A { ListOfB = new List<B> { new B { Id = 1, Property1 = "Value 1", Property2 = "Key1" }, new B { Id = 2, Property1 = "Value 2", Property2 = "Key2" } } };
+            var a2 = new A { ListOfB = new List<B> { new B { Id = 1, Property1 = "Value two", Property2 = "Key2" }, new B { Id = 2, Property1 = "Value one", Property2 = "Key1" } } };
+
+            var settings = new ComparisonSettings();
+
+            settings.ConfigureListComparison(options => 
+            {
+                options.CompareElementsByKey(keyOptions => 
+                {
+                    keyOptions.UseKey(args => ((B)args.Element).Property2);
+                });
+            });
+
+            var comparer = new Comparer(settings);
+            var differences = comparer.CalculateDifferences(a1, a2).ToArray();
+
+            Assert.IsTrue(differences.Count() == 4);
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfB[Key1].Property1" && d.Value1 == "Value 1" && d.Value2 == "Value one"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfB[Key1].Id.Value" && d.Value1 == "1" && d.Value2 == "2"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfB[Key2].Property1" && d.Value1 == "Value 2" && d.Value2 == "Value two"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfB[Key2].Id.Value" && d.Value1 == "2" && d.Value2 == "1"));
+        }
+
+        [Test]
+        public void CompareIntArraysFirstByIndexSecondByKey()
+        {
+            var a1 = new A { IntArray = new int[] { 3, 2, 1 }, IntArray2 = new int[] { 3, 2, 1 } };
+            var a2 = new A { IntArray = new int[] { 1, 2, 3, 4 }, IntArray2 = new int[] { 1, 2, 3, 4 } };
+
+            var settings = new ComparisonSettings();
+
+            settings.ConfigureListComparison((currentProperty, listOptions) =>
+            {
+                listOptions.CompareUnequalLists(true);
+
+                if (currentProperty.Member.Name == nameof(A.IntArray2))
+                {
+                    listOptions.CompareElementsByKey();
+                }
+            });
+
+            var comparer = new Comparer(settings);
+            var differences = comparer.CalculateDifferences(a1, a2).ToArray();
+
+            Assert.IsTrue(differences.Count() == 6);
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "IntArray[0]" && d.Value1 == "3" && d.Value2 == "1"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "IntArray[2]" && d.Value1 == "1" && d.Value2 == "3"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.MissedElementInFirstObject && d.MemberPath == "IntArray[3]" && d.Value1 == "" && d.Value2 == "4"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "IntArray.Length" && d.Value1 == "3" && d.Value2 == "4"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.MissedElementInFirstObject && d.MemberPath == "IntArray2[4]" && d.Value1 == "" && d.Value2 == "4"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "IntArray2.Length" && d.Value1 == "3" && d.Value2 == "4"));
+        }
     }
 }

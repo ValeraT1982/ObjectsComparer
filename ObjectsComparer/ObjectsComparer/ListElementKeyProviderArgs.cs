@@ -18,5 +18,4 @@ namespace ObjectsComparer
         /// </summary>
         public object Element { get; }
     }
-
 }
