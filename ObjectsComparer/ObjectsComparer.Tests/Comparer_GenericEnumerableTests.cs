@@ -1547,7 +1547,7 @@ namespace ObjectsComparer.Tests
             {
                 options.CompareElementsByKey(keyOptions => 
                 {
-                    keyOptions.UseKey(args => ((B)args.Element).Property2);
+                    keyOptions.UseKey(nameof(B.Property2));
                 });
             });
 
@@ -1562,7 +1562,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void CompareIntArraysFirstByIndexSecondByKey()
+        public void CompareIntArrayFirstByIndexSecondByKey()
         {
             var a1 = new A { IntArray = new int[] { 3, 2, 1 }, IntArray2 = new int[] { 3, 2, 1 } };
             var a2 = new A { IntArray = new int[] { 1, 2, 3, 4 }, IntArray2 = new int[] { 1, 2, 3, 4 } };
@@ -1589,6 +1589,43 @@ namespace ObjectsComparer.Tests
             Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "IntArray.Length" && d.Value1 == "3" && d.Value2 == "4"));
             Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.MissedElementInFirstObject && d.MemberPath == "IntArray2[4]" && d.Value1 == "" && d.Value2 == "4"));
             Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "IntArray2.Length" && d.Value1 == "3" && d.Value2 == "4"));
+        }
+
+        [Test]
+        public void CompareObjectListFirstByDefaultKeySecondByCustomKey()
+        {
+            var a1 = new A 
+            {
+                ListOfB = new List<B> { new B { Id = 1, Property1 = "Value 1" }, new B { Id = 2, Property1 = "Value 2" } },
+                ListOfC = new List<C> { new C { Key = "Key1", Property1 = "Value 3" }, new C { Key = "Key2", Property1 = "Value 4" } }
+            };
+
+            var a2 = new A 
+            {
+                ListOfB = new List<B> { new B { Id = 2, Property1 = "Value two" }, new B { Id = 1, Property1 = "Value one" } } ,
+                ListOfC = new List<C> { new C { Key = "Key2", Property1 = "Value four" }, new C { Key = "Key1", Property1 = "Value three" } }
+            };
+
+            var settings = new ComparisonSettings();
+
+            settings.ConfigureListComparison((currentProperty, listOptions) =>
+            {
+                listOptions.CompareElementsByKey();
+
+                if (currentProperty.Member.Name == nameof(A.ListOfC))
+                {
+                    listOptions.CompareElementsByKey(keyOptions => keyOptions.UseKey("Key"));
+                }
+            });
+
+            var comparer = new Comparer(settings);
+            var differences = comparer.CalculateDifferences(a1, a2).ToArray();
+
+            Assert.IsTrue(differences.Count() == 4);
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfB[1].Property1" && d.Value1 == "Value 1" && d.Value2 == "Value one"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfB[2].Property1" && d.Value1 == "Value 2" && d.Value2 == "Value two"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfC[Key1].Property1" && d.Value1 == "Value 3" && d.Value2 == "Value three"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfC[Key2].Property1" && d.Value1 == "Value 4" && d.Value2 == "Value four"));
         }
     }
 }

@@ -40,6 +40,8 @@ namespace ObjectsComparer.Tests.TestClasses
 
         public List<B> ListOfB { get; set; }
 
+        public List<C> ListOfC { get; set; }
+
         public Dictionary<int, B> DictionaryOfB { get; set; }
 
         public CollectionOfB ClassImplementsCollectionOfB { get; set; }
