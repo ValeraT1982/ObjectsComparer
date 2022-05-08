@@ -604,7 +604,7 @@ namespace ObjectsComparer.Tests
         public void ClassImplementsCollectionEquality_CompareByKey()
         {
             var a1 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str1", Id = 1 }, new B { Property1 = "Str2", Id = 2 } } };
-            var a2 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str1", Id = 1 }, new B { Property1 = "Str2", Id = 2 } } };
+            var a2 = new A { ClassImplementsCollectionOfB = new CollectionOfB { new B { Property1 = "Str2", Id = 2 }, new B { Property1 = "Str1", Id = 1 } } };
 
             var settings = new ComparisonSettings();
             settings.ConfigureListComparison(listOptions => listOptions.CompareElementsByKey());
