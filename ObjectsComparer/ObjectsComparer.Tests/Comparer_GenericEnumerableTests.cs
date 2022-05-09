@@ -1484,6 +1484,24 @@ namespace ObjectsComparer.Tests
             var a2 = new int[] { 1, 2, 3, 4 };
 
             var settings = new ComparisonSettings();
+            settings.ConfigureListComparison(compareElementsByKey: true);
+            var comparer = new Comparer(settings);
+            var differences = comparer.CalculateDifferences(a1, a2).ToArray();
+
+            Assert.IsTrue(differences.Count() == 1);
+            Assert.AreEqual(DifferenceTypes.ValueMismatch, differences[0].DifferenceType);
+            Assert.AreEqual("Length", differences[0].MemberPath);
+            Assert.AreEqual("3", differences[0].Value1);
+            Assert.AreEqual("4", differences[0].Value2);
+        }
+
+        [Test]
+        public void CompareIntArrayByKey_UnequalListEnabled()
+        {
+            var a1 = new int[] { 3, 2, 1 };
+            var a2 = new int[] { 1, 2, 3, 4 };
+
+            var settings = new ComparisonSettings();
             settings.ConfigureListComparison(compareElementsByKey: true, compareUnequalLists: true);
             var comparer = new Comparer(settings);
             var differences = comparer.CalculateDifferences(a1, a2).ToArray();
