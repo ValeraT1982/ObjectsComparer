@@ -149,6 +149,24 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual(false, completed);
         }
 
+        [Test]
+        public void CompareIntArrayUnequalListEnabled()
+        {
+            var a1 = new int[] { 3, 2, 1 };
+            var a2 = new int[] { 1, 2, 3, 4 };
+
+            var settings = new ComparisonSettings();
+            settings.ConfigureListComparison(compareUnequalLists: true);
+            var comparer = new Comparer(settings);
+
+            var diffs = comparer.CalculateDifferences(a1, a2);
+
+            foreach (var item in diffs)
+            {
+                System.Diagnostics.Debug.WriteLine(item);
+            }
+        }
+
         protected IEnumerable<T> EnumerateConditionalExt<T>(IEnumerable<T> enumerable, Func<bool> moveNextItem, Action completed = null)
         {
             var enumerator = enumerable.GetEnumerator();

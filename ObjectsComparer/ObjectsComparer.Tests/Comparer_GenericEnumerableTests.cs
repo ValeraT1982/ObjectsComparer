@@ -1444,7 +1444,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void CompareEnumerables_DefaultBehavior()
+        public void CompareIntArrayDefaultBehavior()
         {
             var a1 = new int[] { 3, 2, 1 };
             var a2 = new int[] { 1, 2, 3, 4 };
@@ -1460,7 +1460,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void CompareEnumerables_UnequalListEnabled()
+        public void CompareIntArrayUnequalListEnabled()
         {
             var a1 = new int[] { 3, 2, 1 };
             var a2 = new int[] { 1, 2, 3, 4 };
