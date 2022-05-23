@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 
 namespace ObjectsComparer.Tests.TestClasses
 {
@@ -12,8 +13,8 @@ namespace ObjectsComparer.Tests.TestClasses
 
         public string PhoneNumber { get; set; }
 
-        public IEnumerable NonGenericLiveAddresses { get; set; }
+        public List<Address> ListOfAddress1 { get; set; }
 
-        public IEnumerable NonGenericStayAddresses { get; set; }
+        public List<Address> ListOfAddress2 { get; set; }
     }
 }

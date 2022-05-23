@@ -372,5 +372,28 @@ namespace ObjectsComparer.Tests
             Assert.IsTrue(differences.Any(
                 d => d.MemberPath == "Transaction[0].No" && d.DifferenceType == DifferenceTypes.ValueMismatch));
         }
+
+        [Test]
+        public void ExpandoObjectWithCollectionCheckDifferenceTreeNodePath()
+        {
+            var comparer = new Comparer(new ComparisonSettings { RecursiveComparison = true });
+
+            dynamic a1 = JsonConvert.DeserializeObject<ExpandoObject>(
+                "{ \"Transaction\": [ { \"Name\": \"abc\", \"No\": 101 } ] }");
+
+            dynamic a2 = JsonConvert.DeserializeObject<ExpandoObject>(
+                "{ \"Transaction\": [ { \"Name\": \"abc\", \"No\": 102 } ] }");
+
+            var rootNode = comparer.CalculateDifferenceTree(typeof(object), (object)a1, (object)a2);
+            var namePropertyPath = $"{rootNode.Descendants.First().Member.Name}.[0].{rootNode.Descendants.First().Descendants.First().Descendants.First().Member.Name}";
+            var noPropertyPath = $"{rootNode.Descendants.First().Member.Name}.[0].{rootNode.Descendants.First().Descendants.First().Descendants.Skip(1).First().Member.Name}";
+            var differences = rootNode.GetDifferences(true).ToList();
+
+            Assert.AreEqual(1, differences.Count);
+            Assert.IsTrue(differences.Any(
+                d => d.MemberPath == "Transaction[0].No" && d.DifferenceType == DifferenceTypes.ValueMismatch));
+            Assert.AreEqual("Transaction.[0].Name", namePropertyPath);
+            Assert.AreEqual("Transaction.[0].No", noPropertyPath);
+        }
     }
 }

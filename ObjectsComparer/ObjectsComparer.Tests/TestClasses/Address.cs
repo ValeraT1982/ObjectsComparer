@@ -1,4 +1,6 @@
-﻿namespace ObjectsComparer.Tests.TestClasses
+﻿using System.Collections.Generic;
+
+namespace ObjectsComparer.Tests.TestClasses
 {
     public class Address
     {

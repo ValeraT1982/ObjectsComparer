@@ -7,6 +7,11 @@ using ObjectsComparer.Exceptions;
 using System;
 using ObjectsComparer.Utils;
 using ObjectsComparer.Tests.Utils;
+using System.Diagnostics;
+using Newtonsoft.Json;
+using System.Text;
+using System.Collections;
+using System.Reflection;
 
 namespace ObjectsComparer.Tests
 {
@@ -1632,9 +1637,18 @@ namespace ObjectsComparer.Tests
 
                 if (currentProperty.Member.Name == nameof(A.ListOfC))
                 {
-                    listOptions.CompareElementsByKey(keyOptions => keyOptions.UseKey("Key"));
+                    //listOptions.CompareElementsByKey(keyOptions => keyOptions.UseKey("Key"));
+                    listOptions.CompareElementsByKey(keyOptions => keyOptions.UseKey(args => 
+                    {
+                        var c = (C)args.Element;
+                        return new { c.Key };
+                    }));
                 }
             });
+
+            object obj1 = new { Key = "1", Key2 = "2" };
+            object obj2 = new { Key = "1", Key2 = "3" };
+            var match = object.Equals(obj1, obj2);
 
             var comparer = new Comparer(settings);
             var differences = comparer.CalculateDifferences(a1, a2).ToArray();
@@ -1644,6 +1658,211 @@ namespace ObjectsComparer.Tests
             Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfB[2].Property1" && d.Value1 == "Value 2" && d.Value2 == "Value two"));
             Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfC[Key1].Property1" && d.Value1 == "Value 3" && d.Value2 == "Value three"));
             Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfC[Key2].Property1" && d.Value1 == "Value 4" && d.Value2 == "Value four"));
+        }
+
+        [Test]
+        public void TestCompareEntireObject()
+        {
+            var a1 = new TestClass { IntProperty = 10, StringProperty1 = "a", StringProperty2 = "c", ClassBProperty = new TestClassB { IntPropertyB = 30 } };
+            var a2 = new TestClass { IntProperty = 10, StringProperty1 = "b", StringProperty2 = "c", ClassBProperty = new TestClassB { IntPropertyB = 40 } };
+
+            var comparer = new Comparer<TestClass>();
+            //var comparer = new Comparer();
+            bool compareResult = comparer.Compare(a1, a2); //Only IntProperty.
+            //bool calculateAnyDifferencesResult = comparer.CalculateDifferences(a1, a2).Any(); //Only IntProperty.
+            //var diffsArray = comparer.CalculateDifferences(a1, a2).ToArray(); //All properties.
+
+            /*
+                IntProperty 10.
+                IntProperty 20.
+             */
+        }
+
+        public class TestClassB 
+        {
+            int _intPropertyB;
+
+            public int IntPropertyB
+            {
+                get
+                {
+                    Console.WriteLine($"C IntPropertyB {_intPropertyB}.");
+                    Debug.WriteLine($"IntPropertyB {_intPropertyB}.");
+                    return _intPropertyB;
+                }
+
+                set => _intPropertyB = value;
+            }
+        }
+
+        public class TestClass
+        {
+            int _intProperty;
+            string _stringProperty1;
+            string _stringProperty2;
+            TestClassB _classBProperty;            
+
+            public int IntProperty
+            {
+                get
+                {
+                    Console.WriteLine($"C IntProperty {_intProperty}.");
+                    Debug.WriteLine($"IntProperty {_intProperty}.");
+                    return _intProperty;
+                }
+
+                set => _intProperty = value;
+            }
+
+            public string StringProperty1
+            {
+                get
+                {
+                    Console.WriteLine($"C StringProperty1 {_stringProperty1}.");
+                    Debug.WriteLine($"StringProperty1 {_stringProperty1}.");
+                    return _stringProperty1;
+                }
+
+                set => _stringProperty1 = value;
+            }
+
+            public string StringProperty2
+            {
+                get
+                {
+                    Console.WriteLine($"C StringProperty2 {_stringProperty2}.");
+                    Debug.WriteLine($"StringProperty2 {_stringProperty2}.");
+                    return _stringProperty2;
+                }
+
+                set => _stringProperty2 = value;
+            }
+
+            public TestClassB ClassBProperty
+            {
+                get
+                {
+                    Debug.WriteLine($"ClassBProperty {_classBProperty}.");
+                    return _classBProperty;
+                }
+
+                set => _classBProperty = value;
+            }
+        }
+
+        [Test]
+        public void CompareObjectListsByContext()
+        {
+            var student1 = new Student
+            {
+                Person = new Person
+                {
+                    ListOfAddress1 = new List<Address>
+                    {
+                        new Address { City = "Prag", Country = "Czech republic" },
+                        new Address { City = "Prag", Country = "Czech republic" }
+                    }
+                }
+            };
+
+            var student2 = new Student
+            {
+                Person = new Person
+                {
+                    ListOfAddress1 = new List<Address>
+                    {
+                        new Address { City = "Olomouc", Country = "Czech republic 2" },
+                        new Address { City = "Prag", Country = "Czech republic" }
+                    }
+                }
+            };
+
+            var customer = new Customer
+            {
+                Person = new Person
+                {
+                    ListOfAddress1 = new List<Address>
+                    {
+                        new Address { City = "Olomouc", Country = "Czech republic 2" }
+                    }
+                }
+            };
+
+            var comparer = new ComparersFactory().GetObjectsComparer<Student>();
+            var rootNode = comparer.CalculateDifferenceTree(student1, student2);
+            var diffs = rootNode.GetDifferences(true).ToArray();
+
+            var stringBuilder = new StringBuilder();
+            WalkDifferenceTree(rootNode, 0, stringBuilder);
+            var differenceTreeStr = stringBuilder.ToString();
+            var differenceTreeJson = (rootNode as DifferenceTreeNode).ToJson();
+
+            rootNode.Shrink();
+            
+            Debug.WriteLine("");
+
+            stringBuilder = new StringBuilder();
+            WalkDifferenceTree(rootNode, 0, stringBuilder);
+            differenceTreeStr = stringBuilder.ToString();
+            differenceTreeJson = (rootNode as DifferenceTreeNode).ToJson();
+        }
+
+        void WalkDifferenceTree(IDifferenceTreeNode node, int level, StringBuilder stringBuilder)
+        {
+            var blankMemberName = "?";
+            string indent = String.Concat(Enumerable.Repeat(" ", 2 * level));
+
+            if (TreeNodeIsListItem(node) == false)
+            {
+                var memberName = node?.Member?.Name ?? blankMemberName;
+                var line = indent + memberName;
+                stringBuilder.AppendLine(line);
+                Debug.WriteLine(line);
+            }
+
+            foreach (var diff in node.Differences)
+            {
+                var line = indent + String.Concat(Enumerable.Repeat(" ", 2)) + diff.ToString();
+                stringBuilder.AppendLine(line);
+                Debug.WriteLine(line);
+            }
+
+            level++;
+
+            var descendants = node.Descendants.ToArray();
+
+            for (int i = 0; i < descendants.Length; i++)
+            {
+                var desc = descendants[i];
+
+                if (TreeNodeIsListItem(desc))
+                {
+                    var line = indent + String.Concat(Enumerable.Repeat(" ", 2)) + $"[{GetIndex(desc)}]";
+                    stringBuilder.AppendLine(line);
+                    Debug.WriteLine(line);
+                }
+
+                WalkDifferenceTree(desc, level, stringBuilder);
+            }
+        }
+
+        int? GetIndex(IDifferenceTreeNode node)
+        {
+            var itemx = node.Ancestor.Descendants
+                    .Select((descendant, index) => new { Index = index, Descendant = descendant }).Where(n => n.Descendant == node)
+                    .FirstOrDefault();
+
+            return itemx?.Index;
+        }
+
+        bool TreeNodeIsListItem(IDifferenceTreeNode node)
+        {
+            if (node.Ancestor?.Member?.Info is PropertyInfo pi && typeof(IEnumerable).IsAssignableFrom(pi.PropertyType) && pi.PropertyType != typeof(string))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
