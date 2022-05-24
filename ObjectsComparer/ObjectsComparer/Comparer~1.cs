@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using ObjectsComparer.DifferenceTreeExtensions;
 using ObjectsComparer.Utils;
+using ObjectsComparer.Attributes;
 
 namespace ObjectsComparer
 {
@@ -27,7 +28,9 @@ namespace ObjectsComparer
         {
             var properties = GetProperties(typeof(T), new List<Type>());
             var fields = typeof(T).GetTypeInfo().GetFields().Where(f =>
-                f.IsPublic && !f.IsStatic).ToList();
+                f.IsPublic 
+                && !f.IsStatic 
+                && !f.GetCustomAttributes(true).Any(c=> c is IgnoreInComparisonAttribute)).ToList();
             _members = properties.Union(fields.Cast<MemberInfo>()).ToList();
             _conditionalComparers = new List<IComparerWithCondition>
             {
@@ -43,7 +46,7 @@ namespace ObjectsComparer
 
             // Additional value comparers
             AddComparerOverride<StringBuilder>(new ToStringComparer<StringBuilder>());
-            AddComparerOverride<Uri>(new UriComparer());
+            AddComparerOverride<Uri>(UriComparer.Instance);
         }
 
         /// <summary>
@@ -116,7 +119,12 @@ namespace ObjectsComparer
             }
 
             foreach (var member in _members)
-            {                
+            {
+                if (member.GetCustomAttributes(true).Any(c => c is IgnoreInComparisonAttribute))
+                {
+                  continue;
+                }
+
                 var value1 = member.GetMemberValue(obj1);
                 var value2 = member.GetMemberValue(obj2);
                 var type = member.GetMemberType();
@@ -165,6 +173,7 @@ namespace ObjectsComparer
                 p.CanRead
                 && p.GetGetMethod(true).IsPublic
                 && p.GetGetMethod(true).GetParameters().Length == 0
+                && !p.GetCustomAttributes(true).Any(c=> c is IgnoreInComparisonAttribute)
                 && !p.GetGetMethod(true).IsStatic).ToList();
             processedTypes.Add(type);
 

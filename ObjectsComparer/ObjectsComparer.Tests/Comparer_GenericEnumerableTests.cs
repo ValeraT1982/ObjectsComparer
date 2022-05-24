@@ -560,6 +560,167 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
+        public void IgnoreAttributeComparisonEquality()
+        {
+            var a1 = new Parent();
+            a1.Child1.Add(new ParentChild(a1, "Child1"));
+            a1.Child1.Add(new ParentChild(a1, "Child2"));
+
+            var a2 = new Parent();
+            a2.Child1.Add(new ParentChild(a2, "Child1"));
+            a2.Child1.Add(new ParentChild(a2, "Child2"));
+
+            var comparer = new Comparer<Parent>();
+
+            var isEqual = comparer.Compare(a1, a2);
+
+            Assert.IsTrue(isEqual);
+        }
+
+        [Test]
+        public void IgnoreAttributeComparisonInEquality()
+        {
+            var a1 = new Parent();
+            a1.Child1.Add(new ParentChild(a1, "Child1"));
+            a1.Child1.Add(new ParentChild(a1, "Child2"));
+
+            var a2 = new Parent();
+            a2.Child1.Add(new ParentChild(a2, "Child1"));
+            a2.Child1.Add(new ParentChild(a2, "Child3"));
+
+            var comparer = new Comparer<Parent>();
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToList();
+
+            CollectionAssert.IsNotEmpty(differences);
+            Assert.AreEqual("Child1[1].Property1", differences.First().MemberPath);
+            Assert.AreEqual("Child2", differences.First().Value1);
+            Assert.AreEqual("Child3", differences.First().Value2);
+        }
+
+
+
+        [Test]
+        public void IgnoreAttributeComparisonDeepEquality()
+        {
+          var a1 = new Parent();
+          a1.Child1.Add(new ParentChild(a1,
+                                        "Child1",
+                                        new ObservableCollection <Child>
+                                        {
+                                            new Child("p1",
+                                                      "p2"),
+                                            new Child("p3",
+                                                      "p4")
+                                        }
+                                       ));
+          a1.Child1.Add(new ParentChild(a1,
+                                        "Child2",
+                                        new ObservableCollection <Child>
+                                        {
+                                            new Child("p1",
+                                                      "p2"),
+                                            new Child("p3",
+                                                      "p4")
+                                        }
+                                       ));
+
+          var a2 = new Parent();
+          a2.Child1.Add(new ParentChild(a1,
+                                        "Child1",
+                                        new ObservableCollection <Child>
+                                        {
+                                            new Child("p1",
+                                                      "p2"),
+                                            new Child("p3",
+                                                      "p4")
+                                        }
+                                       ));
+          a2.Child1.Add(new ParentChild(a1,
+                                        "Child2",
+                                        new ObservableCollection <Child>
+                                        {
+                                            new Child("p1",
+                                                      "p2"),
+                                            new Child("p3",
+                                                      "p5")
+                                        }
+                                       ));
+
+          var comparer = new Comparer <Parent>();
+
+          var isEqual = comparer.Compare(a1,
+                                         a2);
+
+          Assert.IsTrue(isEqual);
+        }
+
+
+
+        [Test]
+        public void IgnoreAttributeComparisonDeepInEquality()
+        {
+          var a1 = new Parent();
+          a1.Child1.Add(new ParentChild(a1,
+                                        "Child1",
+                                        new ObservableCollection <Child>
+                                        {
+                                            new Child("p1",
+                                                      "p2"),
+                                            new Child("p3",
+                                                      "p4")
+                                        }
+                                       ));
+          a1.Child1.Add(new ParentChild(a1,
+                                        "Child2",
+                                        new ObservableCollection <Child>()
+                                        {
+                                            new Child("p1",
+                                                      "p2"),
+                                            new Child("p3",
+                                                      "p4")
+                                        }
+                                       ));
+
+          var a2 = new Parent();
+          a2.Child1.Add(new ParentChild(a1,
+                                        "Child1",
+                                        new ObservableCollection <Child>
+                                        {
+                                            new Child("p1",
+                                                      "p2"),
+                                            new Child("p3",
+                                                      "p4")
+                                        }
+                                       ));
+          a2.Child1.Add(new ParentChild(a1,
+                                        "Child2",
+                                        new ObservableCollection <Child>
+                                        {
+                                            new Child("p1",
+                                                      "p2"),
+                                            new Child("p5",
+                                                      "p6")
+                                        }
+                                       ));
+
+          var comparer = new Comparer <Parent>();
+
+          var differences = comparer.CalculateDifferences(a1,
+                                                          a2).ToList();
+
+          CollectionAssert.IsNotEmpty(differences);
+          Assert.AreEqual("Child1[1].Children[1].Property1",
+                          differences.First().MemberPath);
+          Assert.AreEqual("p3",
+                          differences.First().Value1);
+          Assert.AreEqual("p5",
+                          differences.First().Value2);
+        }
+
+
+
+        [Test]
         public void CollectionInequalityProperty()
         {
             var a1 = new A { CollectionOfB = new Collection<B> { new B { Property1 = "Str1" }, new B { Property1 = "Str2" } } };
@@ -1294,7 +1455,7 @@ namespace ObjectsComparer.Tests
             var differences = comparer.CalculateDifferences(a1, a2).ToList();
 
             Assert.AreEqual(1, differences.Count);
-            Assert.AreEqual(DifferenceTypes.MissedElementInFirstObject, differences.First().DifferenceType);
+            Assert.AreEqual(DifferenceTypes.NumberOfElementsMismatch, differences.First().DifferenceType);
         }
 
         [Test]

@@ -70,7 +70,10 @@ namespace ObjectsComparer
                 _overridesByType[type] = new List<ValueComparerWithFilter>();
             }
 
-            _overridesByType[type].Add(new ValueComparerWithFilter(valueComparer, filter));
+            if (!_overridesByType[type].Any(comparer => comparer.ValueComparer == valueComparer && comparer.Filter == filter))
+            {
+                _overridesByType[type].Add(new ValueComparerWithFilter(valueComparer, filter));
+            }
         }
 
         public void AddComparer(string memberName, IValueComparer valueComparer,
