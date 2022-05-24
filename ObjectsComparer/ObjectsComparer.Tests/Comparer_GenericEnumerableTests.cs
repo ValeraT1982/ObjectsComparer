@@ -1807,9 +1807,53 @@ namespace ObjectsComparer.Tests
                 }
             });
 
-            object obj1 = new { Key = "1", Key2 = "2" };
-            object obj2 = new { Key = "1", Key2 = "3" };
-            var match = object.Equals(obj1, obj2);
+            var comparer = new Comparer(settings);
+            var differences = comparer.CalculateDifferences(a1, a2).ToArray();
+
+            Assert.IsTrue(differences.Count() == 4);
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfB[1].Property1" && d.Value1 == "Value 1" && d.Value2 == "Value one"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfB[2].Property1" && d.Value1 == "Value 2" && d.Value2 == "Value two"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfC[{ Key = Key1 }].Property1" && d.Value1 == "Value 3" && d.Value2 == "Value three"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfC[{ Key = Key2 }].Property1" && d.Value1 == "Value 4" && d.Value2 == "Value four"));
+        }
+
+        [Test]
+        public void CompareObjectListFirstByDefaultKeySecondByCustomKeyFormatCustomKey()
+        {
+            var a1 = new A
+            {
+                ListOfB = new List<B> { new B { Id = 1, Property1 = "Value 1" }, new B { Id = 2, Property1 = "Value 2" } },
+                ListOfC = new List<C> { new C { Key = "Key1", Property1 = "Value 3" }, new C { Key = "Key2", Property1 = "Value 4" } }
+            };
+
+            var a2 = new A
+            {
+                ListOfB = new List<B> { new B { Id = 2, Property1 = "Value two" }, new B { Id = 1, Property1 = "Value one" } },
+                ListOfC = new List<C> { new C { Key = "Key2", Property1 = "Value four" }, new C { Key = "Key1", Property1 = "Value three" } }
+            };
+
+            var settings = new ComparisonSettings();
+
+            settings.ConfigureListComparison((currentProperty, listOptions) =>
+            {
+                listOptions.CompareElementsByKey();
+
+                if (currentProperty.Member.Name == nameof(A.ListOfC))
+                {
+                    listOptions.CompareElementsByKey(keyOptions => 
+                        keyOptions
+                            .UseKey(args =>
+                            {
+                                var element = (C)args.Element;
+                                return new { element.Key };
+                            })
+                            .FormatElementKey(args =>
+                            {
+                                var element = (C)args.Element;
+                                return element.Key;
+                            }));
+                }
+            });
 
             var comparer = new Comparer(settings);
             var differences = comparer.CalculateDifferences(a1, a2).ToArray();
@@ -1817,8 +1861,8 @@ namespace ObjectsComparer.Tests
             Assert.IsTrue(differences.Count() == 4);
             Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfB[1].Property1" && d.Value1 == "Value 1" && d.Value2 == "Value one"));
             Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfB[2].Property1" && d.Value1 == "Value 2" && d.Value2 == "Value two"));
-            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfC[Key1].Property1" && d.Value1 == "Value 3" && d.Value2 == "Value three"));
-            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfC[Key2].Property1" && d.Value1 == "Value 4" && d.Value2 == "Value four"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfC[{ Key = Key1 }].Property1" && d.Value1 == "Value 3" && d.Value2 == "Value three"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfC[{ Key = Key2 }].Property1" && d.Value1 == "Value 4" && d.Value2 == "Value four"));
         }
 
         [Test]
@@ -1912,7 +1956,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void CompareObjectListsByContext()
+        public void CompareObjectListByContext()
         {
             var student1 = new Student
             {
@@ -2024,6 +2068,49 @@ namespace ObjectsComparer.Tests
             }
 
             return false;
+        }
+
+        [Test]
+        public void CompareObjectListsByComplexKey()
+        {
+            var a1 = new A
+            {
+                ListOfC = new List<C> 
+                {
+                    new C { Property1 = "Key1a", Property2 ="Key1b", Property3 = "Value 1" }, 
+                    new C { Property1 = "Key2a", Property2 = "Key2b", Property3 = "Value 2" } 
+                }
+            };
+
+            var a2 = new A
+            {
+                ListOfC = new List<C>
+                {                    
+                    new C { Property1 = "Key2a", Property2 = "Key2b", Property3 = "Value two" },
+                    new C { Property1 = "Key1a", Property2 ="Key1b", Property3 = "Value 1" },
+                }
+            };
+
+            var settings = new ComparisonSettings();
+
+            settings.ConfigureListComparison(listOptions =>
+            {
+                listOptions.CompareElementsByKey(keyOptions => keyOptions.UseKey(args => new 
+                { 
+                    ((C)args.Element).Property1, 
+                    ((C)args.Element).Property2 
+                }));
+            });
+
+            var comparer = new Comparer(settings);
+            var differences = comparer.CalculateDifferences(a1, a2).ToArray();
+
+            Assert.IsTrue(differences.Count() == 1);
+            Assert.IsTrue(differences.Any(d => 
+                d.DifferenceType == DifferenceTypes.ValueMismatch 
+                && d.MemberPath == "ListOfC[{ Property1 = Key2a, Property2 = Key2b }].Property3" 
+                && d.Value1 == "Value 2" && 
+                d.Value2 == "Value two"));
         }
     }
 }

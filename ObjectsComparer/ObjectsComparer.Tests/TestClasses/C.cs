@@ -7,5 +7,7 @@
         public string Property2 { get; set; }
 
         public string Key { get; set; }
+
+        public string Property3 { get; set; }
     }
 }
