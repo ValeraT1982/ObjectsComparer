@@ -1798,12 +1798,7 @@ namespace ObjectsComparer.Tests
 
                 if (currentProperty.Member.Name == nameof(A.ListOfC))
                 {
-                    //listOptions.CompareElementsByKey(keyOptions => keyOptions.UseKey("Key"));
-                    listOptions.CompareElementsByKey(keyOptions => keyOptions.UseKey(args => 
-                    {
-                        var c = (C)args.Element;
-                        return new { c.Key };
-                    }));
+                    listOptions.CompareElementsByKey(keyOptions => keyOptions.UseKey(args => ((C)args.Element).Key));
                 }
             });
 
@@ -1840,18 +1835,10 @@ namespace ObjectsComparer.Tests
 
                 if (currentProperty.Member.Name == nameof(A.ListOfC))
                 {
-                    listOptions.CompareElementsByKey(keyOptions => 
+                    listOptions.CompareElementsByKey(keyOptions =>
                         keyOptions
-                            .UseKey(args =>
-                            {
-                                var element = (C)args.Element;
-                                return new { element.Key };
-                            })
-                            .FormatElementKey(args =>
-                            {
-                                var element = (C)args.Element;
-                                return element.Key;
-                            }));
+                            .UseKey(args => new { ((C)args.Element).Key })
+                            .FormatElementKey(args => ((C)args.Element).Key));
                 }
             });
 
