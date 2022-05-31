@@ -71,6 +71,7 @@ namespace ObjectsComparer
 
         /// <summary>
         /// Configures list comparison behavior, especially the type of the comparison. For more info, see <see cref="ListComparisonOptions"/>.
+        /// The term list has a general meaning here and includes almost all Enumerable objects.
         /// </summary>
         /// <param name="comparisonOptions">First parameter: Current list node.</param>
         public ComparisonSettings ConfigureListComparison(Action<IDifferenceTreeNode, ListComparisonOptions> comparisonOptions)
@@ -87,6 +88,7 @@ namespace ObjectsComparer
 
         /// <summary>
         /// Configures list comparison behavior, especially the type of comparison. For more info, see <see cref="ListComparisonOptions"/>.
+        /// The term list has a general meaning here and includes almost all Enumerable objects.
         /// </summary>
         /// <param name="comparisonOptions">See <see cref="ListComparisonOptions"/>.</param>
         public void ConfigureListComparison(Action<ListComparisonOptions> comparisonOptions)
@@ -96,6 +98,7 @@ namespace ObjectsComparer
 
         /// <summary>
         /// Configures the type of list comparison and whether to compare unequal lists. For more info, see <see cref="ListComparisonOptions"/>.
+        /// The term list has a general meaning here and includes almost all Enumerable objects.
         /// </summary>
         /// <param name="compareElementsByKey">
         /// True value is shortcut for <see cref="ListComparisonOptions.CompareElementsByKey()"/> operation.
