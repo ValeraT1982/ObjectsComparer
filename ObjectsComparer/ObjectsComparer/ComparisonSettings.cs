@@ -131,5 +131,17 @@ namespace ObjectsComparer
         {
             DifferenceTreeOptionsAction = options ?? throw new ArgumentNullException(nameof(options));
         }
+
+        internal Action<IDifferenceTreeNode, DifferenceOptions> DifferenceOptionsAction;
+
+        public void ConfigureDifference(Action<IDifferenceTreeNode, DifferenceOptions> differenceOptions)
+        {
+            DifferenceOptionsAction = differenceOptions ?? throw new ArgumentNullException(nameof(differenceOptions));
+        }
+
+        public void ConfigureDifference(Action<DifferenceOptions> differenceOptions)
+        {
+            ConfigureDifference((_, options) => differenceOptions(options));
+        }
     }
 }

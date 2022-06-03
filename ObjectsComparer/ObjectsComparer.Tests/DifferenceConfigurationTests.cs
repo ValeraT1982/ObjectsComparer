@@ -14,15 +14,49 @@ namespace ObjectsComparer.Tests
     public class DifferenceConfigurationTests
     {
         [Test]
-        public void PropertyEquality()
+        public void RawValuesIncludedDefault()
         {
-            var a1 = new A { IntProperty = 10, DateTimeProperty = new DateTime(2017, 1, 1), Property3 = 5 };
-            var a2 = new A { IntProperty = 10, DateTimeProperty = new DateTime(2017, 1, 1), Property3 = 8 };
-            var comparer = new Comparer<A>();
+            var differenceOptions = DifferenceOptions.Default();
+            Assert.IsFalse(differenceOptions.RawValuesIncluded);
+        }
 
-            var isEqual = comparer.Compare(a1, a2);
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void RawValuesIncluded(bool included)
+        {
+            var settings = new ComparisonSettings();
 
-            Assert.IsTrue(isEqual);
+            settings.ConfigureDifference(options => options.IncludeRawValues(included));
+
+            var differenceOptions = DifferenceOptions.Default();
+            settings.DifferenceOptionsAction(null, differenceOptions);
+
+            Assert.AreEqual(included, differenceOptions.RawValuesIncluded);
+        }
+
+        [Test]
+        [TestCase("Property1", "Property1", true)]
+        [TestCase("Property2", "X", false)]
+        public void RawValuesIncludedConditional(string propertyName, string expectedPropertyName, bool expected)
+        {
+            var diffNode = new DifferenceTreeNode(new DifferenceTreeNodeMember(name: propertyName));
+
+            var settings = new ComparisonSettings();
+
+            settings.ConfigureDifference((currentProperty, options) => 
+            {
+                if (currentProperty.Member.Name == expectedPropertyName)
+                {
+                    options.IncludeRawValues(true);
+                }
+            });
+
+            var differenceOptions = DifferenceOptions.Default();
+            settings.DifferenceOptionsAction(diffNode, differenceOptions);
+
+            Assert.AreEqual(expected, differenceOptions.RawValuesIncluded);
         }
     }
 }
+
