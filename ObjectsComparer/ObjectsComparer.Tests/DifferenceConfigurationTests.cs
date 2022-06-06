@@ -38,13 +38,13 @@ namespace ObjectsComparer.Tests
         [Test]
         [TestCase("Property1", "Property1", true)]
         [TestCase("Property2", "X", false)]
-        public void RawValuesIncludedConditional(string propertyName, string expectedPropertyName, bool expected)
+        public void RawValuesIncludedConditionalCorrectlySet(string propertyName, string expectedPropertyName, bool expected)
         {
-            var diffNode = new DifferenceTreeNode(new DifferenceTreeNodeMember(name: propertyName));
+            var differenceTreeNode = new DifferenceTreeNode(new DifferenceTreeNodeMember(name: propertyName));
 
             var settings = new ComparisonSettings();
 
-            settings.ConfigureDifference((currentProperty, options) => 
+            settings.ConfigureDifference((currentProperty, options) =>
             {
                 if (currentProperty.Member.Name == expectedPropertyName)
                 {
@@ -53,9 +53,89 @@ namespace ObjectsComparer.Tests
             });
 
             var differenceOptions = DifferenceOptions.Default();
-            settings.DifferenceOptionsAction(diffNode, differenceOptions);
+            settings.DifferenceOptionsAction(differenceTreeNode, differenceOptions);
 
             Assert.AreEqual(expected, differenceOptions.RawValuesIncluded);
+        }
+
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void DifferenceFactoryOverIncludeRawValues(bool includeRawValues)
+        {
+            var differenceTreeNode = new DifferenceTreeNode(new DifferenceTreeNodeMember());
+            var settings = new ComparisonSettings();
+
+            settings.ConfigureDifference(options => 
+            {
+                options.IncludeRawValues(includeRawValues);
+                options.UseDifferenceFactory(defDifference => defDifference);
+            });
+
+            var sourceDifference = new Difference(
+                    memberPath: "PathXY",
+                    value1: "VALUE1",
+                    value2: "VALUE2",
+                    rawValue1: new { Value = "VALUE1" },
+                    rawValue2: new { Value = "VALUE2" },
+                    differenceType: DifferenceTypes.TypeMismatch);
+
+            var targetDifference = DifferenceProvider.CreateDifference(settings, differenceTreeNode, sourceDifference);
+
+            Assert.AreEqual(sourceDifference, targetDifference);
+        }
+
+        [Test]
+        [TestCase(true)]
+        [TestCase(false)]
+        public void NoDifferenceFactorySourceTargetDifferenceEquality(bool includeRawValues)
+        {
+            var differenceTreeNode = new DifferenceTreeNode(new DifferenceTreeNodeMember());
+            var settings = new ComparisonSettings();
+
+            settings.ConfigureDifference(options =>
+            {
+                options.IncludeRawValues(includeRawValues);
+            });
+
+            var sourceDifference = new Difference(
+                    memberPath: "PathXY",
+                    value1: "VALUE1",
+                    value2: "VALUE2",
+                    rawValue1: new { Value = "VALUE1" },
+                    rawValue2: new { Value = "VALUE2" },
+                    differenceType: DifferenceTypes.TypeMismatch);
+
+            var targetDifference = DifferenceProvider.CreateDifference(settings, differenceTreeNode, sourceDifference);
+
+            Assert.AreEqual(includeRawValues, sourceDifference == targetDifference);
+            Assert.AreEqual(includeRawValues, targetDifference.RawValue1 != null);
+            Assert.AreEqual(includeRawValues, targetDifference.RawValue2 != null);
+        }
+
+        [Test]
+        public void XXX()
+        {
+            var differenceTreeNode = new DifferenceTreeNode(new DifferenceTreeNodeMember());
+            var settings = new ComparisonSettings();
+
+            settings.ConfigureDifference(options =>
+            {
+                options.IncludeRawValues(true);
+                options.UseDifferenceFactory(diff => diff);
+            });
+
+            var sourceDifference = new Difference(
+                    memberPath: "PathXY",
+                    value1: "VALUE1",
+                    value2: "VALUE2",
+                    rawValue1: new { Value = "VALUE1" },
+                    rawValue2: new { Value = "VALUE2" },
+                    differenceType: DifferenceTypes.TypeMismatch);
+
+            var targetDifference = DifferenceProvider.CreateDifference(settings, differenceTreeNode, sourceDifference);
+
+            //Assert.AreEqual(options-, null);
         }
     }
 }

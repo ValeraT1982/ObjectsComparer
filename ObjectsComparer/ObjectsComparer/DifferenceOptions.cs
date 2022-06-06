@@ -4,6 +4,9 @@ using System.Text;
 
 namespace ObjectsComparer
 {
+    /// <summary>
+    /// Options for <see cref="ComparisonSettings.ConfigureDifference(Action{IDifferenceTreeNode, DifferenceOptions})"/> operation.
+    /// </summary>
     public class DifferenceOptions
     {
         DifferenceOptions()
@@ -15,58 +18,35 @@ namespace ObjectsComparer
         /// </summary>
         internal static DifferenceOptions Default() => new DifferenceOptions();
 
-        public bool RawValuesIncluded { get; private set; } = false;
+        public bool? RawValuesIncluded { get; private set; } = false;
 
-        public void IncludeRawValues(bool value)
+        /// <summary>
+        /// Whether the <see cref="Difference"/> instance should contain raw values.
+        /// </summary>
+        public DifferenceOptions IncludeRawValues(bool value)
         {
             RawValuesIncluded = value;
+
+            return this;
         }
-    }
 
-    //public class CreateDifferenceArgs
-    //{
-    //    public CreateDifferenceArgs(string memberPath, string value1, string value2, DifferenceTypes differenceType = DifferenceTypes.ValueMismatch, object rawValue1 = null, object rawValue2 = null)
-    //    {
-    //        MemberPath = memberPath;
-    //        Value1 = value1;
-    //        Value2 = value2;
-    //        DifferenceType = differenceType;
-    //        RawValue1 = rawValue1;
-    //        RawValue2 = rawValue2;
-    //    }
+        internal Func<Difference, Difference> DifferenceFactory = null;
 
-    //    public string MemberPath { get; }
-
-    //    public string Value1 { get; }
-
-    //    public string Value2 { get; }
-
-    //    public DifferenceTypes DifferenceType { get; }
-
-    //    public object RawValue1 { get; }
-
-    //    public object RawValue2 { get; }
-    //}
-
-    public static class DifferenceProvider
-    {
-        public static Difference CreateDifference(
-            ComparisonSettings settings, 
-            IDifferenceTreeNode differenceTreeNode,
-            string memberPath, 
-            string value1, 
-            string value2, 
-            DifferenceTypes differenceType = DifferenceTypes.ValueMismatch, 
-            object rawValue1 = null, 
-            object rawValue2 = null)
+        /// <summary>
+        /// Factory for <see cref="Difference"/> instances. This takes precendence over <see cref="IncludeRawValues(bool)"/>.
+        /// </summary>
+        /// <param name="factory">
+        /// First parameter: The source difference.<br/>
+        /// Returns: Transformed difference or the source difference itself.
+        /// </param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public DifferenceOptions UseDifferenceFactory(Func<Difference, Difference> factory)
         {
-            var options = DifferenceOptions.Default();
-            settings.DifferenceOptionsAction?.Invoke(differenceTreeNode, options);
+            DifferenceFactory = factory ?? throw new ArgumentNullException(nameof(factory));
+            RawValuesIncluded = null;
 
-            //var difference = new Difference();
-
-            throw new NotImplementedException();
-
+            return this;
         }
+
     }
 }

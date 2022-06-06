@@ -26,19 +26,33 @@
         public DifferenceTypes DifferenceType { get; }
 
         /// <summary>
+        /// The first object itself.
+        /// </summary>
+        public object RawValue1 { get; }
+
+        /// <summary>
+        /// The second object itself.
+        /// </summary>
+        public object RawValue2 { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Difference" /> class. 
         /// </summary>
         /// <param name="memberPath">Member Path.</param>
         /// <param name="value1">Value of the first object, converted to string.</param>
         /// <param name="value2">Value of the second object, converted to string.</param>
+        /// <param name="rawValue1">The first object itself.</param>
+        /// <param name="rawValue2">The second object itself.</param>
         /// <param name="differenceType">Type of the difference.</param>
-        public Difference(string memberPath, string value1, string value2,
+        public Difference(string memberPath, string value1, string value2, object rawValue1 = null, object rawValue2 = null,
             DifferenceTypes differenceType = DifferenceTypes.ValueMismatch)
         {
             MemberPath = memberPath;
             Value1 = value1;
             Value2 = value2;
             DifferenceType = differenceType;
+            RawValue1 = rawValue1;
+            RawValue2 = rawValue2;
         }
 
         /// <summary>
