@@ -1808,8 +1808,8 @@ namespace ObjectsComparer.Tests
             Assert.IsTrue(differences.Count() == 4);
             Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfB[1].Property1" && d.Value1 == "Value 1" && d.Value2 == "Value one"));
             Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfB[2].Property1" && d.Value1 == "Value 2" && d.Value2 == "Value two"));
-            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfC[{ Key = Key1 }].Property1" && d.Value1 == "Value 3" && d.Value2 == "Value three"));
-            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfC[{ Key = Key2 }].Property1" && d.Value1 == "Value 4" && d.Value2 == "Value four"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfC[Key1].Property1" && d.Value1 == "Value 3" && d.Value2 == "Value three"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfC[Key2].Property1" && d.Value1 == "Value 4" && d.Value2 == "Value four"));
         }
 
         [Test]
@@ -1838,7 +1838,7 @@ namespace ObjectsComparer.Tests
                     listOptions.CompareElementsByKey(keyOptions =>
                         keyOptions
                             .UseKey(args => new { ((C)args.Element).Key })
-                            .FormatElementKey(args => ((C)args.Element).Key));
+                            .FormatElementKey(args => $"Key={((C)args.Element).Key}"));
                 }
             });
 
@@ -1848,8 +1848,8 @@ namespace ObjectsComparer.Tests
             Assert.IsTrue(differences.Count() == 4);
             Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfB[1].Property1" && d.Value1 == "Value 1" && d.Value2 == "Value one"));
             Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfB[2].Property1" && d.Value1 == "Value 2" && d.Value2 == "Value two"));
-            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfC[{ Key = Key1 }].Property1" && d.Value1 == "Value 3" && d.Value2 == "Value three"));
-            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfC[{ Key = Key2 }].Property1" && d.Value1 == "Value 4" && d.Value2 == "Value four"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfC[Key=Key1].Property1" && d.Value1 == "Value 3" && d.Value2 == "Value three"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "ListOfC[Key=Key2].Property1" && d.Value1 == "Value 4" && d.Value2 == "Value four"));
         }
 
         [Test]
