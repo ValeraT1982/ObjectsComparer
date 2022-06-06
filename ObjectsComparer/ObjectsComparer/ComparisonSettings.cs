@@ -143,5 +143,10 @@ namespace ObjectsComparer
         {
             ConfigureDifference((_, options) => differenceOptions(options));
         }
+
+        public void ConfigureDifference(bool includeRawValues)
+        {
+            ConfigureDifference(options => options.IncludeRawValues(includeRawValues));
+        }
     }
 }

@@ -66,7 +66,7 @@ namespace ObjectsComparer.Tests
             var differenceTreeNode = new DifferenceTreeNode(new DifferenceTreeNodeMember());
             var settings = new ComparisonSettings();
 
-            settings.ConfigureDifference(options => 
+            settings.ConfigureDifference(options =>
             {
                 options.IncludeRawValues(includeRawValues);
                 options.UseDifferenceFactory(defDifference => defDifference);
@@ -114,16 +114,14 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void XXX()
+        [TestCase(true)]
+        [TestCase(false)]
+        public void IncludeRawValuesShortcutCorrectlySet(bool includeRawValues)
         {
             var differenceTreeNode = new DifferenceTreeNode(new DifferenceTreeNodeMember());
             var settings = new ComparisonSettings();
 
-            settings.ConfigureDifference(options =>
-            {
-                options.IncludeRawValues(true);
-                options.UseDifferenceFactory(diff => diff);
-            });
+            settings.ConfigureDifference(includeRawValues);
 
             var sourceDifference = new Difference(
                     memberPath: "PathXY",
@@ -135,7 +133,7 @@ namespace ObjectsComparer.Tests
 
             var targetDifference = DifferenceProvider.CreateDifference(settings, differenceTreeNode, sourceDifference);
 
-            //Assert.AreEqual(options-, null);
+            Assert.IsTrue(includeRawValues ? targetDifference.RawValue1 != null : targetDifference.RawValue1 == null);
         }
     }
 }

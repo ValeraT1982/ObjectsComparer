@@ -44,8 +44,8 @@
         /// <param name="rawValue1">The first object itself.</param>
         /// <param name="rawValue2">The second object itself.</param>
         /// <param name="differenceType">Type of the difference.</param>
-        public Difference(string memberPath, string value1, string value2, object rawValue1 = null, object rawValue2 = null,
-            DifferenceTypes differenceType = DifferenceTypes.ValueMismatch)
+        public Difference(string memberPath, string value1, string value2,
+            DifferenceTypes differenceType = DifferenceTypes.ValueMismatch, object rawValue1 = null, object rawValue2 = null)
         {
             MemberPath = memberPath;
             Value1 = value1;
