@@ -25,23 +25,7 @@ namespace ObjectsComparer
 
             settings.DifferenceOptionsAction?.Invoke(differenceTreeNode, options);
 
-            var customDifference = sourceDifference;
-
-            if (options.DifferenceFactory != null)
-            {
-                customDifference = options.DifferenceFactory(sourceDifference);
-            }
-            else
-            {
-                if (options.RawValuesIncluded != true && (sourceDifference.RawValue1 != null || sourceDifference.RawValue2 != null)) 
-                {
-                    customDifference = new Difference(
-                        memberPath: sourceDifference.MemberPath,
-                        value1: sourceDifference.Value1,
-                        value2: sourceDifference.Value2,
-                        differenceType: DifferenceTypes.TypeMismatch);
-                }
-            }
+            var customDifference = options.DifferenceFactory(sourceDifference);
 
             return customDifference;
         }

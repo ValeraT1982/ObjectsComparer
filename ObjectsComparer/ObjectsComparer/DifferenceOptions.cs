@@ -18,22 +18,41 @@ namespace ObjectsComparer
         /// </summary>
         internal static DifferenceOptions Default() => new DifferenceOptions();
 
-        public bool? RawValuesIncluded { get; private set; } = false;
-
         /// <summary>
         /// Whether the <see cref="Difference"/> instance should contain raw values.
         /// </summary>
         public DifferenceOptions IncludeRawValues(bool value)
         {
-            RawValuesIncluded = value;
+            DifferenceFactory = value ? d => d : DefaultDifferenceFactory;
 
             return this;
         }
 
-        internal Func<Difference, Difference> DifferenceFactory = null;
+        /// <summary>
+        /// Factory for <see cref="Difference"/> instances.
+        /// </summary>
+        internal Func<Difference, Difference> DifferenceFactory { get; private set; } = DefaultDifferenceFactory;
 
         /// <summary>
-        /// Factory for <see cref="Difference"/> instances. This takes precendence over <see cref="IncludeRawValues(bool)"/>.
+        /// Default difference factory.
+        /// If the source difference contains raw values it creates a new <see cref="Difference"/> instance based on the source difference without those values. Otherwise, it returns the source difference itself.
+        /// </summary>
+        public static Func<Difference, Difference> DefaultDifferenceFactory => sourceDifference => 
+        {
+            if (sourceDifference.RawValue1 == null && sourceDifference.RawValue2 == null)
+            {
+                return sourceDifference;
+            }
+
+            return new Difference(
+                memberPath: sourceDifference.MemberPath,
+                value1: sourceDifference.Value1,
+                value2: sourceDifference.Value2,
+                differenceType: sourceDifference.DifferenceType);
+        };
+
+        /// <summary>
+        /// Factory for <see cref="Difference"/> instances.
         /// </summary>
         /// <param name="factory">
         /// First parameter: The source difference.<br/>
@@ -43,10 +62,8 @@ namespace ObjectsComparer
         public DifferenceOptions UseDifferenceFactory(Func<Difference, Difference> factory)
         {
             DifferenceFactory = factory ?? throw new ArgumentNullException(nameof(factory));
-            RawValuesIncluded = null;
 
             return this;
         }
-
     }
 }
