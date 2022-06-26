@@ -4,7 +4,7 @@ namespace ObjectsComparer
 {
     public static class DifferenceProvider
     {
-        public static Difference CreateDifference(ComparisonSettings settings, IDifferenceTreeNode differenceTreeNode, Difference sourceDifference)
+        public static Difference CreateDifference(ComparisonSettings settings, IDifferenceTreeNode differenceTreeNode, Difference defaultDifference, object rawValue1, object rawValue2)
         {
             if (settings is null)
             {
@@ -16,18 +16,21 @@ namespace ObjectsComparer
                 throw new ArgumentNullException(nameof(differenceTreeNode));
             }
 
-            if (sourceDifference is null)
+            if (defaultDifference is null)
             {
-                throw new ArgumentNullException(nameof(sourceDifference));
+                throw new ArgumentNullException(nameof(defaultDifference));
             }
 
-            var options = DifferenceOptions.Default();
+            var differenceOptions = DifferenceOptions.Default();
 
-            settings.DifferenceOptionsAction?.Invoke(differenceTreeNode, options);
+            settings.DifferenceOptionsAction?.Invoke(differenceTreeNode, differenceOptions);
 
-            var customDifference = options.DifferenceFactory(sourceDifference);
+            if (differenceOptions.DifferenceFactory == null)
+            {
+                return defaultDifference;
+            }
 
-            return customDifference;
+            return differenceOptions.DifferenceFactory(new CreateDifferenceArgs(defaultDifference, rawValue1, rawValue2));
         }
     }
 }

@@ -139,14 +139,28 @@ namespace ObjectsComparer
             DifferenceOptionsAction = differenceOptions ?? throw new ArgumentNullException(nameof(differenceOptions));
         }
 
-        public void ConfigureDifference(Action<DifferenceOptions> differenceOptions)
-        {
-            ConfigureDifference((_, options) => differenceOptions(options));
-        }
-
         public void ConfigureDifference(bool includeRawValues)
         {
-            ConfigureDifference(options => options.IncludeRawValues(includeRawValues));
+            DifferenceOptionsAction = (_, options) => 
+            {
+                if (includeRawValues)
+                {
+                    options.UseDifferenceFactory(args =>
+                    {
+                        return new Difference(
+                            args.DefaultDifference.MemberPath, 
+                            args.DefaultDifference.Value1, 
+                            args.DefaultDifference.Value2, 
+                            args.DefaultDifference.DifferenceType, 
+                            args.RawValue1, 
+                            args.RawValue2);
+                    });
+                }
+                else
+                {
+                    options.UseDifferenceFactory(args => args.DefaultDifference);
+                }
+            };
         }
     }
 }

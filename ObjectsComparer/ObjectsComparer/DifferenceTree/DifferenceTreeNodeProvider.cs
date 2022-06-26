@@ -52,13 +52,7 @@ namespace ObjectsComparer
             if (options.DifferenceTreeNodeMemberFactory != null)
             {
                 var customDifferenceTreeNodeMember = options.DifferenceTreeNodeMemberFactory.Invoke(differenceTreeNodeMember);
-                
-                if (customDifferenceTreeNodeMember == null)
-                {
-                    throw new InvalidOperationException("Difference tree node member factory returned null member.");
-                }
-
-                differenceTreeNodeMember = customDifferenceTreeNodeMember;
+                differenceTreeNodeMember = customDifferenceTreeNodeMember ?? throw new InvalidOperationException("Difference tree node member factory returned null member.");
             }
 
             if (options.DifferenceTreeNodeFactory != null)

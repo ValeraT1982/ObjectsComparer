@@ -27,7 +27,7 @@ namespace ObjectsComparer.Tests
             var differenceTreeNode = new DifferenceTreeNode(new DifferenceTreeNodeMember());
             var settings = new ComparisonSettings();
 
-            var targetDifference = DifferenceProvider.CreateDifference(settings, differenceTreeNode, sourceDifference);
+            var targetDifference = DifferenceProvider.CreateDifference(settings, differenceTreeNode, sourceDifference, null, null);
 
             Assert.IsTrue(targetDifference.MemberPath == targetDifference.MemberPath);
             Assert.IsTrue(targetDifference.Value1 == targetDifference.Value1);
@@ -53,7 +53,7 @@ namespace ObjectsComparer.Tests
 
             settings.ConfigureDifference(includeRawValues: true);
 
-            var targetDifference = DifferenceProvider.CreateDifference(settings, differenceTreeNode, sourceDifference);
+            var targetDifference = DifferenceProvider.CreateDifference(settings, differenceTreeNode, sourceDifference,null, null);
 
             Assert.IsTrue(targetDifference == sourceDifference);
         }
@@ -74,7 +74,7 @@ namespace ObjectsComparer.Tests
 
             settings.ConfigureDifference(includeRawValues: false);
 
-            var targetDifference = DifferenceProvider.CreateDifference(settings, differenceTreeNode, sourceDifference);
+            var targetDifference = DifferenceProvider.CreateDifference(settings, differenceTreeNode, sourceDifference, null, null);
 
             Assert.IsTrue(targetDifference.MemberPath == targetDifference.MemberPath);
             Assert.IsTrue(targetDifference.Value1 == targetDifference.Value1);
@@ -92,10 +92,7 @@ namespace ObjectsComparer.Tests
             var differenceTreeNode = new DifferenceTreeNode(new DifferenceTreeNodeMember());
             var settings = new ComparisonSettings();
 
-            settings.ConfigureDifference(options =>
-            {
-                options.IncludeRawValues(includeRawValues);
-            });
+            settings.ConfigureDifference(includeRawValues);
 
             var sourceDifference = new Difference(
                     memberPath: "PathXY",
@@ -105,7 +102,7 @@ namespace ObjectsComparer.Tests
                     rawValue2: new { Value = "VALUE2" },
                     differenceType: DifferenceTypes.TypeMismatch);
 
-            var targetDifference = DifferenceProvider.CreateDifference(settings, differenceTreeNode, sourceDifference);
+            var targetDifference = DifferenceProvider.CreateDifference(settings, differenceTreeNode, sourceDifference, null, null);
 
             Assert.AreEqual(includeRawValues, sourceDifference == targetDifference);
             Assert.AreEqual(includeRawValues, targetDifference.RawValue1 != null);

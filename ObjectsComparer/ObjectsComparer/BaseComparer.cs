@@ -205,5 +205,41 @@ namespace ObjectsComparer
 
             return new DifferenceLocation(difference, differenceTreeNode);
         }
+
+        protected virtual DifferenceLocation AddDifferenceToTree(IDifferenceTreeNode differenceTreeNode, string memberPath, string value1, string value2,
+            DifferenceTypes differenceType = DifferenceTypes.ValueMismatch, object rawValue1 = null, object rawValue2 = null)
+        {
+            var difference = CreateDifference(differenceTreeNode, memberPath, value1, value2, differenceType, rawValue1, rawValue2);
+
+            return new DifferenceLocation(difference, differenceTreeNode);
+        }
+
+        protected virtual Difference CreateDifference(IDifferenceTreeNode differenceTreeNode, string memberPath, string value1, string value2,
+            DifferenceTypes differenceType = DifferenceTypes.ValueMismatch, object rawValue1 = null, object rawValue2 = null)
+        {
+            if (differenceTreeNode is null)
+            {
+                throw new ArgumentNullException(nameof(differenceTreeNode));
+            }
+
+            var differenceOptions = DifferenceOptions.Default();
+            var defaultDifference = new Difference(memberPath, value1, value2, differenceType);
+
+            Settings.DifferenceOptionsAction?.Invoke(differenceTreeNode, differenceOptions);
+
+            if (differenceOptions.DifferenceFactory == null)
+            {
+                return defaultDifference;
+            }
+
+            var customDifference = differenceOptions.DifferenceFactory(new CreateDifferenceArgs(defaultDifference, rawValue1, rawValue2));
+
+            if (customDifference == null)
+            {
+                throw new NullReferenceException("DifferenceFactory returned null.");
+            }
+
+            return customDifference;
+        }
     }
 }
