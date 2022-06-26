@@ -50,7 +50,7 @@ namespace ObjectsComparer
         /// <exception cref="ArgumentNullException"></exception>
         public DifferenceOptions UseDifferenceFactory(Func<CreateDifferenceArgs, Difference> factory)
         {
-            DifferenceFactory = factory ?? throw new ArgumentNullException(nameof(factory));
+            DifferenceFactory = factory;
 
             return this;
         }

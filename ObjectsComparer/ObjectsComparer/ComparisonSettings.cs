@@ -141,26 +141,20 @@ namespace ObjectsComparer
 
         public void ConfigureDifference(bool includeRawValues)
         {
-            DifferenceOptionsAction = (_, options) => 
+            if (includeRawValues)
             {
-                if (includeRawValues)
-                {
-                    options.UseDifferenceFactory(args =>
-                    {
-                        return new Difference(
-                            args.DefaultDifference.MemberPath, 
-                            args.DefaultDifference.Value1, 
-                            args.DefaultDifference.Value2, 
-                            args.DefaultDifference.DifferenceType, 
-                            args.RawValue1, 
-                            args.RawValue2);
-                    });
-                }
-                else
-                {
-                    options.UseDifferenceFactory(args => args.DefaultDifference);
-                }
-            };
+                ConfigureDifference((_, options) => options.UseDifferenceFactory(args => new Difference(
+                    args.DefaultDifference.MemberPath,
+                    args.DefaultDifference.Value1,
+                    args.DefaultDifference.Value2,
+                    args.DefaultDifference.DifferenceType,
+                    args.RawValue1,
+                    args.RawValue2)));
+            }
+            else
+            {
+                ConfigureDifference((_, options) => options.UseDifferenceFactory(null));
+            }
         }
     }
 }

@@ -14,27 +14,51 @@ namespace ObjectsComparer.Tests
     public class DifferenceConfigurationTests
     {
         [Test]
-        public void CreateDifferenceDefaultBehavior()
+        public void PreserveRawValuesDefaultBehavior()
         {
-            var sourceDifference = new Difference(
-                    memberPath: "PathXY",
-                    value1: "VALUE1",
-                    value2: "VALUE2",
-                    rawValue1: new { Value = "VALUE1" },
-                    rawValue2: new { Value = "VALUE2" },
-                    differenceType: DifferenceTypes.TypeMismatch);
+            var a1 = new A() { IntProperty = 10 };
+            var a2 = new A() { IntProperty = 11 };
 
-            var differenceTreeNode = new DifferenceTreeNode(new DifferenceTreeNodeMember());
+            var comparer = new Comparer<A>();
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToArray();
+
+            Assert.IsTrue(differences[0].RawValue1 == null);
+            Assert.IsTrue(differences[0].RawValue2 == null);
+        }
+
+        [Test]
+        public void PreserveRawValues()
+        {
+            var a1 = new A() { IntProperty = 10 };
+            var a2 = new A() { IntProperty = 11 };
+
             var settings = new ComparisonSettings();
+            settings.ConfigureDifference(includeRawValues: true);
 
-            var targetDifference = DifferenceProvider.CreateDifference(settings, differenceTreeNode, sourceDifference, null, null);
+            var comparer = new Comparer<A>(settings);
+            
+            var differences = comparer.CalculateDifferences(a1, a2).ToArray();
 
-            Assert.IsTrue(targetDifference.MemberPath == targetDifference.MemberPath);
-            Assert.IsTrue(targetDifference.Value1 == targetDifference.Value1);
-            Assert.IsTrue(targetDifference.Value2 == targetDifference.Value2);
-            Assert.IsTrue(targetDifference.RawValue2 == null);
-            Assert.IsTrue(targetDifference.RawValue1 == null);
-            Assert.IsTrue(targetDifference.DifferenceType == targetDifference.DifferenceType);
+            Assert.IsTrue((int)differences[0].RawValue1 == 10);
+            Assert.IsTrue((int)differences[0].RawValue2 == 11);
+        }
+
+        [Test]
+        public void DontPreserveRawValues()
+        {
+            var a1 = new A() { IntProperty = 10 };
+            var a2 = new A() { IntProperty = 11 };
+
+            var settings = new ComparisonSettings();
+            settings.ConfigureDifference(includeRawValues: false);
+
+            var comparer = new Comparer<A>(settings);
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToArray();
+
+            Assert.IsTrue(differences[0].RawValue1 == null);
+            Assert.IsTrue(differences[0].RawValue2 == null);
         }
 
         [Test]
