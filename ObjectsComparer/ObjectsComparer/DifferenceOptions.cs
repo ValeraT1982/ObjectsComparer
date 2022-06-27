@@ -54,5 +54,25 @@ namespace ObjectsComparer
 
             return this;
         }
+
+        public DifferenceOptions IncludeRawValues(bool includeRawValues)
+        {
+            if (includeRawValues)
+            {
+                UseDifferenceFactory(args => new Difference(
+                    args.DefaultDifference.MemberPath,
+                    args.DefaultDifference.Value1,
+                    args.DefaultDifference.Value2,
+                    args.DefaultDifference.DifferenceType,
+                    args.RawValue1,
+                    args.RawValue2));
+            }
+            else
+            {
+                UseDifferenceFactory(null);
+            }
+
+            return this;
+        }
     }
 }

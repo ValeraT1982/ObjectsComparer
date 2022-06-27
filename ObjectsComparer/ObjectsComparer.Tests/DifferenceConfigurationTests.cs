@@ -62,6 +62,32 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
+        public void PreserveRawValuesConditionaly()
+        {
+            var a1 = new A() { IntProperty = 10, TestProperty1 = "TestProperty1value" };
+            var a2 = new A() { IntProperty = 11, TestProperty1 = "TestProperty2value" };
+
+            var settings = new ComparisonSettings();
+
+            settings.ConfigureDifference((currentProperty, options) => 
+            {
+                options.IncludeRawValues(currentProperty.Member.Name == "IntProperty");
+            });
+
+            var comparer = new Comparer<A>(settings);
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToArray();
+
+            Assert.IsTrue(differences[0].MemberPath == "IntProperty");
+            Assert.IsTrue((int)differences[0].RawValue1 == 10);
+            Assert.IsTrue((int)differences[0].RawValue2 == 11);
+
+            Assert.IsTrue(differences[1].MemberPath == "TestProperty1");
+            Assert.IsTrue(differences[1].RawValue1 == null);
+            Assert.IsTrue(differences[1].RawValue2 == null);
+        }
+
+        [Test]
         public void CreateDifferenceIncludeRawValues()
         {
             var sourceDifference = new Difference(
