@@ -185,10 +185,12 @@ namespace ObjectsComparer
             OverridesCollection.AddComparer(DoNotCompareValueComparer.Instance, filter);
         }
 
+
         /// <summary>
         /// Adds an <paramref name="difference"/> to the end of the <paramref name="differenceTreeNode"/>'s <see cref="IDifferenceTreeNode.Differences"/>.
         /// </summary>
         /// <returns>The <see cref="DifferenceLocation"/> instance.</returns>
+        [Obsolete("Use 2. method", true)]
         protected virtual DifferenceLocation AddDifferenceToTree(Difference difference, IDifferenceTreeNode differenceTreeNode)
         {
             if (difference is null)

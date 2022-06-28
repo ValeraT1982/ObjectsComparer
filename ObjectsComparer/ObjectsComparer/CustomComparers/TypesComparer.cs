@@ -49,7 +49,8 @@ namespace ObjectsComparer
             if (type1Str != type2Str)
             {
                 //yield return new Difference(string.Empty, type1Str, type2Str);
-                yield return AddDifferenceToTree(new Difference(string.Empty, type1Str, type2Str), differenceTreeNode);
+                //yield return AddDifferenceToTree(new Difference(string.Empty, type1Str, type2Str), differenceTreeNode);
+                yield return AddDifferenceToTree(differenceTreeNode, string.Empty, type1Str, type2Str, DifferenceTypes.ValueMismatch, obj1, obj2);
             }
         }
 

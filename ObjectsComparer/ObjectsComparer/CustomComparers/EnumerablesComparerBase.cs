@@ -56,7 +56,8 @@ namespace ObjectsComparer
 
                     var nullElementIdentifier = keyOptions.GetNullElementIdentifier(new FormatNullElementIdentifierArgs(element1Index));
 
-                    yield return AddDifferenceToTree(new Difference($"[{nullElementIdentifier}]", string.Empty, string.Empty, DifferenceTypes.MissedElementInSecondObject), elementDifferenceTreeNode);
+                    //yield return AddDifferenceToTree(new Difference($"[{nullElementIdentifier}]", string.Empty, string.Empty, DifferenceTypes.MissedElementInSecondObject), elementDifferenceTreeNode);
+                    yield return AddDifferenceToTree(elementDifferenceTreeNode, $"[{nullElementIdentifier}]", string.Empty, string.Empty, DifferenceTypes.MissedElementInSecondObject);
                     continue;
                 }
 
@@ -88,7 +89,8 @@ namespace ObjectsComparer
                 else
                 {
                     var valueComparer1 = OverridesCollection.GetComparer(element1.GetType()) ?? DefaultValueComparer;
-                    yield return AddDifferenceToTree(new Difference($"[{formattedElement1Key}]", valueComparer1.ToString(element1), string.Empty, DifferenceTypes.MissedElementInSecondObject), elementDifferenceTreeNode);
+                    //yield return AddDifferenceToTree(new Difference($"[{formattedElement1Key}]", valueComparer1.ToString(element1), string.Empty, DifferenceTypes.MissedElementInSecondObject), elementDifferenceTreeNode);
+                    yield return AddDifferenceToTree(elementDifferenceTreeNode, $"[{formattedElement1Key}]", valueComparer1.ToString(element1), string.Empty, DifferenceTypes.MissedElementInSecondObject, element1);
                 }
             }
 
@@ -106,7 +108,8 @@ namespace ObjectsComparer
 
                     var nullElementIdentifier = keyOptions.GetNullElementIdentifier(new FormatNullElementIdentifierArgs(element2Index));
 
-                    yield return AddDifferenceToTree(new Difference($"[{nullElementIdentifier}]", string.Empty, string.Empty, DifferenceTypes.MissedElementInFirstObject), elementDifferenceTreeNode);
+                    //yield return AddDifferenceToTree(new Difference($"[{nullElementIdentifier}]", string.Empty, string.Empty, DifferenceTypes.MissedElementInFirstObject), elementDifferenceTreeNode);
+                    yield return AddDifferenceToTree(elementDifferenceTreeNode, $"[{nullElementIdentifier}]", string.Empty, string.Empty, DifferenceTypes.MissedElementInFirstObject);
                     continue;
                 }
 
@@ -126,7 +129,8 @@ namespace ObjectsComparer
                 {
                     var formattedElement2Key = keyOptions.GetFormattedElementKey(new FormatListElementKeyArgs(element2Index, element2Key, element2));
                     var valueComparer2 = OverridesCollection.GetComparer(element2.GetType()) ?? DefaultValueComparer;
-                    yield return AddDifferenceToTree(new Difference($"[{formattedElement2Key}]", string.Empty, valueComparer2.ToString(element2), DifferenceTypes.MissedElementInFirstObject), elementDifferenceTreeNode);
+                    //yield return AddDifferenceToTree(new Difference($"[{formattedElement2Key}]", string.Empty, valueComparer2.ToString(element2), DifferenceTypes.MissedElementInFirstObject), elementDifferenceTreeNode);
+                    yield return AddDifferenceToTree(elementDifferenceTreeNode, $"[{formattedElement2Key}]", string.Empty, valueComparer2.ToString(element2), DifferenceTypes.MissedElementInFirstObject, null, element2);
                 }
             }
         }
@@ -157,19 +161,22 @@ namespace ObjectsComparer
 
                 if (array1[i] == null)
                 {
-                    yield return AddDifferenceToTree(new Difference($"[{i}]", string.Empty, valueComparer2.ToString(array2[i])), elementDifferenceTreeNode);
+                    //yield return AddDifferenceToTree(new Difference($"[{i}]", string.Empty, valueComparer2.ToString(array2[i])), elementDifferenceTreeNode);
+                    yield return AddDifferenceToTree(elementDifferenceTreeNode, $"[{i}]", string.Empty, valueComparer2.ToString(array2[i]), DifferenceTypes.ValueMismatch, null, array2[i]);
                     continue;
                 }
 
                 if (array2[i] == null)
                 {
-                    yield return AddDifferenceToTree(new Difference($"[{i}]", valueComparer1.ToString(array1[i]), string.Empty), elementDifferenceTreeNode);
+                    //yield return AddDifferenceToTree(new Difference($"[{i}]", valueComparer1.ToString(array1[i]), string.Empty), elementDifferenceTreeNode);
+                    yield return AddDifferenceToTree(elementDifferenceTreeNode, $"[{i}]", valueComparer1.ToString(array1[i]), string.Empty, DifferenceTypes.ValueMismatch, array1[i]);
                     continue;
                 }
 
                 if (array1[i].GetType() != array2[i].GetType())
                 {
-                    yield return AddDifferenceToTree(new Difference($"[{i}]", valueComparer1.ToString(array1[i]), valueComparer2.ToString(array2[i]), DifferenceTypes.TypeMismatch), elementDifferenceTreeNode);
+                    //yield return AddDifferenceToTree(new Difference($"[{i}]", valueComparer1.ToString(array1[i]), valueComparer2.ToString(array2[i]), DifferenceTypes.TypeMismatch), elementDifferenceTreeNode);
+                    yield return AddDifferenceToTree(elementDifferenceTreeNode, $"[{i}]", valueComparer1.ToString(array1[i]), valueComparer2.ToString(array2[i]), DifferenceTypes.TypeMismatch, array1[i], array2[i]);
                     continue;
                 }
 
@@ -191,13 +198,20 @@ namespace ObjectsComparer
                 {
                     var valueComparer = largerArray[i] != null ? OverridesCollection.GetComparer(largerArray[i].GetType()) ?? DefaultValueComparer : DefaultValueComparer;
 
-                    var difference = new Difference(
+                    //var difference = new Difference(
+                    //    memberPath: $"[{i}]",
+                    //    value1: array1Count > array2Count ? valueComparer.ToString(largerArray[i]) : string.Empty,
+                    //    value2: array2Count > array1Count ? valueComparer.ToString(largerArray[i]) : string.Empty,
+                    //    differenceType: array1Count > array2Count ? DifferenceTypes.MissedElementInSecondObject : DifferenceTypes.MissedElementInFirstObject);
+
+                    //yield return AddDifferenceToTree(difference, DifferenceTreeNodeProvider.CreateNode(Settings, listDifferenceTreeNode));
+                    yield return AddDifferenceToTree(DifferenceTreeNodeProvider.CreateNode(Settings, listDifferenceTreeNode),
                         memberPath: $"[{i}]",
                         value1: array1Count > array2Count ? valueComparer.ToString(largerArray[i]) : string.Empty,
                         value2: array2Count > array1Count ? valueComparer.ToString(largerArray[i]) : string.Empty,
-                        differenceType: array1Count > array2Count ? DifferenceTypes.MissedElementInSecondObject : DifferenceTypes.MissedElementInFirstObject);
-
-                    yield return AddDifferenceToTree(difference, DifferenceTreeNodeProvider.CreateNode(Settings, listDifferenceTreeNode));
+                        differenceType: array1Count > array2Count ? DifferenceTypes.MissedElementInSecondObject : DifferenceTypes.MissedElementInFirstObject,
+                        array1Count > array2Count ? largerArray[i] : (object)null,
+                        array2Count > array1Count ? largerArray[i] : (object)null);
                 }
             }
         }

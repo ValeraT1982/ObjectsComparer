@@ -63,11 +63,12 @@ namespace ObjectsComparer
             {
                 if (!hashSet2.Contains(element))
                 {
-                    var difference = AddDifferenceToTree(
-                        new Difference("", valueComparer.ToString(element), string.Empty, DifferenceTypes.MissedElementInSecondObject), 
-                        differenceTreeNode);
+                    //var differenceLocation = AddDifferenceToTree(
+                    //    new Difference("", valueComparer.ToString(element), string.Empty, DifferenceTypes.MissedElementInSecondObject), 
+                    //    differenceTreeNode);
+                    var differenceLocation = AddDifferenceToTree(differenceTreeNode, "", valueComparer.ToString(element), string.Empty, DifferenceTypes.MissedElementInSecondObject, element, null);
 
-                    yield return difference;
+                    yield return differenceLocation;
                 }
             }
             
@@ -75,10 +76,11 @@ namespace ObjectsComparer
             {
                 if (!hashSet1.Contains(element))
                 {
-                    var difference = AddDifferenceToTree(new Difference("", string.Empty, valueComparer.ToString(element),
-                        DifferenceTypes.MissedElementInFirstObject), differenceTreeNode);
+                    //var differenceLocation = AddDifferenceToTree(new Difference("", string.Empty, valueComparer.ToString(element),
+                    //    DifferenceTypes.MissedElementInFirstObject), differenceTreeNode);
+                    var differenceLocation = AddDifferenceToTree(differenceTreeNode, "", string.Empty, valueComparer.ToString(element), DifferenceTypes.MissedElementInFirstObject, null, element);
 
-                    yield return difference;
+                    yield return differenceLocation;
                 }
             }
         }

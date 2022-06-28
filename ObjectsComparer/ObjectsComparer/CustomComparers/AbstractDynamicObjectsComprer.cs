@@ -82,21 +82,30 @@ namespace ObjectsComparer
                 {
                     if (!existsInObject1)
                     {
-                        var difference = AddDifferenceToTree(
-                            new Difference(propertyKey, string.Empty, valueComparer.ToString(value2), DifferenceTypes.MissedMemberInFirstObject),
-                            keyDifferenceTreeNode);
+                        var differenceLocation = AddDifferenceToTree(keyDifferenceTreeNode, propertyKey, string.Empty, valueComparer.ToString(value2), DifferenceTypes.ValueMismatch, null, value2);
+                        //var differenceLocation = AddDifferenceToTree(
+                        //    new Difference(propertyKey, string.Empty, valueComparer.ToString(value2), DifferenceTypes.MissedMemberInFirstObject),
+                        //    keyDifferenceTreeNode);
 
-                        yield return difference;
+                        yield return differenceLocation;
                         continue;
                     }
 
                     if (!existsInObject2)
                     {
-                        var difference = AddDifferenceToTree(
-                            new Difference(propertyKey, valueComparer.ToString(value1), string.Empty, DifferenceTypes.MissedMemberInSecondObject),
-                            keyDifferenceTreeNode);
+                        var differenceLocation = AddDifferenceToTree(
+                            keyDifferenceTreeNode,
+                            propertyKey,
+                            valueComparer.ToString(value1),
+                            string.Empty,
+                            DifferenceTypes.MissedMemberInSecondObject,
+                            value1,
+                            null);
+                        //var differenceLocation = AddDifferenceToTree(
+                        //    new Difference(propertyKey, valueComparer.ToString(value1), string.Empty, DifferenceTypes.MissedMemberInSecondObject),
+                        //    keyDifferenceTreeNode);
 
-                        yield return difference;
+                        yield return differenceLocation;
                         continue;
                     }
                 }
@@ -107,11 +116,12 @@ namespace ObjectsComparer
                         OverridesCollection.GetComparer(propertyKey) ?? 
                         DefaultValueComparer;
 
-                    var difference = AddDifferenceToTree(
-                        new Difference(propertyKey, valueComparer.ToString(value1), valueComparer2.ToString(value2), DifferenceTypes.TypeMismatch),
-                        keyDifferenceTreeNode);
+                    //var differenceLocation = AddDifferenceToTree(
+                    //    new Difference(propertyKey, valueComparer.ToString(value1), valueComparer2.ToString(value2), DifferenceTypes.TypeMismatch),
+                    //    keyDifferenceTreeNode);
+                    var differenceLocation = AddDifferenceToTree(keyDifferenceTreeNode, propertyKey, valueComparer.ToString(value1), valueComparer2.ToString(value2), DifferenceTypes.TypeMismatch, value1, value2);
 
-                    yield return difference;
+                    yield return differenceLocation;
                     continue;
                 }
 
@@ -123,11 +133,12 @@ namespace ObjectsComparer
                         OverridesCollection.GetComparer(value2.GetType()) ?? OverridesCollection.GetComparer(propertyKey) ?? DefaultValueComparer :
                         DefaultValueComparer;
 
-                    var difference = AddDifferenceToTree(
-                        new Difference(propertyKey, valueComparer.ToString(value1), valueComparer2.ToString(value2), DifferenceTypes.TypeMismatch),
-                        keyDifferenceTreeNode);
+                    //var differenceLocation = AddDifferenceToTree(
+                    //    new Difference(propertyKey, valueComparer.ToString(value1), valueComparer2.ToString(value2), DifferenceTypes.TypeMismatch),
+                    //    keyDifferenceTreeNode);
+                    var differenceLocation = AddDifferenceToTree(keyDifferenceTreeNode, propertyKey, valueComparer.ToString(value1), valueComparer2.ToString(value2), DifferenceTypes.TypeMismatch, value1, value2);
 
-                    yield return difference;
+                    yield return differenceLocation;
                     continue;
                 }
 
@@ -135,9 +146,10 @@ namespace ObjectsComparer
                 {
                     if (!customComparer.Compare(value1, value2, Settings))
                     {
-                        var differenceLocation = AddDifferenceToTree(
-                            new Difference(propertyKey, customComparer.ToString(value1), customComparer.ToString(value2)),
-                            keyDifferenceTreeNode);
+                        //var differenceLocation = AddDifferenceToTree(
+                        //    new Difference(propertyKey, customComparer.ToString(value1), customComparer.ToString(value2)),
+                        //    keyDifferenceTreeNode);
+                        var differenceLocation = AddDifferenceToTree(keyDifferenceTreeNode, propertyKey, customComparer.ToString(value1), customComparer.ToString(value2), DifferenceTypes.ValueMismatch, value1, value2);
 
                         yield return differenceLocation;
                     }
