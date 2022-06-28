@@ -212,6 +212,7 @@ namespace ObjectsComparer
             DifferenceTypes differenceType = DifferenceTypes.ValueMismatch, object rawValue1 = null, object rawValue2 = null)
         {
             var difference = CreateDifference(differenceTreeNode, memberPath, value1, value2, differenceType, rawValue1, rawValue2);
+            differenceTreeNode.AddDifference(difference);
 
             return new DifferenceLocation(difference, differenceTreeNode);
         }

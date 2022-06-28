@@ -82,7 +82,7 @@ namespace ObjectsComparer
                 {
                     if (!existsInObject1)
                     {
-                        var differenceLocation = AddDifferenceToTree(keyDifferenceTreeNode, propertyKey, string.Empty, valueComparer.ToString(value2), DifferenceTypes.ValueMismatch, null, value2);
+                        var differenceLocation = AddDifferenceToTree(keyDifferenceTreeNode, propertyKey, string.Empty, valueComparer.ToString(value2), DifferenceTypes.MissedMemberInFirstObject, null, value2);
                         //var differenceLocation = AddDifferenceToTree(
                         //    new Difference(propertyKey, string.Empty, valueComparer.ToString(value2), DifferenceTypes.MissedMemberInFirstObject),
                         //    keyDifferenceTreeNode);
