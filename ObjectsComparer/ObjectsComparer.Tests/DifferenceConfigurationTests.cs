@@ -87,6 +87,30 @@ namespace ObjectsComparer.Tests
             Assert.IsTrue(differences[1].RawValue2 == null);
         }
 
+        [Test]
+        public void CustomizeMemberPath()
+        {
+            var a1 = new A() { IntProperty = 10, TestProperty2 = "value1", ListOfC = new List<C> { new C { Property1 = "property1" } } };
+            var a2 = new A() { IntProperty = 11, TestProperty2 = "value2", ListOfC = new List<C> { new C { Property1 = "property2" } } };
+
+            var settings = new ComparisonSettings();
+
+            settings.ConfigureDifference((currentProperty, options) =>
+            {
+                if (currentProperty.Member.Name == nameof(A.IntProperty))
+                {
+                    options.UseDifferenceFactory(args => new Difference("Integer property", args.DefaultDifference.Value1, args.DefaultDifference.Value2));
+                }
+            });
+
+            var comparer = new Comparer<A>(settings);
+
+            var differences = comparer.CalculateDifferences(a1, a2).ToArray();
+
+            Assert.IsTrue(differences.Any(diff=> diff.MemberPath == "Integer property"));
+            Assert.IsTrue(differences.Any(diff => diff.MemberPath == "TestProperty2"));
+        }
+
         //[Test]
         //public void CreateDifferenceIncludeRawValues()
         //{
