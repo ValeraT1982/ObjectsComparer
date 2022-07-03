@@ -66,7 +66,6 @@ namespace ObjectsComparer
             {
                 if (!type.GetTypeInfo().IsArray)
                 {
-                    //yield return AddDifferenceToTree(new Difference("", list1.Count().ToString(), list2.Count().ToString(), DifferenceTypes.NumberOfElementsMismatch), listDifferenceTreeNode);
                     yield return AddDifferenceToTree(listDifferenceTreeNode, "", list1.Count().ToString(), list2.Count().ToString(), DifferenceTypes.NumberOfElementsMismatch);
                 }
 

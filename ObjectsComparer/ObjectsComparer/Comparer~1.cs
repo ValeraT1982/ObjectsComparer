@@ -84,7 +84,6 @@ namespace ObjectsComparer
                 if (!comparer.Compare(obj1, obj2, Settings))
                 {
                     yield return AddDifferenceToTree(differenceTreeNode, string.Empty, comparer.ToString(obj1), comparer.ToString(obj2), DifferenceTypes.ValueMismatch, obj1, obj2);
-                    //yield return AddDifferenceToTree(new Difference(string.Empty, comparer.ToString(obj1), comparer.ToString(obj2)), differenceTreeNode); DaN AddDifferenceToTree
                 }
 
                 yield break;
@@ -109,7 +108,6 @@ namespace ObjectsComparer
                 if (!DefaultValueComparer.Compare(obj1, obj2, Settings))
                 {
                     yield return AddDifferenceToTree(differenceTreeNode, string.Empty, DefaultValueComparer.ToString(obj1), DefaultValueComparer.ToString(obj2), DifferenceTypes.ValueMismatch, obj1, obj2);
-                    //yield return AddDifferenceToTree(new Difference(string.Empty, DefaultValueComparer.ToString(obj1), DefaultValueComparer.ToString(obj2)), differenceTreeNode); DaN AddDifferenceToTree
                 }
 
                 yield break;
@@ -155,7 +153,7 @@ namespace ObjectsComparer
 
                     foreach (var failure in objectDataComparer.TryBuildDifferenceTree(type, value1, value2, memberNode))
                     {
-                        failure.Difference.InsertPath(member.Name);
+                        InsertPathToDifference(failure.Difference, member.Name, memberNode, failure.TreeNode);
                         yield return failure;
                     }
 
@@ -165,7 +163,6 @@ namespace ObjectsComparer
                 if (!valueComparer.Compare(value1, value2, Settings))
                 {
                     yield return AddDifferenceToTree(memberNode, member.Name, valueComparer.ToString(value1), valueComparer.ToString(value2), DifferenceTypes.ValueMismatch, value1, value2);
-                    //yield return AddDifferenceToTree(new Difference(member.Name, valueComparer.ToString(value1), valueComparer.ToString(value2)), memberNode); //DaN AddDifferenceToTree
                 }
             }
         }

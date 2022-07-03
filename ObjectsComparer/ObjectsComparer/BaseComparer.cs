@@ -244,5 +244,19 @@ namespace ObjectsComparer
 
             return customDifference;
         }
+
+        protected virtual void InsertPathToDifference(Difference difference, string defaultRootElementPath, IDifferenceTreeNode rootNode, IDifferenceTreeNode differenceNode)
+        {
+            var differencePathOptions = DifferencePathOptions.Default();
+            
+            Settings.DifferencePathOptionsAction?.Invoke(rootNode, differencePathOptions);
+
+            if (differencePathOptions.InsertPathFactory != null)
+            {
+                defaultRootElementPath = differencePathOptions.InsertPathFactory(new InsertPathFactoryArgs(defaultRootElementPath, differenceNode));
+            }
+
+            difference.InsertPath(defaultRootElementPath);
+        }
     }
 }

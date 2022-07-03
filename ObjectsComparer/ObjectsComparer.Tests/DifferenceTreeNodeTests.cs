@@ -96,6 +96,70 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
+        public void TestThrowDifferenceTreeBuilderNotImplemented_ConfigureListComparison()
+        {
+            var settings = new ComparisonSettings();
+
+            settings.ConfigureListComparison();
+
+            var factory = new CustomComparersFactory();
+            var comparer = factory.GetObjectsComparer<A>(settings);
+
+            var a1 = new A { ClassB = new B() };
+            var a2 = new A { ClassB = new B() };
+
+            Assert.Throws<DifferenceTreeBuilderNotImplementedException>(() => comparer.CalculateDifferences(a1, a2).ToArray());
+        }
+
+        [Test]
+        public void TestThrowDifferenceTreeBuilderNotImplemented_ConfigureDifference()
+        {
+            var settings = new ComparisonSettings();
+
+            settings.ConfigureDifference(false);
+
+            var factory = new CustomComparersFactory();
+            var comparer = factory.GetObjectsComparer<A>(settings);
+
+            var a1 = new A { ClassB = new B() };
+            var a2 = new A { ClassB = new B() };
+
+            Assert.Throws<DifferenceTreeBuilderNotImplementedException>(() => comparer.CalculateDifferences(a1, a2).ToArray());
+        }
+
+        [Test]
+        public void TestThrowDifferenceTreeBuilderNotImplemented_ConfigureDifferenceTree()
+        {
+            var settings = new ComparisonSettings();
+
+            settings.ConfigureDifferenceTree((_, options) => { });
+
+            var factory = new CustomComparersFactory();
+            var comparer = factory.GetObjectsComparer<A>(settings);
+
+            var a1 = new A { ClassB = new B() };
+            var a2 = new A { ClassB = new B() };
+
+            Assert.Throws<DifferenceTreeBuilderNotImplementedException>(() => comparer.CalculateDifferences(a1, a2).ToArray());
+        }
+
+        [Test]
+        public void TestThrowDifferenceTreeBuilderNotImplemented_ConfigureDifferencePath()
+        {
+            var settings = new ComparisonSettings();
+
+            settings.ConfigureDifferencePath((_, options) => { });
+
+            var factory = new CustomComparersFactory();
+            var comparer = factory.GetObjectsComparer<A>(settings);
+
+            var a1 = new A { ClassB = new B() };
+            var a2 = new A { ClassB = new B() };
+
+            Assert.Throws<DifferenceTreeBuilderNotImplementedException>(() => comparer.CalculateDifferences(a1, a2).ToArray());
+        }
+
+        [Test]
         public void EnumerateConditional()
         {
             var list = new List<int> { 6, 8, 79, 3, 45, 9 };
@@ -190,12 +254,17 @@ namespace ObjectsComparer.Tests
     {
         public override IComparer<T> GetObjectsComparer<T>(ComparisonSettings settings = null, BaseComparer parentComparer = null)
         {
-            if (typeof(T) != typeof(string))
+            if (typeof(T) == typeof(B))
             {
-                return base.GetObjectsComparer<T>(settings, parentComparer);
+                return (IComparer<T>)new CustomClassBComparer(settings, parentComparer, this);
             }
 
-            return (IComparer<T>)new CustomStringComparer(settings, parentComparer, this);
+            if (typeof(T) == typeof(string))
+            {
+                return (IComparer<T>)new CustomStringComparer(settings, parentComparer, this);
+            }
+
+            return base.GetObjectsComparer<T>(settings, parentComparer);
         }
     }
 
@@ -206,6 +275,20 @@ namespace ObjectsComparer.Tests
         }
 
         public override IEnumerable<Difference> CalculateDifferences(string obj1, string obj2)
+        {
+            //var comparer = Factory.GetObjectsComparer(obj1.GetType());
+            //return comparer.CalculateDifferences(obj1, obj2);
+            throw new NotImplementedException();
+        }
+    }
+
+    class CustomClassBComparer : AbstractComparer<B>
+    {
+        public CustomClassBComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory) : base(settings, parentComparer, factory)
+        {
+        }
+
+        public override IEnumerable<Difference> CalculateDifferences(B obj1, B obj2)
         {
             throw new NotImplementedException();
         }

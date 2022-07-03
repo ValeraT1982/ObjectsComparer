@@ -126,12 +126,24 @@ namespace ObjectsComparer.DifferenceTreeExtensions
 
             if (comparisonSettings.ListComparisonOptionsAction != null)
             {
-                var message = $"Because the list comparison has bben explicitly configured, the {comparer.GetType().FullName} must implement {unImplementedInterface} interface " +
+                var message = $"Because the list comparison has been explicitly configured, the {comparer.GetType().FullName} must implement {unImplementedInterface} interface " +
                     "or throwing the DifferenceTreeBuilderNotImplementedException must be disabled.";
                 throw new DifferenceTreeBuilderNotImplementedException(message);
             }
 
-            //TODO: Check DifferenceOptionsAction
+            if (comparisonSettings.DifferenceOptionsAction != null)
+            {
+                var message = $"Because the difference has been explicitly configured, the {comparer.GetType().FullName} must implement {unImplementedInterface} interface " +
+                    "or throwing the DifferenceTreeBuilderNotImplementedException must be disabled.";
+                throw new DifferenceTreeBuilderNotImplementedException(message);
+            }
+
+            if (comparisonSettings.DifferencePathOptionsAction != null)
+            {
+                var message = $"Because the difference path has been explicitly configured, the {comparer.GetType().FullName} must implement {unImplementedInterface} interface " +
+                    "or throwing the DifferenceTreeBuilderNotImplementedException must be disabled.";
+                throw new DifferenceTreeBuilderNotImplementedException(message);
+            }
 
             if (HasDifferenceTreeImplicitRoot(differenceTreeNode) == false)
             {

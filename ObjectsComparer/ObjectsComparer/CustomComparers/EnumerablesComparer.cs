@@ -36,7 +36,6 @@ namespace ObjectsComparer
             if (!Settings.EmptyAndNullEnumerablesEqual &&
                 (obj1 == null || obj2 == null) && obj1 != obj2)
             {
-                //yield return AddDifferenceToTree(new Difference("[]", obj1?.ToString() ?? string.Empty, obj2?.ToString() ?? string.Empty), listDifferenceTreeNode);
                 yield return AddDifferenceToTree(listDifferenceTreeNode, "[]", obj1?.ToString() ?? string.Empty, obj2?.ToString() ?? string.Empty, DifferenceTypes.ValueMismatch, obj1, obj2);
                 yield break;
             }
@@ -67,7 +66,6 @@ namespace ObjectsComparer
 
             if (array1.Length != array2.Length)
             {
-                //yield return AddDifferenceToTree(new Difference("", array1.Length.ToString(), array2.Length.ToString(), DifferenceTypes.NumberOfElementsMismatch), listDifferenceTreeNode);
                 yield return AddDifferenceToTree(listDifferenceTreeNode, "", array1.Length.ToString(), array2.Length.ToString(), DifferenceTypes.NumberOfElementsMismatch, array1, array2);
 
                 if (listComparisonOptions.UnequalListsComparisonEnabled == false)

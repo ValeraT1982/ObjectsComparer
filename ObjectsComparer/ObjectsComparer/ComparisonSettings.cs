@@ -67,7 +67,7 @@ namespace ObjectsComparer
             throw new KeyNotFoundException();
         }
 
-        internal Action<IDifferenceTreeNode, ListComparisonOptions> ListComparisonOptionsAction { get; private set; } = null;
+        public Action<IDifferenceTreeNode, ListComparisonOptions> ListComparisonOptionsAction { get; private set; } = null;
 
         /// <summary>
         /// Configures list comparison behavior, especially the type of the comparison. For more info, see <see cref="ListComparisonOptions"/>.
@@ -91,9 +91,11 @@ namespace ObjectsComparer
         /// The term list has a general meaning here and includes almost all Enumerable objects.
         /// </summary>
         /// <param name="comparisonOptions">See <see cref="ListComparisonOptions"/>.</param>
-        public void ConfigureListComparison(Action<ListComparisonOptions> comparisonOptions)
+        public ComparisonSettings ConfigureListComparison(Action<ListComparisonOptions> comparisonOptions)
         {
             ConfigureListComparison((_, options) => comparisonOptions(options));
+
+            return this;
         }
 
         /// <summary>
@@ -107,7 +109,7 @@ namespace ObjectsComparer
         /// <param name="compareUnequalLists">
         /// Shortcut for <see cref="ListComparisonOptions.CompareUnequalLists(bool)"/> operation. Default value = false.
         /// </param>
-        public void ConfigureListComparison(bool compareElementsByKey = false, bool compareUnequalLists = false)
+        public ComparisonSettings ConfigureListComparison(bool compareElementsByKey = false, bool compareUnequalLists = false)
         {
             ConfigureListComparison(options =>
             {
@@ -118,30 +120,53 @@ namespace ObjectsComparer
                     options.CompareElementsByKey();
                 }
             });
+
+            return this;
         }
 
-        internal Action<IDifferenceTreeNode, DifferenceTreeOptions> DifferenceTreeOptionsAction { get; private set; }
+        public Action<IDifferenceTreeNode, DifferenceTreeOptions> DifferenceTreeOptionsAction { get; private set; }
 
         /// <summary>
         /// Configures the difference tree behavior, see <see cref="DifferenceTreeOptions"/>.
         /// </summary>
         /// <param name="options"></param>
         /// <exception cref="ArgumentNullException"></exception>
-        public void ConfigureDifferenceTree(Action<IDifferenceTreeNode, DifferenceTreeOptions> options)
+        public ComparisonSettings ConfigureDifferenceTree(Action<IDifferenceTreeNode, DifferenceTreeOptions> options)
         {
             DifferenceTreeOptionsAction = options ?? throw new ArgumentNullException(nameof(options));
+
+            return this;
         }
 
-        internal Action<IDifferenceTreeNode, DifferenceOptions> DifferenceOptionsAction;
+        public Action<IDifferenceTreeNode, DifferenceOptions> DifferenceOptionsAction;
 
-        public void ConfigureDifference(Action<IDifferenceTreeNode, DifferenceOptions> differenceOptions)
+        public ComparisonSettings ConfigureDifference(Action<IDifferenceTreeNode, DifferenceOptions> differenceOptions)
         {
             DifferenceOptionsAction = differenceOptions ?? throw new ArgumentNullException(nameof(differenceOptions));
+
+            return this;
         }
 
-        public void ConfigureDifference(bool includeRawValues)
+        public ComparisonSettings ConfigureDifference(bool includeRawValues)
         {
             ConfigureDifference((_, options) => options.IncludeRawValues(includeRawValues));
+
+            return this;
+        }
+
+        public Action<IDifferenceTreeNode, DifferencePathOptions> DifferencePathOptionsAction;
+
+        /// <summary>
+        /// Behavior of the insertion into the difference path.
+        /// </summary>
+        /// <param name="options">
+        /// First parameter: The parent of the property to which the path is inserted.
+        /// </param>
+        public ComparisonSettings ConfigureDifferencePath(Action<IDifferenceTreeNode, DifferencePathOptions> options)
+        {
+            DifferencePathOptionsAction = options ?? throw new ArgumentNullException(nameof(options));
+
+            return this;
         }
     }
 }

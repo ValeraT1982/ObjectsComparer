@@ -60,7 +60,6 @@ namespace ObjectsComparer
 
             if (array1.Rank != array2.Rank)
             {
-                //var difference = AddDifferenceToTree(new Difference("Rank", array1.Rank.ToString(), array2.Rank.ToString()), differenceTreeNode);
                 var differenceLocation = AddDifferenceToTree(differenceTreeNode, "Rank", array1.Rank.ToString(), array2.Rank.ToString());
                 yield return differenceLocation;
                 yield break;
@@ -76,7 +75,6 @@ namespace ObjectsComparer
                 if (length1 != length2)
                 {
                     dimensionsFailure = true;
-                    //var differenceLocation = AddDifferenceToTree(new Difference($"Dimension{i}", length1.ToString(), length2.ToString()), differenceTreeNode);
                     var differenceLocation = AddDifferenceToTree(differenceTreeNode, $"Dimension{i}", length1.ToString(), length2.ToString());
                     yield return differenceLocation;
                 }
