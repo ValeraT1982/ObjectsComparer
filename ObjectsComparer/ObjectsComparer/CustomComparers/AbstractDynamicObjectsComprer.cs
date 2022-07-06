@@ -55,7 +55,7 @@ namespace ObjectsComparer
                 if (existsInObject2)
                 {
                     TryGetMemberValue(castedObject2, propertyKey, out value2);
-                    TryGetMember(castedObject1, propertyKey, out member2);
+                    TryGetMember(castedObject2, propertyKey, out member2);
                 }
 
                 var keyDifferenceTreeNode = DifferenceTreeNodeProvider.CreateNode(Settings, differenceTreeNode, member1 ?? member2, propertyKey);
