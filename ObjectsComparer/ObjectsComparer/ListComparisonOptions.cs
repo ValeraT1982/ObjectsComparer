@@ -18,7 +18,7 @@ namespace ObjectsComparer
         /// <summary>
         /// See <see cref="CompareUnequalLists(bool)"/>.
         /// </summary>
-        internal bool UnequalListsComparisonEnabled { get; private set; } = false;
+        public bool UnequalListsComparisonEnabled { get; private set; } = false;
 
         /// <summary>
         /// Whether to compare elements of the lists even if their number differs. Regardless of the <paramref name="value"/>, if lists are unequal, the difference of type <see cref="DifferenceTypes.NumberOfElementsMismatch"/> will always be logged. Default value = false - unequal lists will not be compared.
@@ -46,7 +46,7 @@ namespace ObjectsComparer
             return this;
         }
 
-        internal Action<ListElementComparisonByKeyOptions> KeyOptionsAction { get; private set; }
+        public Action<ListElementComparisonByKeyOptions> KeyOptionsAction { get; private set; }
 
         /// <summary>
         /// Compares list elements by key using <see cref="ListElementComparisonByKeyOptions.DefaultElementKeyProviderAction"/> element key provider.
