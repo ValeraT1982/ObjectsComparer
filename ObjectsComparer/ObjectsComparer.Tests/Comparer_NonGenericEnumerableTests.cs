@@ -52,7 +52,7 @@ namespace ObjectsComparer.Tests
             var a2 = new int?[] { null, 3, 2, 1 };
 
             var settings = new ComparisonSettings();
-            settings.ConfigureListComparison(compareElementsByKey, false);
+            settings.ConfigureListComparison(compareElementsByKey);
 
             var comparer = new Comparer<int?[]>(settings);
 
@@ -277,10 +277,7 @@ namespace ObjectsComparer.Tests
             var a2 = new A { NonGenericEnumerable = new ArrayList { "Str2", null } };
 
             var settings = new ComparisonSettings();
-            settings.ConfigureListComparison(listOptions =>
-            {
-                listOptions.CompareElementsByKey(); 
-            });
+            settings.ConfigureListComparison(compareElementsByKey: true);
 
             var comparer = new Comparer<A>(settings);
 

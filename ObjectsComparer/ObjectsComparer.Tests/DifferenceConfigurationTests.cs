@@ -90,8 +90,8 @@ namespace ObjectsComparer.Tests
 		[Test]
 		public void CustomizeMemberPath()
 		{
-			var a1 = new A() { IntProperty = 10, TestProperty2 = "value1", ListOfC = new List<C> { new C { Property1 = "property1" } } };
-			var a2 = new A() { IntProperty = 11, TestProperty2 = "value2", ListOfC = new List<C> { new C { Property1 = "property2" } } };
+			var a1 = new A() { ClassB = new B { Property1 = "value1 " }, IntProperty = 10, TestProperty2 = "value1", ListOfC = new List<C> { new C { Property1 = "property1" } } };
+			var a2 = new A() { ClassB = new B { Property1 = "value2 " }, IntProperty = 11, TestProperty2 = "value2", ListOfC = new List<C> { new C { Property1 = "property2" } } };
 
 			var settings = new ComparisonSettings();
 
@@ -104,7 +104,14 @@ namespace ObjectsComparer.Tests
 					}
 					else if (currentProperty.Member.Name == nameof(C.Property1))
 					{
-						options.UseDifferenceFactory(args => new Difference("First property", args.DefaultDifference.Value1, args.DefaultDifference.Value2));
+                        if (currentProperty.Ancestor.Member.Name == "ClassB")
+                        {
+							options.UseDifferenceFactory(args => new Difference("First property of Class B", args.DefaultDifference.Value1, args.DefaultDifference.Value2));
+						}
+                        else
+                        {
+							options.UseDifferenceFactory(args => new Difference("First property of class A", args.DefaultDifference.Value1, args.DefaultDifference.Value2));
+						}
 					}
 				})
 				.ConfigureDifferencePath((parentProperty, options) => 
@@ -121,80 +128,9 @@ namespace ObjectsComparer.Tests
 
 			Assert.IsTrue(differences.Any(diff => diff.MemberPath == "Integer property"));
 			Assert.IsTrue(differences.Any(diff => diff.MemberPath == "TestProperty2"));
-			Assert.IsTrue(differences.Any(diff => diff.MemberPath == "Collection of C objects[0].First property"));
+			Assert.IsTrue(differences.Any(diff => diff.MemberPath == "Collection of C objects[0].First property of class A"));
+			Assert.IsTrue(differences.Any(diff => diff.MemberPath == "ClassB.First property of Class B"));
 		}
-
-		//[Test]
-		//public void CreateDifferenceIncludeRawValues()
-		//{
-		//    var sourceDifference = new Difference(
-		//            memberPath: "PathXY",
-		//            value1: "VALUE1",
-		//            value2: "VALUE2",
-		//            rawValue1: new { Value = "VALUE1" },
-		//            rawValue2: new { Value = "VALUE2" },
-		//            differenceType: DifferenceTypes.TypeMismatch);
-
-		//    var differenceTreeNode = new DifferenceTreeNode(new DifferenceTreeNodeMember());
-		//    var settings = new ComparisonSettings();
-
-		//    settings.ConfigureDifference(includeRawValues: true);
-
-		//    var targetDifference = DifferenceProvider.CreateDifference(settings, differenceTreeNode, sourceDifference,null, null);
-
-		//    Assert.IsTrue(targetDifference == sourceDifference);
-		//}
-
-		//[Test]
-		//public void CreateDifferenceNotIncludeRawValues()
-		//{
-		//    var sourceDifference = new Difference(
-		//            memberPath: "PathXY",
-		//            value1: "VALUE1",
-		//            value2: "VALUE2",
-		//            rawValue1: new { Value = "VALUE1" },
-		//            rawValue2: new { Value = "VALUE2" },
-		//            differenceType: DifferenceTypes.TypeMismatch);
-
-		//    var differenceTreeNode = new DifferenceTreeNode(new DifferenceTreeNodeMember());
-		//    var settings = new ComparisonSettings();
-
-		//    settings.ConfigureDifference(includeRawValues: false);
-
-		//    var targetDifference = DifferenceProvider.CreateDifference(settings, differenceTreeNode, sourceDifference, null, null);
-
-		//    Assert.IsTrue(targetDifference.MemberPath == targetDifference.MemberPath);
-		//    Assert.IsTrue(targetDifference.Value1 == targetDifference.Value1);
-		//    Assert.IsTrue(targetDifference.Value2 == targetDifference.Value2);
-		//    Assert.IsTrue(targetDifference.RawValue2 == null);
-		//    Assert.IsTrue(targetDifference.RawValue1 == null);
-		//    Assert.IsFalse(targetDifference == sourceDifference);
-		//                 }
-
-		//[Test]
-		//[TestCase(true)]
-		//[TestCase(false)]
-		//public void NoDifferenceFactorySourceTargetDifferenceEquality(bool includeRawValues)
-		//{
-		//    var differenceTreeNode = new DifferenceTreeNode(new DifferenceTreeNodeMember());
-		//    var settings = new ComparisonSettings();
-
-		//    settings.ConfigureDifference(includeRawValues);
-
-		//    var sourceDifference = new Difference(
-		//            memberPath: "PathXY",
-		//            value1: "VALUE1",
-		//            value2: "VALUE2",
-		//            rawValue1: new { Value = "VALUE1" },
-		//            rawValue2: new { Value = "VALUE2" },
-		//            differenceType: DifferenceTypes.TypeMismatch);
-
-		//    var targetDifference = DifferenceProvider.CreateDifference(settings, differenceTreeNode, sourceDifference, null, null);
-
-		//    Assert.AreEqual(includeRawValues, sourceDifference == targetDifference);
-		//    Assert.AreEqual(includeRawValues, targetDifference.RawValue1 != null);
-		//    Assert.AreEqual(includeRawValues, targetDifference.RawValue2 != null);
-		//}
 	}
 }
 

@@ -11,7 +11,7 @@ namespace ObjectsComparer
         }
 
         /// <summary>
-        /// Returns the root of the difference tree for cases where the consumer does not explicitly, directly or indirectly request the difference tree, ie the difference tree is created only as an auxiliary.
+        /// Returns the root of the difference tree for cases where the consumer does not explicitly, directly or indirectly request the difference tree, i.e the difference tree is created only as an auxiliary.
         /// </summary>
         public static IDifferenceTreeNode CreateImplicitRootNode(ComparisonSettings comparisonSettings)
         {            

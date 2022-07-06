@@ -127,10 +127,8 @@ namespace ObjectsComparer
         public Action<IDifferenceTreeNode, DifferenceTreeOptions> DifferenceTreeOptionsAction { get; private set; }
 
         /// <summary>
-        /// Configures the difference tree behavior, see <see cref="DifferenceTreeOptions"/>.
+        /// Configures creation of the <see cref="IDifferenceTreeNode"/> instance, see <see cref="DifferenceTreeOptions"/>.
         /// </summary>
-        /// <param name="options"></param>
-        /// <exception cref="ArgumentNullException"></exception>
         public ComparisonSettings ConfigureDifferenceTree(Action<IDifferenceTreeNode, DifferenceTreeOptions> options)
         {
             DifferenceTreeOptionsAction = options ?? throw new ArgumentNullException(nameof(options));
@@ -140,6 +138,9 @@ namespace ObjectsComparer
 
         public Action<IDifferenceTreeNode, DifferenceOptions> DifferenceOptionsAction;
 
+        /// <summary>
+        /// Configures creation of the <see cref="Difference"/> instance, see <see cref="DifferenceOptions"/>.
+        /// </summary>
         public ComparisonSettings ConfigureDifference(Action<IDifferenceTreeNode, DifferenceOptions> differenceOptions)
         {
             DifferenceOptionsAction = differenceOptions ?? throw new ArgumentNullException(nameof(differenceOptions));
@@ -147,6 +148,9 @@ namespace ObjectsComparer
             return this;
         }
 
+        /// <summary>
+        /// Configures creation of the <see cref="Difference"/> instance.
+        /// </summary>
         public ComparisonSettings ConfigureDifference(bool includeRawValues)
         {
             ConfigureDifference((_, options) => options.IncludeRawValues(includeRawValues));
@@ -157,7 +161,7 @@ namespace ObjectsComparer
         public Action<IDifferenceTreeNode, DifferencePathOptions> DifferencePathOptionsAction;
 
         /// <summary>
-        /// Behavior of the insertion into the difference path.
+        /// Configures the insertion into the difference path, see <see cref="DifferencePathOptions"/>.
         /// </summary>
         /// <param name="options">
         /// First parameter: The parent of the property to which the path is inserted.
