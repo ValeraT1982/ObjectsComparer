@@ -2076,6 +2076,158 @@ namespace ObjectsComparer.Tests
             }
         }
 
+        [Test]
+        public void BuildDifferenceTree_CustomizeMemberNames()
+        {
+            var student1 = new Student
+            {
+                Person = new Person
+                {
+                    ListOfAddress1 = new List<Address>
+                    {
+                        new Address { City = "Prag", Country = "Czech republic" },
+                        new Address { City = "Prag", Country = "Czech republic" }
+                    }
+                }
+            };
+
+            var student2 = new Student
+            {
+                Person = new Person
+                {
+                    ListOfAddress1 = new List<Address>
+                    {
+                        new Address { City = "Olomouc", Country = "Czech republic 2" },
+                        new Address { City = "Prag", Country = "Czech republic" }
+                    }
+                }
+            };
+
+            var settings = new ComparisonSettings();
+
+            settings.ConfigureDifferenceTree((ancestor, options) => 
+            {
+                options.UseDifferenceTreeNodeMemberFactory(defaultMember => new DifferenceTreeNodeMember(defaultMember.Info, TranslateToCzech(defaultMember?.Name)));
+            });
+
+            var comparer = new Comparer<Student>(settings);
+
+            var rootNode = comparer.CalculateDifferenceTree(student1, student2);
+
+            var stringBuilder = new StringBuilder();
+            WalkDifferenceTree(rootNode, 0, stringBuilder);
+            var differenceTreeStr = stringBuilder.ToString();
+            var differenceTreeJson = (rootNode as DifferenceTreeNode).ToJson();
+
+            /*
+             * differenceTreeStr:
+            ?
+              Person
+                FirstName
+                LastName
+                Birthdate
+                PhoneNumber
+                ListOfAddress1
+                  [0]
+                    Id
+                    City
+                      Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].City', Value1='Prag', Value2='Olomouc'.
+                    Country
+                      Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].Country', Value1='Czech republic', Value2='Czech republic 2'.
+                    State
+                    PostalCode
+                    Street
+                  [1]
+                    Id
+                    City
+                    Country
+                    State
+                    PostalCode
+                    Street
+                ListOfAddress2
+             */
+
+            using (var sr = new System.IO.StringReader(differenceTreeStr))
+            {
+                var expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "?");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Person");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "FirstName");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "LastName");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Birthdate");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "PhoneNumber");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "ListOfAddress1");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "[0]");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Id");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "City");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].City', Value1='Prag', Value2='Olomouc'.");
+            }
+
+            rootNode.Shrink();
+
+            Debug.WriteLine("");
+
+            stringBuilder = new StringBuilder();
+            WalkDifferenceTree(rootNode, 0, stringBuilder);
+            differenceTreeStr = stringBuilder.ToString();
+            differenceTreeJson = (rootNode as DifferenceTreeNode).ToJson();
+
+            /* differenceTreeStr (shrinked):
+             ?
+              Person
+                ListOfAddress1
+                  [0]
+                    City
+                      Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].City', Value1='Prag', Value2='Olomouc'.
+                    Country
+                      Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].Country', Value1='Czech republic', Value2='Czech republic 2'.
+             */
+
+            using (var sr = new System.IO.StringReader(differenceTreeStr))
+            {
+                var expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "?");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Person");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "ListOfAddress1");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "[0]");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Id");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "City");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].City', Value1='Prag', Value2='Olomouc'.");
+            }
+        }
+
+        string TranslateToCzech(string original)
+        {
+            var translated = original;
+
+            switch (original)
+            {
+                case "Person":
+                    translated = "Osoba";
+                    break;
+                default:
+                    break;
+            }
+
+            return translated;
+        }
+
         void WalkDifferenceTree(IDifferenceTreeNode node, int level, StringBuilder stringBuilder)
         {
             var blankMemberName = "?";
