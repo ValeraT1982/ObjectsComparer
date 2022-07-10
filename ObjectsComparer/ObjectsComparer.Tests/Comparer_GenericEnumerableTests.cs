@@ -1948,7 +1948,7 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
-        public void BuildDifferenceTree()
+        public void CalculateCompletedDifferenceTree()
         {
             var student1 = new Student
             {
@@ -1956,8 +1956,8 @@ namespace ObjectsComparer.Tests
                 {
                     ListOfAddress1 = new List<Address>
                     {
-                        new Address { City = "Prag", Country = "Czech republic" },
-                        new Address { City = "Prag", Country = "Czech republic" }
+                        new Address { City = "Prague", Country = "Czech republic" },
+                        new Address { City = "Pilsen", Country = "Czech republic" }
                     }
                 }
             };
@@ -1968,8 +1968,8 @@ namespace ObjectsComparer.Tests
                 {
                     ListOfAddress1 = new List<Address>
                     {
-                        new Address { City = "Olomouc", Country = "Czech republic 2" },
-                        new Address { City = "Prag", Country = "Czech republic" }
+                        new Address { City = "Olomouc", Country = "Czechia" },
+                        new Address { City = "Pilsen", Country = "Czech republic" }
                     }
                 }
             };
@@ -1978,10 +1978,11 @@ namespace ObjectsComparer.Tests
 
             var rootNode = comparer.CalculateDifferenceTree(student1, student2);
 
+            Assert.AreEqual(2, rootNode.GetDifferences(recursive: true).Count());
+
             var stringBuilder = new StringBuilder();
             WalkDifferenceTree(rootNode, 0, stringBuilder);
             var differenceTreeStr = stringBuilder.ToString();
-            var differenceTreeJson = (rootNode as DifferenceTreeNode).ToJson();
 
             /*
              * differenceTreeStr:
@@ -1995,9 +1996,9 @@ namespace ObjectsComparer.Tests
                   [0]
                     Id
                     City
-                      Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].City', Value1='Prag', Value2='Olomouc'.
+                      Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].City', Value1='Prague', Value2='Olomouc'.
                     Country
-                      Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].Country', Value1='Czech republic', Value2='Czech republic 2'.
+                      Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].Country', Value1='Czech republic', Value2='Czechia'.
                     State
                     PostalCode
                     Street
@@ -2034,17 +2035,18 @@ namespace ObjectsComparer.Tests
                 expectedLine = sr.ReadLine();
                 Assert.AreEqual(expectedLine.Trim(), "City");
                 expectedLine = sr.ReadLine();
-                Assert.AreEqual(expectedLine.Trim(), "Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].City', Value1='Prag', Value2='Olomouc'.");
+                Assert.AreEqual(expectedLine.Trim(), "Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].City', Value1='Prague', Value2='Olomouc'.");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Country");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].Country', Value1='Czech republic', Value2='Czechia'.");
             }
 
             rootNode.Shrink();
             
-            Debug.WriteLine("");
-
             stringBuilder = new StringBuilder();
             WalkDifferenceTree(rootNode, 0, stringBuilder);
             differenceTreeStr = stringBuilder.ToString();
-            differenceTreeJson = (rootNode as DifferenceTreeNode).ToJson();
 
             /* differenceTreeStr (shrinked):
              ?
@@ -2052,9 +2054,9 @@ namespace ObjectsComparer.Tests
                 ListOfAddress1
                   [0]
                     City
-                      Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].City', Value1='Prag', Value2='Olomouc'.
+                      Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].City', Value1='Prague', Value2='Olomouc'.
                     Country
-                      Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].Country', Value1='Czech republic', Value2='Czech republic 2'.
+                      Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].Country', Value1='Czech republic', Value2='Czechia'.
              */
 
             using (var sr = new System.IO.StringReader(differenceTreeStr))
@@ -2068,16 +2070,18 @@ namespace ObjectsComparer.Tests
                 expectedLine = sr.ReadLine();
                 Assert.AreEqual(expectedLine.Trim(), "[0]");
                 expectedLine = sr.ReadLine();
-                Assert.AreEqual(expectedLine.Trim(), "Id");
-                expectedLine = sr.ReadLine();
                 Assert.AreEqual(expectedLine.Trim(), "City");
                 expectedLine = sr.ReadLine();
-                Assert.AreEqual(expectedLine.Trim(), "Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].City', Value1='Prag', Value2='Olomouc'.");
+                Assert.AreEqual(expectedLine.Trim(), "Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].City', Value1='Prague', Value2='Olomouc'.");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Country");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].Country', Value1='Czech republic', Value2='Czechia'.");
             }
         }
 
         [Test]
-        public void BuildDifferenceTree_CustomizeMemberNames()
+        public void CalculateUncompletedDifferenceTree()
         {
             var student1 = new Student
             {
@@ -2085,8 +2089,8 @@ namespace ObjectsComparer.Tests
                 {
                     ListOfAddress1 = new List<Address>
                     {
-                        new Address { City = "Prag", Country = "Czech republic" },
-                        new Address { City = "Prag", Country = "Czech republic" }
+                        new Address { City = "Prague", Country = "Czech republic" },
+                        new Address { City = "Pilsen", Country = "Czech republic" }
                     }
                 }
             };
@@ -2097,90 +2101,23 @@ namespace ObjectsComparer.Tests
                 {
                     ListOfAddress1 = new List<Address>
                     {
-                        new Address { City = "Olomouc", Country = "Czech republic 2" },
-                        new Address { City = "Prag", Country = "Czech republic" }
+                        new Address { City = "Olomouc", Country = "Czechia" },
+                        new Address { City = "Pilsen", Country = "Czech republic" }
                     }
                 }
             };
 
-            var settings = new ComparisonSettings();
+            var comparer = new Comparer<Student>();
 
-            settings.ConfigureDifferenceTree((ancestor, options) => 
-            {
-                options.UseDifferenceTreeNodeMemberFactory(defaultMember => new DifferenceTreeNodeMember(defaultMember.Info, TranslateToCzech(defaultMember?.Name)));
-            });
+            var rootNode = comparer.CalculateDifferenceTree(student1, student2, ctx => false);
 
-            var comparer = new Comparer<Student>(settings);
+            Assert.AreEqual(1, rootNode.GetDifferences(recursive: true).Count());
 
-            var rootNode = comparer.CalculateDifferenceTree(student1, student2);
+            rootNode.Shrink();
 
             var stringBuilder = new StringBuilder();
             WalkDifferenceTree(rootNode, 0, stringBuilder);
             var differenceTreeStr = stringBuilder.ToString();
-            var differenceTreeJson = (rootNode as DifferenceTreeNode).ToJson();
-
-            /*
-             * differenceTreeStr:
-            ?
-              Person
-                FirstName
-                LastName
-                Birthdate
-                PhoneNumber
-                ListOfAddress1
-                  [0]
-                    Id
-                    City
-                      Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].City', Value1='Prag', Value2='Olomouc'.
-                    Country
-                      Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].Country', Value1='Czech republic', Value2='Czech republic 2'.
-                    State
-                    PostalCode
-                    Street
-                  [1]
-                    Id
-                    City
-                    Country
-                    State
-                    PostalCode
-                    Street
-                ListOfAddress2
-             */
-
-            using (var sr = new System.IO.StringReader(differenceTreeStr))
-            {
-                var expectedLine = sr.ReadLine();
-                Assert.AreEqual(expectedLine.Trim(), "?");
-                expectedLine = sr.ReadLine();
-                Assert.AreEqual(expectedLine.Trim(), "Person");
-                expectedLine = sr.ReadLine();
-                Assert.AreEqual(expectedLine.Trim(), "FirstName");
-                expectedLine = sr.ReadLine();
-                Assert.AreEqual(expectedLine.Trim(), "LastName");
-                expectedLine = sr.ReadLine();
-                Assert.AreEqual(expectedLine.Trim(), "Birthdate");
-                expectedLine = sr.ReadLine();
-                Assert.AreEqual(expectedLine.Trim(), "PhoneNumber");
-                expectedLine = sr.ReadLine();
-                Assert.AreEqual(expectedLine.Trim(), "ListOfAddress1");
-                expectedLine = sr.ReadLine();
-                Assert.AreEqual(expectedLine.Trim(), "[0]");
-                expectedLine = sr.ReadLine();
-                Assert.AreEqual(expectedLine.Trim(), "Id");
-                expectedLine = sr.ReadLine();
-                Assert.AreEqual(expectedLine.Trim(), "City");
-                expectedLine = sr.ReadLine();
-                Assert.AreEqual(expectedLine.Trim(), "Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].City', Value1='Prag', Value2='Olomouc'.");
-            }
-
-            rootNode.Shrink();
-
-            Debug.WriteLine("");
-
-            stringBuilder = new StringBuilder();
-            WalkDifferenceTree(rootNode, 0, stringBuilder);
-            differenceTreeStr = stringBuilder.ToString();
-            differenceTreeJson = (rootNode as DifferenceTreeNode).ToJson();
 
             /* differenceTreeStr (shrinked):
              ?
@@ -2188,9 +2125,7 @@ namespace ObjectsComparer.Tests
                 ListOfAddress1
                   [0]
                     City
-                      Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].City', Value1='Prag', Value2='Olomouc'.
-                    Country
-                      Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].Country', Value1='Czech republic', Value2='Czech republic 2'.
+                      Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].City', Value1='Prague', Value2='Olomouc'.
              */
 
             using (var sr = new System.IO.StringReader(differenceTreeStr))
@@ -2204,11 +2139,119 @@ namespace ObjectsComparer.Tests
                 expectedLine = sr.ReadLine();
                 Assert.AreEqual(expectedLine.Trim(), "[0]");
                 expectedLine = sr.ReadLine();
-                Assert.AreEqual(expectedLine.Trim(), "Id");
-                expectedLine = sr.ReadLine();
                 Assert.AreEqual(expectedLine.Trim(), "City");
                 expectedLine = sr.ReadLine();
-                Assert.AreEqual(expectedLine.Trim(), "Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].City', Value1='Prag', Value2='Olomouc'.");
+                Assert.AreEqual(expectedLine.Trim(), "Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].City', Value1='Prague', Value2='Olomouc'.");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine, null);
+            }
+        }
+
+        [Test]
+        public void CalculateDifferencesTranslateMembers()
+        {
+            var student1 = new Student
+            {
+                Person = new Person
+                {
+                    ListOfAddress1 = new List<Address>
+                    {
+                        new Address { City = "Prague", Country = "Czech republic" },
+                        new Address { City = "Pilsen", Country = "Czech republic" }
+                    }
+                }
+            };
+
+            var student2 = new Student
+            {
+                Person = new Person
+                {
+                    ListOfAddress1 = new List<Address>
+                    {
+                        new Address { City = "Olomouc", Country = "Czechia" },
+                        new Address { City = "Pilsen", Country = "Czech republic" }
+                    }
+                }
+            };
+
+            var settings = new ComparisonSettings();
+            settings.ConfigureDifference(defaultMemberName => TranslateToCzech(defaultMemberName));
+            var comparer = new Comparer<Student>(settings);
+            var differences = comparer.CalculateDifferences(student1, student2).ToArray();
+
+            Assert.AreEqual(2, differences.Count());
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "Osoba.Seznam adres 1[0].Město" && d.Value1 == "Prague" && d.Value2 == "Olomouc"));
+            Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "Osoba.Seznam adres 1[0].Stát" && d.Value1 == "Czech republic" && d.Value2 == "Czechia"));
+        }
+
+        [Test]
+        public void CalculateDifferenceTreeTranslateMembers()
+        {
+            var student1 = new Student
+            {
+                Person = new Person
+                {
+                    ListOfAddress1 = new List<Address>
+                    {
+                        new Address { City = "Prague", Country = "Czech republic" },
+                        new Address { City = "Pilsen", Country = "Czech republic" }
+                    }
+                }
+            };
+
+            var student2 = new Student
+            {
+                Person = new Person
+                {
+                    ListOfAddress1 = new List<Address>
+                    {
+                        new Address { City = "Olomouc", Country = "Czechia" },
+                        new Address { City = "Pilsen", Country = "Czech republic" }
+                    }
+                }
+            };
+
+            var settings = new ComparisonSettings();
+            settings.ConfigureDifference(defaultMemberName => TranslateToCzech(defaultMemberName));
+            var comparer = new Comparer<Student>(settings);
+            var rootNode = comparer.CalculateDifferenceTree(student1, student2);
+            rootNode.Shrink();
+
+            Assert.AreEqual(2, rootNode.GetDifferences(recursive: true).Count());
+
+            var stringBuilder = new StringBuilder();
+            WalkDifferenceTree(rootNode, 0, stringBuilder);
+            var differenceTreeStr = stringBuilder.ToString();
+
+            /* differenceTreeStr (shrinked):
+             ?
+              Osoba
+                Seznam adres 1
+                  [0]
+                    Město
+                      Difference: DifferenceType=ValueMismatch, MemberPath='Osoba.Seznam adres 1[0].Město', Value1='Prague', Value2='Olomouc'.
+                    Stát
+                      Difference: DifferenceType=ValueMismatch, MemberPath='Osoba.Seznam adres 1[0].Stát', Value1='Czech republic', Value2='Czechia'.
+             */
+
+            using (var sr = new StringReader(differenceTreeStr))
+            {
+                var expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "?");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Osoba");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Seznam adres 1");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "[0]");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Město");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Difference: DifferenceType=ValueMismatch, MemberPath='Osoba.Seznam adres 1[0].Město', Value1='Prague', Value2='Olomouc'.");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Stát");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Difference: DifferenceType=ValueMismatch, MemberPath='Osoba.Seznam adres 1[0].Stát', Value1='Czech republic', Value2='Czechia'.");
             }
         }
 
@@ -2220,6 +2263,27 @@ namespace ObjectsComparer.Tests
             {
                 case "Person":
                     translated = "Osoba";
+                    break;
+                case "FirstName":
+                    translated = "Křestní jméno";
+                    break;
+                case "LastName":
+                    translated = "Příjmení";
+                    break;
+                case "Birthdate":
+                    translated = "Datum narození";
+                    break;
+                case "PhoneNumber":
+                    translated = "Číslo telefonu";
+                    break;
+                case "ListOfAddress1":
+                    translated = "Seznam adres 1";
+                    break;
+                case "City":
+                    translated = "Město";
+                    break;
+                case "Country":
+                    translated = "Stát";
                     break;
                 default:
                     break;

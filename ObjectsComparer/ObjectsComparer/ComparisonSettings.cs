@@ -158,6 +158,30 @@ namespace ObjectsComparer
             return this;
         }
 
+        public ComparisonSettings ConfigureDifference(Func<string, string> memberNameProvider, bool includeRawValues = false)
+        {
+            ConfigureDifferenceTree((_, options) =>
+                options.UseDifferenceTreeNodeMemberFactory(defaultMember =>
+                    new DifferenceTreeNodeMember(
+                        defaultMember.Info,
+                        memberNameProvider(defaultMember.Name))));
+
+            ConfigureDifference((_, options) =>
+                options.UseDifferenceFactory(args =>
+                    new Difference(
+                        memberPath: memberNameProvider(args.DefaultDifference.MemberPath),
+                        args.DefaultDifference.Value1,
+                        args.DefaultDifference.Value2,
+                        args.DefaultDifference.DifferenceType,
+                        rawValue1: includeRawValues ? args.RawValue1 : null,
+                        rawValue2: includeRawValues ? args.RawValue2 : null)));
+
+            ConfigureDifferencePath((_, options) =>
+                options.UseInsertPathFactory(args => memberNameProvider(args.DefaultRootElementPath)));
+
+            return this;
+        }
+
         public Action<IDifferenceTreeNode, DifferencePathOptions> DifferencePathOptionsAction;
 
         /// <summary>
