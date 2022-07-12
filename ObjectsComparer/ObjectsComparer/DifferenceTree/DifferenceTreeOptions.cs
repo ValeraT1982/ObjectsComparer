@@ -18,11 +18,13 @@ namespace ObjectsComparer
         internal Func<IDifferenceTreeNodeMember, IDifferenceTreeNode> DifferenceTreeNodeFactory { get; private set; }
 
         internal Func<IDifferenceTreeNodeMember, IDifferenceTreeNodeMember> DifferenceTreeNodeMemberFactory { get; private set; }
-        
+
         /// <summary>
         /// Factory for <see cref="IDifferenceTreeNode"/> instances.
         /// </summary>
-        /// <param name="factory"></param>
+        /// <param name="factory">
+        /// First parameter type: The member the tree node is created for. It can be replaced by a custom instance.
+        /// </param>
         public void UseDifferenceTreeNodeFactory(Func<IDifferenceTreeNodeMember, IDifferenceTreeNode> factory)
         {
             DifferenceTreeNodeFactory = factory ?? throw new ArgumentNullException(nameof(factory));
@@ -31,6 +33,9 @@ namespace ObjectsComparer
         /// <summary>
         /// Factory for <see cref="IDifferenceTreeNodeMember"/> instances.
         /// </summary>
+        /// <param name="factory">
+        /// First parameter type: Default member, can be used as a falback.
+        /// </param>
         public void UseDifferenceTreeNodeMemberFactory(Func<IDifferenceTreeNodeMember, IDifferenceTreeNodeMember> factory)
         {
             DifferenceTreeNodeMemberFactory = factory ?? throw new ArgumentNullException(nameof(factory));

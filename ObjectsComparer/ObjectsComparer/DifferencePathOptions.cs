@@ -2,6 +2,9 @@
 
 namespace ObjectsComparer
 {
+    /// <summary>
+    /// Configures the insertion into the difference path.
+    /// </summary>
     public class DifferencePathOptions
     {
         DifferencePathOptions()
@@ -20,8 +23,8 @@ namespace ObjectsComparer
         /// </summary>
         /// <param name="factory">
         /// Null value is allowed here and means that a default behavior of the insertion into the difference path is required.<br/>
-        /// Func first parameter: The args for the path insertion.<br/>
-        /// Returns: Transformed root path element or the not transformed root path element itself.
+        /// First parameter type: The args for the path insertion, see <see cref="InsertPathFactoryArgs"/>.<br/>
+        /// Returns: Transformed root path element or not transformed root path element itself.
         /// </param>
         public void UseInsertPathFactory(Func<InsertPathFactoryArgs, string> factory)
         {

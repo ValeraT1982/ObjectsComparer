@@ -144,7 +144,8 @@ namespace ObjectsComparer
         /// <summary>
         /// Key identification. It attempts to find the key using the <paramref name="keyProvider"/> parameter.
         /// </summary>
-        /// <param name="keyProvider">First parameter: The element whose key is required. Return value: The element's key.</param>
+        /// <param name="keyProvider">First parameter type: The element whose key is required, see <see cref="ListElementKeyProviderArgs"/>. <br/>
+        /// Return value: The element's key.</param>
         public ListElementComparisonByKeyOptions UseKey(Func<ListElementKeyProviderArgs, object> keyProvider)
         {
             if (keyProvider is null)
@@ -281,7 +282,10 @@ namespace ObjectsComparer
         /// Formats the element identifier if it refers to null. Formatted identifier is then used as part of the <see cref="Difference.MemberPath"/> property.<br/>
         /// By default, <see cref="DefaultNullElementIdentifierTemplate"/> template will be used to format the identifier.
         /// </summary>
-        /// <param name="formatter">First parameter: Element index. Return value: Formatted identifier.</param>
+        /// <param name="formatter">
+        /// First parameter type: Element index.<br/>
+        /// Second parameter type: Formatted identifier.
+        /// </param>
         public ListElementComparisonByKeyOptions FormatNullElementIdentifier(Func<FormatNullElementIdentifierArgs, string> formatter)
         {
             if (formatter is null)

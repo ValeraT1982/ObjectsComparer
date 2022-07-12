@@ -1,5 +1,8 @@
 ﻿namespace ObjectsComparer
 {
+    /// <summary>
+    /// Arguments for <see cref="DifferencePathOptions.UseInsertPathFactory(System.Func{InsertPathFactoryArgs, string})"/>.
+    /// </summary>
     public class InsertPathFactoryArgs
     {
         public InsertPathFactoryArgs(string defaultRootElementPath, IDifferenceTreeNode childNode)

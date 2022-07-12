@@ -73,7 +73,9 @@ namespace ObjectsComparer
         /// Configures list comparison behavior, especially the type of the comparison. For more info, see <see cref="ListComparisonOptions"/>.
         /// The term list has a general meaning here and includes almost all Enumerable objects.
         /// </summary>
-        /// <param name="comparisonOptions">First parameter: Current list node.</param>
+        /// <param name="comparisonOptions">
+        /// First parameter type: Current list node.
+        /// </param>
         public ComparisonSettings ConfigureListComparison(Action<IDifferenceTreeNode, ListComparisonOptions> comparisonOptions)
         {
             if (comparisonOptions is null)
@@ -129,6 +131,9 @@ namespace ObjectsComparer
         /// <summary>
         /// Configures creation of the <see cref="IDifferenceTreeNode"/> instance, see <see cref="DifferenceTreeOptions"/>.
         /// </summary>
+        /// <param name="options">
+        /// First parameter type: The ancestor member the tree node is configured for.
+        /// </param>
         public ComparisonSettings ConfigureDifferenceTree(Action<IDifferenceTreeNode, DifferenceTreeOptions> options)
         {
             DifferenceTreeOptionsAction = options ?? throw new ArgumentNullException(nameof(options));
@@ -141,6 +146,9 @@ namespace ObjectsComparer
         /// <summary>
         /// Configures creation of the <see cref="Difference"/> instance, see <see cref="DifferenceOptions"/>.
         /// </summary>
+        /// <param name="differenceOptions">
+        /// First parameter type: The member the difference is configured for.
+        /// </param>
         public ComparisonSettings ConfigureDifference(Action<IDifferenceTreeNode, DifferenceOptions> differenceOptions)
         {
             DifferenceOptionsAction = differenceOptions ?? throw new ArgumentNullException(nameof(differenceOptions));
@@ -188,7 +196,7 @@ namespace ObjectsComparer
         /// Configures the insertion into the difference path, see <see cref="DifferencePathOptions"/>.
         /// </summary>
         /// <param name="options">
-        /// First parameter: The parent of the property to which the path is inserted.
+        /// First parameter type: The parent of the member to which the path is inserted.
         /// </param>
         public ComparisonSettings ConfigureDifferencePath(Action<IDifferenceTreeNode, DifferencePathOptions> options)
         {
