@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Collections;
 
 namespace ObjectsComparer
 {
@@ -15,7 +17,7 @@ namespace ObjectsComparer
         public bool RecursiveComparison { get; set; }
 
         /// <summary>
-        /// If true, empty <see cref="System.Collections.IEnumerable"/>  and null values will be considered as equal values. False by default.
+        /// If true, empty <see cref="IEnumerable"/>  and null values will be considered as equal values. False by default.
         /// </summary>
         public bool EmptyAndNullEnumerablesEqual { get; set; }
 
@@ -166,26 +168,50 @@ namespace ObjectsComparer
             return this;
         }
 
-        public ComparisonSettings ConfigureDifference(Func<string, string> memberNameProvider, bool includeRawValues = false)
+        //public ComparisonSettings ConfigureDifferences(Func<string, string> memberNameProvider, bool includeRawValues = false)
+        //{
+        //    ConfigureDifferenceTree((_, options) =>
+        //        options.UseDifferenceTreeNodeMemberFactory(defaultMember =>
+        //            new DifferenceTreeNodeMember(
+        //                defaultMember.Info,
+        //                memberNameProvider(defaultMember.Name))));
+
+        //    ConfigureDifference((_, options) =>
+        //        options.UseDifferenceFactory(args =>
+        //            new Difference(
+        //                memberPath: memberNameProvider(args.DefaultDifference.MemberPath),
+        //                args.DefaultDifference.Value1,
+        //                args.DefaultDifference.Value2,
+        //                args.DefaultDifference.DifferenceType,
+        //                rawValue1: includeRawValues ? args.RawValue1 : null,
+        //                rawValue2: includeRawValues ? args.RawValue2 : null)));
+
+        //    ConfigureDifferencePath((_, options) =>
+        //        options.UseInsertPathFactory(args => memberNameProvider(args.DefaultRootElementPath)));
+
+        //    return this;
+        //}
+
+        public ComparisonSettings ConfigureDifferences(Func<MemberInfo, string> memberNameProvider, bool includeRawValues = false)
         {
-            ConfigureDifferenceTree((_, options) =>
+            ConfigureDifferenceTree((ancestor, options) =>
                 options.UseDifferenceTreeNodeMemberFactory(defaultMember =>
                     new DifferenceTreeNodeMember(
-                        defaultMember.Info,
-                        memberNameProvider(defaultMember.Name))));
+                        defaultMember?.Info,
+                        memberNameProvider(defaultMember?.Info))));
 
-            ConfigureDifference((_, options) =>
+            ConfigureDifference((currentMember, options) =>
                 options.UseDifferenceFactory(args =>
                     new Difference(
-                        memberPath: memberNameProvider(args.DefaultDifference.MemberPath),
+                        memberPath: memberNameProvider(currentMember.Member.Info),
                         args.DefaultDifference.Value1,
                         args.DefaultDifference.Value2,
                         args.DefaultDifference.DifferenceType,
                         rawValue1: includeRawValues ? args.RawValue1 : null,
                         rawValue2: includeRawValues ? args.RawValue2 : null)));
 
-            ConfigureDifferencePath((_, options) =>
-                options.UseInsertPathFactory(args => memberNameProvider(args.DefaultRootElementPath)));
+            ConfigureDifferencePath((ancestor, options) =>
+                options.UseInsertPathFactory(args => memberNameProvider(ancestor.Member.Info)));
 
             return this;
         }

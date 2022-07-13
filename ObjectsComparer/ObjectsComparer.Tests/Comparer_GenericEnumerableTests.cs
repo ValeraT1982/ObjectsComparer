@@ -13,6 +13,8 @@ using System.Text;
 using System.Collections;
 using System.Reflection;
 using System.IO;
+using System.ComponentModel;
+using DescriptionAttribute = System.ComponentModel.DescriptionAttribute;
 
 namespace ObjectsComparer.Tests
 {
@@ -2012,7 +2014,7 @@ namespace ObjectsComparer.Tests
                 ListOfAddress2
              */
 
-            using (var sr = new System.IO.StringReader(differenceTreeStr)) 
+            using (var sr = new StringReader(differenceTreeStr)) 
             {
                 var expectedLine = sr.ReadLine();
                 Assert.AreEqual(expectedLine.Trim(), "?");
@@ -2175,13 +2177,84 @@ namespace ObjectsComparer.Tests
             };
 
             var settings = new ComparisonSettings();
-            settings.ConfigureDifference(defaultMemberName => TranslateToCzech(defaultMemberName));
+            settings.ConfigureDifferences(defaultMember => TranslateToCzech(defaultMember.Name));
             var comparer = new Comparer<Student>(settings);
             var differences = comparer.CalculateDifferences(student1, student2).ToArray();
 
             Assert.AreEqual(2, differences.Count());
             Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "Osoba.Seznam adres 1[0].Město" && d.Value1 == "Prague" && d.Value2 == "Olomouc"));
             Assert.IsTrue(differences.Any(d => d.DifferenceType == DifferenceTypes.ValueMismatch && d.MemberPath == "Osoba.Seznam adres 1[0].Stát" && d.Value1 == "Czech republic" && d.Value2 == "Czechia"));
+        }
+
+        [Test]
+        public void CalculateDifferenceTreeTranslateMembersUsingAttributes()
+        {
+            var student1 = new Student
+            {
+                Person = new Person
+                {
+                    ListOfAddress1 = new List<Address>
+                    {
+                        new Address { City = "Prague", Country = "Czech republic" },
+                        new Address { City = "Pilsen", Country = "Czech republic" }
+                    }
+                }
+            };
+
+            var student2 = new Student
+            {
+                Person = new Person
+                {
+                    ListOfAddress1 = new List<Address>
+                    {
+                        new Address { City = "Olomouc", Country = "Czechia" },
+                        new Address { City = "Pilsen", Country = "Czech republic" }
+                    }
+                }
+            };
+
+            var settings = new ComparisonSettings();
+            settings.ConfigureDifferences(defaultMember => TranslateToCzech(defaultMember));
+            var comparer = new Comparer<Student>(settings);
+            var rootNode = comparer.CalculateDifferenceTree(student1, student2);
+            rootNode.Shrink();
+
+            Assert.AreEqual(2, rootNode.GetDifferences(recursive: true).Count());
+
+            var stringBuilder = new StringBuilder();
+            WalkDifferenceTree(rootNode, 0, stringBuilder);
+            var differenceTreeStr = stringBuilder.ToString();
+
+            /* differenceTreeStr (shrinked):
+             ?
+              Člověk
+                Kolekce adres
+                  [0]
+                    Aglomerace (město)
+                      Difference: DifferenceType=ValueMismatch, MemberPath='Člověk.Kolekce adres[0].Aglomerace (město)', Value1='Prague', Value2='Olomouc'.
+                    Země (stát)
+                      Difference: DifferenceType=ValueMismatch, MemberPath='Člověk.Kolekce adres[0].Země (stát)', Value1='Czech republic', Value2='Czechia'.
+             */
+
+            using (var sr = new StringReader(differenceTreeStr))
+            {
+                var expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "?");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Člověk");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Kolekce adres");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "[0]");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Aglomerace (město)");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Difference: DifferenceType=ValueMismatch, MemberPath='Člověk.Kolekce adres[0].Aglomerace (město)', Value1='Prague', Value2='Olomouc'.");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Země (stát)");
+                expectedLine = sr.ReadLine();
+                Assert.AreEqual(expectedLine.Trim(), "Difference: DifferenceType=ValueMismatch, MemberPath='Člověk.Kolekce adres[0].Země (stát)', Value1='Czech republic', Value2='Czechia'.");
+            }
         }
 
         [Test]
@@ -2212,7 +2285,7 @@ namespace ObjectsComparer.Tests
             };
 
             var settings = new ComparisonSettings();
-            settings.ConfigureDifference(defaultMemberName => TranslateToCzech(defaultMemberName));
+            settings.ConfigureDifferences(defaultMember => TranslateToCzech(defaultMember?.Name));
             var comparer = new Comparer<Student>(settings);
             var rootNode = comparer.CalculateDifferenceTree(student1, student2);
             rootNode.Shrink();
@@ -2253,6 +2326,23 @@ namespace ObjectsComparer.Tests
                 expectedLine = sr.ReadLine();
                 Assert.AreEqual(expectedLine.Trim(), "Difference: DifferenceType=ValueMismatch, MemberPath='Osoba.Seznam adres 1[0].Stát', Value1='Czech republic', Value2='Czechia'.");
             }
+        }
+
+        string TranslateToCzech(MemberInfo member)
+        {
+            if (member == null)
+            {
+                return null;
+            }
+
+            var descriptionAttr = member.GetCustomAttribute<DescriptionAttribute>();
+
+            if (descriptionAttr != null)
+            {
+                return descriptionAttr.Description;
+            }
+
+            return TranslateToCzech(member.Name);
         }
 
         string TranslateToCzech(string original)
