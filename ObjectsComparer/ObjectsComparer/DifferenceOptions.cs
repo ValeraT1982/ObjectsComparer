@@ -28,7 +28,7 @@ namespace ObjectsComparer
         /// </summary>
         /// <param name="factory">
         /// Null value is allowed here and means that a default behavior of creation of the difference is required.<br/>
-        /// First parameter type: The args for the difference creation, see <see cref="CreateDifferenceArgs"/>.<br/>
+        /// First parameter: The args for the difference creation, see <see cref="CreateDifferenceArgs"/>.<br/>
         /// Returns: Transformed difference or the source difference itself.
         /// </param>
         /// <exception cref="ArgumentNullException"></exception>

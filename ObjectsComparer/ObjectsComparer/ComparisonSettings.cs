@@ -76,7 +76,7 @@ namespace ObjectsComparer
         /// The term list has a general meaning here and includes almost all Enumerable objects.
         /// </summary>
         /// <param name="comparisonOptions">
-        /// First parameter type: Current list node.
+        /// First parameter: Current list node.
         /// </param>
         public ComparisonSettings ConfigureListComparison(Action<IDifferenceTreeNode, ListComparisonOptions> comparisonOptions)
         {
@@ -134,7 +134,7 @@ namespace ObjectsComparer
         /// Configures creation of the <see cref="IDifferenceTreeNode"/> instance, see <see cref="DifferenceTreeOptions"/>.
         /// </summary>
         /// <param name="options">
-        /// First parameter type: The ancestor member the tree node is configured for.
+        /// First parameter: The ancestor member the tree node is configured for.
         /// </param>
         public ComparisonSettings ConfigureDifferenceTree(Action<IDifferenceTreeNode, DifferenceTreeOptions> options)
         {
@@ -149,7 +149,7 @@ namespace ObjectsComparer
         /// Configures creation of the <see cref="Difference"/> instance, see <see cref="DifferenceOptions"/>.
         /// </summary>
         /// <param name="differenceOptions">
-        /// First parameter type: The member the difference is configured for.
+        /// First parameter: The member the difference is configured for.
         /// </param>
         public ComparisonSettings ConfigureDifference(Action<IDifferenceTreeNode, DifferenceOptions> differenceOptions)
         {
@@ -168,30 +168,15 @@ namespace ObjectsComparer
             return this;
         }
 
-        //public ComparisonSettings ConfigureDifferences(Func<string, string> memberNameProvider, bool includeRawValues = false)
-        //{
-        //    ConfigureDifferenceTree((_, options) =>
-        //        options.UseDifferenceTreeNodeMemberFactory(defaultMember =>
-        //            new DifferenceTreeNodeMember(
-        //                defaultMember.Info,
-        //                memberNameProvider(defaultMember.Name))));
-
-        //    ConfigureDifference((_, options) =>
-        //        options.UseDifferenceFactory(args =>
-        //            new Difference(
-        //                memberPath: memberNameProvider(args.DefaultDifference.MemberPath),
-        //                args.DefaultDifference.Value1,
-        //                args.DefaultDifference.Value2,
-        //                args.DefaultDifference.DifferenceType,
-        //                rawValue1: includeRawValues ? args.RawValue1 : null,
-        //                rawValue2: includeRawValues ? args.RawValue2 : null)));
-
-        //    ConfigureDifferencePath((_, options) =>
-        //        options.UseInsertPathFactory(args => memberNameProvider(args.DefaultRootElementPath)));
-
-        //    return this;
-        //}
-
+        /// <summary>
+        /// Wraps <see cref="ConfigureDifferenceTree(Action{IDifferenceTreeNode, DifferenceTreeOptions})"/>, <see cref="ConfigureDifference(Action{IDifferenceTreeNode, DifferenceOptions})"/> and <see cref="ConfigureDifferencePath(Action{IDifferenceTreeNode, DifferencePathOptions})"/>
+        /// by applying the <paramref name="memberNameProvider"/> argument to them.
+        /// </summary>
+        /// <param name="memberNameProvider">
+        /// Customizes the <see cref="Difference.MemberPath"/>, <see cref="IDifferenceTreeNodeMember.Name"/>. <br/>
+        /// First parameter: It can be null in some cases, for example, when it represents the root of the comparison.
+        /// </param>
+        /// <param name="includeRawValues">Whether raw values should be included in the <see cref="Difference"/> instance.</param>
         public ComparisonSettings ConfigureDifferences(Func<MemberInfo, string> memberNameProvider, bool includeRawValues = false)
         {
             ConfigureDifferenceTree((ancestor, options) =>
@@ -222,7 +207,7 @@ namespace ObjectsComparer
         /// Configures the insertion into the difference path, see <see cref="DifferencePathOptions"/>.
         /// </summary>
         /// <param name="options">
-        /// First parameter type: The parent of the member to which the path is inserted.
+        /// First parameter: The parent of the member to which the path is inserted.
         /// </param>
         public ComparisonSettings ConfigureDifferencePath(Action<IDifferenceTreeNode, DifferencePathOptions> options)
         {

@@ -13,7 +13,7 @@ namespace ObjectsComparer
         /// </summary>
         /// <param name="comparisonListener">
         /// Comparison process listener. If the argument is null the process is looking for all the differences at once.<br/>
-        /// First parameter type: Current comparison context, see <see cref="ComparisonContext"/>.<br/>
+        /// First parameter: Current comparison context, see <see cref="ComparisonContext"/>.<br/>
         /// Second parameter type: Whether to look for another difference. If value = false the comparison process will be terminated immediately.
         /// </param>
         /// <param name="differenceTreeCompleted">Occurs if (and only if) the comparison process reaches the last member of the objects being compared.</param>
@@ -52,7 +52,7 @@ namespace ObjectsComparer
         /// </summary>
         /// <param name="comparisonListener">
         /// Comparison process listener. If the argument is null the process is looking for all the differences at once.<br/>
-        /// First parameter type: Current comparison context, see <see cref="ComparisonContext"/>.<br/>
+        /// First parameter: Current comparison context, see <see cref="ComparisonContext"/>.<br/>
         /// Second parameter type: Whether to look for another difference. If value = false the comparison process will be terminated immediately.
         /// </param>
         /// <param name="differenceTreeCompleted">Occurs if (and only if) the comparison process reaches the last member of the objects being compared.</param>

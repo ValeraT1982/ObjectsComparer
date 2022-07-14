@@ -23,7 +23,7 @@ namespace ObjectsComparer
         /// Factory for <see cref="IDifferenceTreeNode"/> instances.
         /// </summary>
         /// <param name="factory">
-        /// First parameter type: The member the tree node is created for. It can be replaced by a custom instance.
+        /// First parameter: The member the tree node is created for. It can be replaced by a custom instance.
         /// </param>
         public void UseDifferenceTreeNodeFactory(Func<IDifferenceTreeNodeMember, IDifferenceTreeNode> factory)
         {
@@ -34,7 +34,7 @@ namespace ObjectsComparer
         /// Factory for <see cref="IDifferenceTreeNodeMember"/> instances.
         /// </summary>
         /// <param name="factory">
-        /// First parameter type: Default member, can be used as a falback.
+        /// First parameter: Default member, it can be used as a falback from the delegate.
         /// </param>
         public void UseDifferenceTreeNodeMemberFactory(Func<IDifferenceTreeNodeMember, IDifferenceTreeNodeMember> factory)
         {
