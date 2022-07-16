@@ -69,7 +69,7 @@ namespace ObjectsComparer.Tests
 		}
 
 		[Test]
-		public void PreserveRawValuesConditionaly()
+		public void PreserveRawValuesConditionally()
 		{
 			var a1 = new A() { IntProperty = 10, TestProperty1 = "TestProperty1value" };
 			var a2 = new A() { IntProperty = 11, TestProperty1 = "TestProperty2value" };
@@ -177,7 +177,7 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual(3, rootNode.GetDifferences(recursive: true).Count());
 
             var stringBuilder = new StringBuilder();
-            WalkDifferenceTree(rootNode, 0, stringBuilder);
+            WriteDifferenceTree(rootNode, 0, stringBuilder);
             var differenceTreeStr = stringBuilder.ToString();
 
             /*
@@ -244,7 +244,7 @@ namespace ObjectsComparer.Tests
             rootNode.Shrink();
 
             stringBuilder = new StringBuilder();
-            WalkDifferenceTree(rootNode, 0, stringBuilder);
+            WriteDifferenceTree(rootNode, 0, stringBuilder);
             differenceTreeStr = stringBuilder.ToString();
 
             /* differenceTreeStr (shrinked):
@@ -260,7 +260,7 @@ namespace ObjectsComparer.Tests
                       Difference: DifferenceType=ValueMismatch, MemberPath='Person.ListOfAddress1[0].Country', Value1='Czech republic', Value2='Czechia'.
              */
 
-            using (var sr = new System.IO.StringReader(differenceTreeStr))
+            using (var sr = new StringReader(differenceTreeStr))
             {
                 var expectedLine = sr.ReadLine();
                 Assert.AreEqual(expectedLine.Trim(), "?");
@@ -328,7 +328,7 @@ namespace ObjectsComparer.Tests
             rootNode.Shrink();
 
             var stringBuilder = new StringBuilder();
-            WalkDifferenceTree(rootNode, 0, stringBuilder);
+            WriteDifferenceTree(rootNode, 0, stringBuilder);
             var differenceTreeStr = stringBuilder.ToString();
 
             /* differenceTreeStr (shrinked):
@@ -338,7 +338,7 @@ namespace ObjectsComparer.Tests
                         Difference: DifferenceType=ValueMismatch, MemberPath='Person.FirstName', Value1='Daniel', Value2='Dan'.
              */
 
-            using (var sr = new System.IO.StringReader(differenceTreeStr))
+            using (var sr = new StringReader(differenceTreeStr))
             {
                 var expectedLine = sr.ReadLine();
                 Assert.AreEqual(expectedLine.Trim(), "?");
@@ -434,7 +434,7 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual(2, rootNode.GetDifferences(recursive: true).Count());
 
             var stringBuilder = new StringBuilder();
-            WalkDifferenceTree(rootNode, 0, stringBuilder);
+            WriteDifferenceTree(rootNode, 0, stringBuilder);
             var differenceTreeStr = stringBuilder.ToString();
 
             /* differenceTreeStr (shrinked):
@@ -505,7 +505,7 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual(2, rootNode.GetDifferences(recursive: true).Count());
 
             var stringBuilder = new StringBuilder();
-            WalkDifferenceTree(rootNode, 0, stringBuilder);
+            WriteDifferenceTree(rootNode, 0, stringBuilder);
             var differenceTreeStr = stringBuilder.ToString();
 
             /* differenceTreeStr (shrinked):
@@ -594,7 +594,7 @@ namespace ObjectsComparer.Tests
             return translated;
         }
 
-        void WalkDifferenceTree(IDifferenceTreeNode node, int level, StringBuilder stringBuilder)
+        void WriteDifferenceTree(IDifferenceTreeNode node, int level, StringBuilder stringBuilder)
         {
             var blankMemberName = "?";
             string indent = String.Concat(Enumerable.Repeat(" ", 2 * level));
@@ -629,7 +629,7 @@ namespace ObjectsComparer.Tests
                     Debug.WriteLine(line);
                 }
 
-                WalkDifferenceTree(desc, level, stringBuilder);
+                WriteDifferenceTree(desc, level, stringBuilder);
             }
         }
 
