@@ -172,7 +172,7 @@ namespace ObjectsComparer.Examples.Example4
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Items[1].Delay" && d.Value1 == "60" && d.Value2 == "80"));
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Items[1].Name" && d.Value1 == "Item 1" && d.Value2 == "Item One"));
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Items[1].Instruction" && d.Value1 == "Instruction 1" && d.Value2 == "Instruction One"));
-            Assert.IsTrue(differences.Any(d => d.DifferenceType ==  DifferenceTypes.MissedElementInFirstObject && d.Value1 == "" && d.Value2 == "ObjectsComparer.Examples.Example4.FormulaItem"));
+            Assert.IsTrue(differences.Any(d => d.MemberPath == "Items[2]" && d.DifferenceType ==  DifferenceTypes.MissedElementInFirstObject && d.Value1 == "" && d.Value2 == "ObjectsComparer.Examples.Example4.FormulaItem"));
         }
 
         [Test]
