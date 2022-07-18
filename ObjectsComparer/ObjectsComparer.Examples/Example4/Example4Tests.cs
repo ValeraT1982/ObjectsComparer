@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using ObjectsComparer.Exceptions;
 using static ObjectsComparer.Examples.OutputHelper;
 
 // ReSharper disable PossibleMultipleEnumeration
@@ -63,6 +64,48 @@ namespace ObjectsComparer.Examples.Example4
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Items[Id=1].Delay" && d.Value1 == "60" && d.Value2 == "80"));
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Items[Id=1].Name" && d.Value1 == "Item 1" && d.Value2 == "Item One"));
             Assert.IsTrue(differences.Any(d => d.MemberPath == "Items[Id=1].Instruction" && d.Value1 == "Instruction 1" && d.Value2 == "Instruction One"));
+        }
+
+        [Test]
+        public void CalculateDifferenceTree_Throw_DifferenceBuilderNotImplemented()
+        {            
+            var formula1 = new Formula
+            {
+                Id = 1,
+                Name = "Formula 1",
+                Items = new List<FormulaItem>
+                {
+                    new FormulaItem
+                    {
+                        Id = 1,
+                        Delay = 60,
+                        Name = "Item 1",
+                        Instruction = "Instruction 1"
+                    }
+                }
+            };
+
+            var formula2 = new Formula
+            {
+                Id = 1,
+                Name = "Formula 1",
+                Items = new List<FormulaItem>
+                {
+                    new FormulaItem
+                    {
+                        Id = 1,
+                        Delay = 80,
+                        Name = "Item One",
+                        Instruction = "Instruction One"
+                    }
+                }
+            };
+
+            Assert.Throws<DifferenceTreeBuilderNotImplementedException>(() => 
+            {
+                var rootNode = _comparer.CalculateDifferenceTree(formula1, formula2);
+                var differences = rootNode.GetDifferences(true).ToArray();
+            });
         }
 
         [Test]

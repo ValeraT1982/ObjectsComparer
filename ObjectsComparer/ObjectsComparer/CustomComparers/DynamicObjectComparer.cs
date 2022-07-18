@@ -59,5 +59,11 @@ namespace ObjectsComparer
 
             return obj.TryGetMember(getBinder, out value);
         }
+
+        protected override bool TryGetMember(DynamicObject obj, string propertyName, out MemberInfo value)
+        {
+            value = null;
+            return false;
+        }
     }
 }

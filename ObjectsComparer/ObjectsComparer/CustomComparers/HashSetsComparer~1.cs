@@ -1,19 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ObjectsComparer.DifferenceTreeExtensions;
 using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    internal class HashSetsComparer<T> : AbstractComparer
+    internal class HashSetsComparer<T> : AbstractComparer, IDifferenceTreeBuilder, IDifferenceTreeBuilder<T>
     {
         public HashSetsComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory)
             :base(settings, parentComparer, factory)
         {
         }
 
+        public IEnumerable<DifferenceLocation> BuildDifferenceTree(T obj1, T obj2, IDifferenceTreeNode differenceTreeNode)
+        {
+            return BuildDifferenceTree(typeof(T), obj1, obj2, differenceTreeNode);
+        }
+
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
+            return BuildDifferenceTree(type, obj1, obj2, DifferenceTreeNodeProvider.CreateImplicitRootNode(Settings))
+                .Select(differenceLocation => differenceLocation.Difference);
+        }
+
+        public IEnumerable<DifferenceLocation> BuildDifferenceTree(Type type, object obj1, object obj2, IDifferenceTreeNode differenceTreeNode)
+        {
+            if (differenceTreeNode is null)
+            {
+                throw new ArgumentNullException(nameof(differenceTreeNode));
+            }
+
             if (!type.InheritsFrom(typeof(HashSet<>)))
             {
                 throw new ArgumentException("Invalid type");
@@ -46,8 +63,9 @@ namespace ObjectsComparer
             {
                 if (!hashSet2.Contains(element))
                 {
-                    yield return new Difference("", valueComparer.ToString(element), string.Empty,
-                        DifferenceTypes.MissedElementInSecondObject);
+                    var differenceLocation = AddDifferenceToTree(differenceTreeNode, "", valueComparer.ToString(element), string.Empty, DifferenceTypes.MissedElementInSecondObject, element, null);
+
+                    yield return differenceLocation;
                 }
             }
             
@@ -55,11 +73,13 @@ namespace ObjectsComparer
             {
                 if (!hashSet1.Contains(element))
                 {
-                    yield return new Difference("", string.Empty, valueComparer.ToString(element),
-                        DifferenceTypes.MissedElementInFirstObject);
+                    var differenceLocation = AddDifferenceToTree(differenceTreeNode, "", string.Empty, valueComparer.ToString(element), DifferenceTypes.MissedElementInFirstObject, null, element);
+
+                    yield return differenceLocation;
                 }
             }
         }
+              
 
         public bool IsMatch(Type type, object obj1, object obj2)
         {

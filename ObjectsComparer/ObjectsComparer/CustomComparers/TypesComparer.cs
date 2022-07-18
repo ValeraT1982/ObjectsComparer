@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using ObjectsComparer.DifferenceTreeExtensions;
 using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    internal class TypesComparer : AbstractComparer, IComparerWithCondition
+    internal class TypesComparer : AbstractComparer, IComparerWithCondition, IDifferenceTreeBuilder
     {
         public TypesComparer(ComparisonSettings settings, BaseComparer parentComparer,
             IComparersFactory factory)
@@ -15,6 +17,17 @@ namespace ObjectsComparer
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
+            return BuildDifferenceTree(type, obj1, obj2, DifferenceTreeNodeProvider.CreateImplicitRootNode(Settings))
+                .Select(differenceLocation => differenceLocation.Difference);
+        }
+
+        public IEnumerable<DifferenceLocation> BuildDifferenceTree(Type type, object obj1, object obj2, IDifferenceTreeNode differenceTreeNode)
+        {
+            if (differenceTreeNode is null)
+            {
+                throw new ArgumentNullException(nameof(differenceTreeNode));
+            }
+
             if (obj1 == null && obj2 == null)
             {
                 yield break;
@@ -35,7 +48,7 @@ namespace ObjectsComparer
 
             if (type1Str != type2Str)
             {
-                yield return new Difference(string.Empty, type1Str, type2Str);
+                yield return AddDifferenceToTree(differenceTreeNode, string.Empty, type1Str, type2Str, DifferenceTypes.ValueMismatch, obj1, obj2);
             }
         }
 

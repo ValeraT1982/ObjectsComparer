@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Dynamic;
 using Newtonsoft.Json;
 using NSubstitute;
+using System.Diagnostics.CodeAnalysis;
+using ObjectsComparer.Tests.Utils;
 
 namespace ObjectsComparer.Tests
 {
@@ -98,6 +100,31 @@ namespace ObjectsComparer.Tests
             Assert.IsTrue(differences.Any(d => d.MemberPath == "FieldSub1.Field1" && d.Value1 == "10" && d.Value2 == "8"));
         }
 
+        [Test]
+        public void Hierarchy_CheckDifferenceTreeNode()
+        {
+            dynamic a1Sub1 = new ExpandoObject();
+            a1Sub1.Field1 = 10;
+            dynamic a1 = new ExpandoObject();
+            a1.FieldSub1 = a1Sub1;
+            dynamic a2Sub1 = new ExpandoObject();
+            a2Sub1.Field1 = 8;
+            dynamic a2 = new ExpandoObject();
+            a2.FieldSub1 = a2Sub1;
+            var comparer = new Comparer();
+
+            var isEqual = comparer.Compare(a1, a2, out IEnumerable<Difference> differencesEnum);
+            var differences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            Assert.AreEqual(1, differences.Count);
+            Assert.IsTrue(differences.Any(d => d.MemberPath == "FieldSub1.Field1" && d.Value1 == "10" && d.Value2 == "8"));
+
+            var rootNode = comparer.CalculateDifferenceTree(typeof(object), (object)a1, (object)a2);
+            var treeDifferences = rootNode.GetDifferences(true).ToList();
+            Assert.IsTrue(treeDifferences.Any(d => d.MemberPath == "FieldSub1.Field1" && d.Value1 == "10" && d.Value2 == "8"));
+        }
+        
         [Test]
         public void DifferentTypes()
         {
@@ -256,6 +283,27 @@ namespace ObjectsComparer.Tests
         }
 
         [Test]
+        public void UseDefaultValuesWhenSubclassNotSpecified_CheckDifferenceTreeNode()
+        {
+            dynamic a1 = new ExpandoObject();
+            a1.Field1 = new ExpandoObject();
+            a1.Field1.SubField1 = 0;
+            a1.Field1.SubField2 = null;
+            a1.Field1.SubField3 = 0.0;
+            dynamic a2 = new ExpandoObject();
+            var comparer = new Comparer(new ComparisonSettings { UseDefaultIfMemberNotExist = true });
+
+            var obja1 = (object)a1;
+            var obja2 = (object)a2;
+
+            var rootNode = comparer.CalculateDifferenceTree(((object)a1).GetType(), obja1, obja2);
+            IEnumerable<Difference> diffs = rootNode.GetDifferences(true);
+            var differences = diffs.ToArray();
+
+            CollectionAssert.IsEmpty(differences);
+        }
+
+        [Test]
         public void DifferenceWhenSubclassNotSpecified()
         {
             dynamic a1 = new ExpandoObject();
@@ -272,6 +320,36 @@ namespace ObjectsComparer.Tests
             Assert.IsFalse(isEqual);
             Assert.AreEqual(1, differences.Count);
             Assert.IsTrue(differences.Any(
+                d => d.MemberPath == "Field1" && d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject));
+        }
+
+        [Test]
+        public void DifferenceWhenSubclassNotSpecified_CheckDifferenceTreeNode()
+        {
+            dynamic a1 = new ExpandoObject();
+            a1.Field1 = new ExpandoObject();
+            a1.Field1.SubField1 = 0;
+            a1.Field1.SubField2 = null;
+            a1.Field1.SubField3 = 0.0;
+            dynamic a2 = new ExpandoObject();
+            var comparer = new Comparer();
+
+            var isEqual = comparer.Compare(a1, a2, out IEnumerable<Difference> differencesEnum);
+            var compareDifferences = differencesEnum.ToList();
+
+            Assert.IsFalse(isEqual);
+            Assert.AreEqual(1, compareDifferences.Count);
+            Assert.IsTrue(compareDifferences.Any(
+                d => d.MemberPath == "Field1" && d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject));
+
+            var obja1 = (object)a1;
+            var obja2 = (object)a2;
+
+            var rootNode = comparer.CalculateDifferenceTree(((object)a1).GetType(), obja1, obja2);
+            var calculateDifferences = rootNode.GetDifferences(true).ToList();
+
+            Assert.AreEqual(1, calculateDifferences.Count);
+            Assert.IsTrue(calculateDifferences.Any(
                 d => d.MemberPath == "Field1" && d.DifferenceType == DifferenceTypes.MissedMemberInSecondObject));
         }
 
@@ -293,6 +371,29 @@ namespace ObjectsComparer.Tests
             Assert.AreEqual(1, differences.Count);
             Assert.IsTrue(differences.Any(
                 d => d.MemberPath == "Transaction[0].No" && d.DifferenceType == DifferenceTypes.ValueMismatch));
+        }
+
+        [Test]
+        public void ExpandoObjectWithCollectionCheckDifferenceTreeNodePath()
+        {
+            var comparer = new Comparer(new ComparisonSettings { RecursiveComparison = true });
+
+            dynamic a1 = JsonConvert.DeserializeObject<ExpandoObject>(
+                "{ \"Transaction\": [ { \"Name\": \"abc\", \"No\": 101 } ] }");
+
+            dynamic a2 = JsonConvert.DeserializeObject<ExpandoObject>(
+                "{ \"Transaction\": [ { \"Name\": \"abc\", \"No\": 102 } ] }");
+
+            var rootNode = comparer.CalculateDifferenceTree(typeof(object), (object)a1, (object)a2);
+            var namePropertyPath = $"{rootNode.Descendants.First().Member.Name}.[0].{rootNode.Descendants.First().Descendants.First().Descendants.First().Member.Name}";
+            var noPropertyPath = $"{rootNode.Descendants.First().Member.Name}.[0].{rootNode.Descendants.First().Descendants.First().Descendants.Skip(1).First().Member.Name}";
+            var differences = rootNode.GetDifferences(true).ToList();
+
+            Assert.AreEqual(1, differences.Count);
+            Assert.IsTrue(differences.Any(
+                d => d.MemberPath == "Transaction[0].No" && d.DifferenceType == DifferenceTypes.ValueMismatch));
+            Assert.AreEqual("Transaction.[0].Name", namePropertyPath);
+            Assert.AreEqual("Transaction.[0].No", noPropertyPath);
         }
     }
 }

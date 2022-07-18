@@ -1,28 +1,45 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using ObjectsComparer.DifferenceTreeExtensions;
+using ObjectsComparer.Exceptions;
 using ObjectsComparer.Utils;
 
 namespace ObjectsComparer
 {
-    internal class EnumerablesComparer : AbstractComparer, IComparerWithCondition
+    internal class EnumerablesComparer : EnumerablesComparerBase, IComparerWithCondition, IDifferenceTreeBuilder
     {
-        public EnumerablesComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory)
-            : base(settings, parentComparer, factory)
+        public EnumerablesComparer(ComparisonSettings settings, BaseComparer parentComparer, IComparersFactory factory) : base(settings, parentComparer, factory)
         {
         }
 
         public override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2)
         {
+            return AsDifferenceTreeBuilder().BuildDifferenceTree(type, obj1, obj2, DifferenceTreeNodeProvider.CreateImplicitRootNode(Settings))
+                .Select(differenceLocation => differenceLocation.Difference);
+        }
+
+        IDifferenceTreeBuilder AsDifferenceTreeBuilder() => this;
+
+        IEnumerable<DifferenceLocation> IDifferenceTreeBuilder.BuildDifferenceTree(Type type, object obj1, object obj2, IDifferenceTreeNode listDifferenceTreeNode)
+        {
+            Debug.WriteLine($"{GetType().Name}.{nameof(CalculateDifferences)}: {type.Name}");
+
+            if (listDifferenceTreeNode is null)
+            {
+                throw new ArgumentNullException(nameof(listDifferenceTreeNode));
+            }
+
             if (!Settings.EmptyAndNullEnumerablesEqual &&
                 (obj1 == null || obj2 == null) && obj1 != obj2)
             {
-                yield return new Difference("[]", obj1?.ToString() ?? string.Empty, obj2?.ToString() ?? string.Empty);
+                yield return AddDifferenceToTree(listDifferenceTreeNode, "[]", obj1?.ToString() ?? string.Empty, obj2?.ToString() ?? string.Empty, DifferenceTypes.ValueMismatch, obj1, obj2);
                 yield break;
             }
-
+            
             obj1 = obj1 ?? Enumerable.Empty<object>();
             obj2 = obj2 ?? Enumerable.Empty<object>();
 
@@ -42,49 +59,26 @@ namespace ObjectsComparer
             }
 
             var array1 = ((IEnumerable)obj1).Cast<object>().ToArray();
-            var array2 = ((IEnumerable)obj2).Cast<object>().ToArray();
+             var array2 = ((IEnumerable)obj2).Cast<object>().ToArray();
+
+            var listComparisonOptions = ListComparisonOptions.Default();
+            Settings.ListComparisonOptionsAction?.Invoke(listDifferenceTreeNode, listComparisonOptions);
 
             if (array1.Length != array2.Length)
             {
-                yield return new Difference("", array1.Length.ToString(), array2.Length.ToString(), 
-                    DifferenceTypes.NumberOfElementsMismatch);
-                yield break;
+                yield return AddDifferenceToTree(listDifferenceTreeNode, "", array1.Length.ToString(), array2.Length.ToString(), DifferenceTypes.NumberOfElementsMismatch, array1, array2);
+
+                if (listComparisonOptions.UnequalListsComparisonEnabled == false)
+                {
+                    yield break;
+                }
             }
 
-            //ToDo Extract type
-            for (var i = 0; i < array2.Length; i++)
+            var failrues = CalculateDifferences(array1, array2, listDifferenceTreeNode, listComparisonOptions);
+            
+            foreach (var failrue in failrues)
             {
-                if (array1[i] == null && array2[i] == null)
-                {
-                    continue;
-                }
-
-                var valueComparer1 = array1[i] != null ? OverridesCollection.GetComparer(array1[i].GetType()) ?? DefaultValueComparer : DefaultValueComparer;
-                var valueComparer2 = array2[i] != null ? OverridesCollection.GetComparer(array2[i].GetType()) ?? DefaultValueComparer : DefaultValueComparer;
-
-                if (array1[i] == null)
-                {
-                    yield return new Difference($"[{i}]", string.Empty, valueComparer2.ToString(array2[i]));
-                    continue;
-                }
-
-                if (array2[i] == null)
-                {
-                    yield return new Difference($"[{i}]", valueComparer1.ToString(array1[i]), string.Empty);
-                    continue;
-                }
-
-                if (array1[i].GetType() != array2[i].GetType())
-                {
-                    yield return new Difference($"[{i}]", valueComparer1.ToString(array1[i]), valueComparer2.ToString(array2[i]), DifferenceTypes.TypeMismatch);
-                    continue;
-                }
-
-                var comparer = Factory.GetObjectsComparer(array1[i].GetType(), Settings, this);
-                foreach (var failure in comparer.CalculateDifferences(array1[i].GetType(), array1[i], array2[i]))
-                {
-                    yield return failure.InsertPath($"[{i}]");
-                }
+                yield return failrue;
             }
         }
 

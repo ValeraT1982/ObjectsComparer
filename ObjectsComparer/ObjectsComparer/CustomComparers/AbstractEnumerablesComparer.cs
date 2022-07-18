@@ -1,12 +1,29 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Reflection;
 using ObjectsComparer.Utils;
+using System.Collections;
+using ObjectsComparer.DifferenceTreeExtensions;
 
 namespace ObjectsComparer
 {
-    internal abstract class AbstractEnumerablesComparer: AbstractComparer, IComparerWithCondition
+    internal abstract class AbstractEnumerablesComparer: AbstractComparer, IComparerWithCondition, IDifferenceTreeBuilder
     {
+        ///// <summary>
+        ///// <see cref="Array"/> member names that will be skipped from comaprison.
+        ///// </summary>
+        //static readonly string[] SkipArrayMemberNameList = new string[] 
+        //{
+        //    nameof(Array.Length),
+        //    "LongLength", 
+        //    nameof(Array.Rank),
+        //    "SyncRoot",
+        //    "IsReadOnly",
+        //    "IsFixedSize",
+        //    "IsSynchronized"
+        //};
+
         protected AbstractEnumerablesComparer(ComparisonSettings settings, BaseComparer parentComparer,
             IComparersFactory factory)
             : base(settings, parentComparer, factory)
@@ -42,5 +59,7 @@ namespace ObjectsComparer
         public abstract override IEnumerable<Difference> CalculateDifferences(Type type, object obj1, object obj2);
 
         public abstract bool IsMatch(Type type, object obj1, object obj2);
+
+        public abstract IEnumerable<DifferenceLocation> BuildDifferenceTree(Type type, object obj1, object obj2, IDifferenceTreeNode differenceTreeNode);
     }
 }

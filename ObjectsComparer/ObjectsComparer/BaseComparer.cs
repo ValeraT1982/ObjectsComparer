@@ -2,6 +2,7 @@ using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using ObjectsComparer.Utils;
+using ObjectsComparer.DifferenceTreeExtensions;
 
 namespace ObjectsComparer
 {
@@ -139,9 +140,9 @@ namespace ObjectsComparer
 
         /// <summary>
         /// Sets <see cref="IBaseComparer.DefaultValueComparer"/>.
+        public void SetDefaultComparer(IValueComparer valueComparer)
         /// </summary>
         /// <param name="valueComparer">Value Comparer.</param>
-        public void SetDefaultComparer(IValueComparer valueComparer)
         {
             DefaultValueComparer = valueComparer ?? throw new ArgumentNullException(nameof(valueComparer));
         }
@@ -182,6 +183,80 @@ namespace ObjectsComparer
         public void IgnoreMember(Func<MemberInfo, bool> filter)
         {
             OverridesCollection.AddComparer(DoNotCompareValueComparer.Instance, filter);
+        }
+
+
+        /// <summary>
+        /// Adds an <paramref name="difference"/> to the end of the <paramref name="differenceTreeNode"/>'s <see cref="IDifferenceTreeNode.Differences"/>.
+        /// </summary>
+        /// <returns>The <see cref="DifferenceLocation"/> instance.</returns>
+        [Obsolete("Use 2. method", true)]
+        protected virtual DifferenceLocation AddDifferenceToTree(Difference difference, IDifferenceTreeNode differenceTreeNode)
+        {
+            if (difference is null)
+            {
+                throw new ArgumentNullException(nameof(difference));
+            }
+
+            if (differenceTreeNode is null)
+            {
+                throw new ArgumentNullException(nameof(differenceTreeNode));
+            }
+
+            differenceTreeNode.AddDifference(difference);
+
+            return new DifferenceLocation(difference, differenceTreeNode);
+        }
+
+        protected virtual DifferenceLocation AddDifferenceToTree(IDifferenceTreeNode differenceTreeNode, string memberPath, string value1, string value2,
+            DifferenceTypes differenceType = DifferenceTypes.ValueMismatch, object rawValue1 = null, object rawValue2 = null)
+        {
+            var difference = CreateDifference(differenceTreeNode, memberPath, value1, value2, differenceType, rawValue1, rawValue2);
+            differenceTreeNode.AddDifference(difference);
+
+            return new DifferenceLocation(difference, differenceTreeNode);
+        }
+
+        protected virtual Difference CreateDifference(IDifferenceTreeNode differenceTreeNode, string memberPath, string value1, string value2,
+            DifferenceTypes differenceType = DifferenceTypes.ValueMismatch, object rawValue1 = null, object rawValue2 = null)
+        {
+            if (differenceTreeNode is null)
+            {
+                throw new ArgumentNullException(nameof(differenceTreeNode));
+            }
+
+            var differenceOptions = DifferenceOptions.Default();
+            var defaultDifference = new Difference(memberPath, value1, value2, differenceType);
+
+            Settings.DifferenceOptionsAction?.Invoke(differenceTreeNode, differenceOptions);
+
+            if (differenceOptions.DifferenceFactory == null)
+            {
+                return defaultDifference;
+            }
+
+            var customDifference = differenceOptions.DifferenceFactory(new CreateDifferenceArgs(defaultDifference, rawValue1, rawValue2));
+
+            if (customDifference == null)
+            {
+                throw new NullReferenceException("DifferenceFactory returned null.");
+            }
+
+            return customDifference;
+        }
+
+        protected virtual void InsertPathToDifference(Difference difference, string defaultRootElementPath, IDifferenceTreeNode rootNode, IDifferenceTreeNode differenceNode)
+        {
+            var differencePathOptions = DifferencePathOptions.Default();
+            
+            Settings.DifferencePathOptionsAction?.Invoke(rootNode, differencePathOptions);
+
+            if (differencePathOptions.InsertPathFactory != null)
+            {
+                defaultRootElementPath = differencePathOptions.InsertPathFactory(new InsertPathFactoryArgs(defaultRootElementPath, differenceNode));
+            }
+
+            difference.InsertPath(defaultRootElementPath);
         }
     }
 }

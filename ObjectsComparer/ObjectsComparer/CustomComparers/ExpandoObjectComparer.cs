@@ -32,6 +32,12 @@ namespace ObjectsComparer
             return ((IDictionary<string, object>) obj)?.Keys.ToList() ?? new List<string>();
         }
 
+        protected override bool TryGetMember(ExpandoObject obj, string propertyName, out MemberInfo value)
+        {
+            value = null;
+            return false;
+        }
+
         protected override bool TryGetMemberValue(ExpandoObject obj, string propertyName, out object value)
         {
             if (obj != null)
